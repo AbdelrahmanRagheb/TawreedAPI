@@ -1,0 +1,6 @@
+<Solution>
+  <Project Path="Tawreed.Domain\Tawreed.Domain.csproj" />
+  <Project Path="Tawreed.Application\Tawreed.Application.csproj" />
+  <Project Path="Tawreed.Infrastructure\Tawreed.Infrastructure.csproj" />
+  <Project Path="Tawreed.Web\Tawreed.Web.csproj" />
+</Solution>
