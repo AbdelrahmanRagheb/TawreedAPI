@@ -45,10 +45,17 @@ public class DeliveryItemDto
     public int Quantity { get; set; }
 }
 
+public class AcceptOrderRequest
+{
+    public string? Notes { get; set; }
+    public DateTimeOffset ScheduledDeliveryAt { get; set; }
+    public string? DeliveryNotes { get; set; }
+}
+
 public interface ISupplierOrderService
 {
     Task<PaginatedResult<SupplierOrderListDto>> GetOrdersAsync(Guid userId, string? status = null, int page = 1, int limit = 20, CancellationToken cancellationToken = default);
-    Task<object> AcceptOrderAsync(Guid orderId, Guid userId, string? notes = null, CancellationToken cancellationToken = default);
+    Task<object> AcceptOrderAsync(Guid orderId, Guid userId, AcceptOrderRequest request, CancellationToken cancellationToken = default);
     Task<object> DeclineOrderAsync(Guid orderId, Guid userId, string reason, CancellationToken cancellationToken = default);
     Task<PaginatedResult<DeliveryListDto>> GetDeliveriesAsync(Guid userId, string? status = null, int page = 1, int limit = 20, CancellationToken cancellationToken = default);
     Task<object> UpdateDeliveryStatusAsync(Guid deliveryId, string status, string? trackingNotes = null, DateTimeOffset? scheduledAt = null, CancellationToken cancellationToken = default);

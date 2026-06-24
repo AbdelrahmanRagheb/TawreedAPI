@@ -17,6 +17,7 @@ public class SupplierProfileDto
     public decimal RatingAvg { get; set; }
     public bool IsApproved { get; set; }
     public string PreferredLang { get; set; } = string.Empty;
+    public required List<Guid> CategoryIds { get; set; }
 }
 
 public class SupplierRegistrationStatusDto
@@ -39,4 +40,6 @@ public interface ISupplierProfileService
     Task<SupplierProfileDto> GetProfileAsync(Guid userId, CancellationToken cancellationToken = default);
     Task UpdateProfileAsync(Guid userId, UpdateProfileRequest request, CancellationToken cancellationToken = default);
     Task<SupplierRegistrationStatusDto> GetRegistrationStatusAsync(Guid userId, CancellationToken cancellationToken = default);
+    Task<List<Guid>> GetCategoryIdsAsync(Guid userId, CancellationToken cancellationToken = default);
+    Task UpdateCategoriesAsync(Guid userId, List<Guid> categoryIds, CancellationToken cancellationToken = default);
 }

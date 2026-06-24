@@ -33,6 +33,9 @@ public class GroupOrderRepository : GenericRepository<GroupOrder>, IGroupOrderRe
             .Include(o => o.Creator).ThenInclude(c => c.User)
             .Include(o => o.Items).ThenInclude(i => i.Product)
             .Include(o => o.Items).ThenInclude(i => i.ParticipantItems)
+            .Include(o => o.Participants)
+            .Include(o => o.Events)
+            .Include(o => o.Region)
             .Where(o => o.SupplierId == supplierId)
             .ToListAsync(cancellationToken);
     }
@@ -47,7 +50,7 @@ public class GroupOrderRepository : GenericRepository<GroupOrder>, IGroupOrderRe
         return await DbSet
             .Include(o => o.Creator).ThenInclude(c => c.User)
             .Include(o => o.Items).ThenInclude(i => i.Product).ThenInclude(p => p.Unit)
-            .Include(o => o.Items).ThenInclude(i => i.SupplierProduct)
+            .Include(o => o.Items).ThenInclude(i => i.SupplierProduct).ThenInclude(sp => sp.PricingTiers)
             .Include(o => o.Items).ThenInclude(i => i.ParticipantItems)
             .Include(o => o.Participants).ThenInclude(p => p.Buyer)
             .Include(o => o.Participants).ThenInclude(p => p.Items).ThenInclude(pi => pi.GroupOrderItem).ThenInclude(goi => goi.Product)
@@ -63,7 +66,7 @@ public class GroupOrderRepository : GenericRepository<GroupOrder>, IGroupOrderRe
             .Include(o => o.Creator).ThenInclude(c => c.User)
             .Include(o => o.Region)
             .Include(o => o.Supplier)
-            .Include(o => o.Items)
+            .Include(o => o.Items).ThenInclude(i => i.Product)
             .Include(o => o.Participants)
             .ToListAsync(cancellationToken);
     }

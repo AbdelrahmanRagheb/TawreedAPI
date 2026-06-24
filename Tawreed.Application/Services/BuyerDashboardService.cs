@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using Tawreed.Application.Common.Models;
 using Tawreed.Application.Interfaces;
 using Tawreed.Domain.Enums;
 using Tawreed.Domain.Interfaces;
@@ -108,7 +109,20 @@ public class BuyerDashboardService : IBuyerDashboardService
         {
             ActiveOrders = activeOrders,
             NearbyOrders = nearbyOrders,
-            Notifications = notifications.ToList(),
+            Notifications = notifications.Select(n => new NotificationDto(
+                n.Id,
+                n.UserId,
+                n.Type,
+                n.TitleAr,
+                n.TitleEn,
+                n.BodyAr,
+                n.BodyEn,
+                n.Channel,
+                n.IsRead,
+                n.ReadAt,
+                n.RelatedOrderId,
+                n.CreatedAt
+            )).ToList(),
             TrendingProducts = trending,
             TotalSavings = 0,
             UnreadNotificationCount = unreadCount

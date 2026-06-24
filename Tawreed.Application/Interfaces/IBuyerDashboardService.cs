@@ -1,4 +1,4 @@
-using Tawreed.Domain.Entities;
+using Tawreed.Application.Common.Models;
 
 namespace Tawreed.Application.Interfaces;
 
@@ -6,7 +6,7 @@ public class BuyerDashboardData
 {
     public required IReadOnlyList<ActiveOrderDto> ActiveOrders { get; set; }
     public required IReadOnlyList<NearbyOrderDto> NearbyOrders { get; set; }
-    public required IReadOnlyList<Notification> Notifications { get; set; }
+    public required IReadOnlyList<NotificationDto> Notifications { get; set; }
     public required IReadOnlyList<TrendingProductDto> TrendingProducts { get; set; }
     public decimal TotalSavings { get; set; }
     public int UnreadNotificationCount { get; set; }

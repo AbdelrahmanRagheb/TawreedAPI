@@ -15,13 +15,11 @@ public class InvoiceConfiguration : IEntityTypeConfiguration<Invoice>
         builder.Property(i => i.InvoiceNumber).HasMaxLength(50).IsRequired();
         builder.Property(i => i.Subtotal).HasColumnType("decimal(12,2)");
         builder.Property(i => i.DeliveryFee).HasColumnType("decimal(12,2)");
-        builder.Property(i => i.DiscountAmount).HasColumnType("decimal(12,2)");
         builder.Property(i => i.Total).HasColumnType("decimal(12,2)");
         builder.Property(i => i.PaymentMethod).HasMaxLength(10).IsRequired();
         builder.Property(i => i.PaymentStatus).HasMaxLength(20).IsRequired();
-        builder.Property(i => i.ShippingAddress).HasMaxLength(500).IsRequired();
-        builder.Property(i => i.ShippingLatitude).HasColumnType("decimal(9,6)");
-        builder.Property(i => i.ShippingLongitude).HasColumnType("decimal(9,6)");
+        builder.Property(i => i.VerificationCode).HasMaxLength(10).IsRequired();
+        builder.Property(i => i.ShippingRegion).HasMaxLength(500).IsRequired().HasColumnName("shipping_address");
 
         builder.HasOne(i => i.GroupOrder)
             .WithMany(o => o.Invoices)
@@ -36,6 +34,7 @@ public class InvoiceConfiguration : IEntityTypeConfiguration<Invoice>
         builder.HasOne(i => i.Participant)
             .WithMany(p => p.Invoices)
             .HasForeignKey(i => i.ParticipantId)
-            .OnDelete(DeleteBehavior.Restrict);
+            .OnDelete(DeleteBehavior.Restrict)
+            .IsRequired(false);
     }
 }

@@ -25,6 +25,7 @@ public class SupplierPendingOrderDto
     public Guid Id { get; set; }
     public string Title { get; set; } = string.Empty;
     public string CreatorName { get; set; } = string.Empty;
+    public int Participants { get; set; }
     public decimal TotalAmount { get; set; }
     public DateTimeOffset Deadline { get; set; }
     public string Region { get; set; } = string.Empty;
@@ -60,7 +61,8 @@ public class DeliveryOverviewDto
 
 public class RecentActivityDto
 {
-    public string Action { get; set; } = string.Empty;
+    public string ActionEn { get; set; } = string.Empty;
+    public string ActionAr { get; set; } = string.Empty;
     public DateTimeOffset Time { get; set; }
 }
 

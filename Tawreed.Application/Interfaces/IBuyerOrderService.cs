@@ -135,6 +135,25 @@ public class EligibleSupplierDto
     public decimal TotalEstimatedCost { get; set; }
 }
 
+public class BuyerDeliveryItemDto
+{
+    public string ProductName { get; set; } = string.Empty;
+    public int Quantity { get; set; }
+}
+
+public class BuyerDeliveryDto
+{
+    public Guid Id { get; set; }
+    public Guid OrderId { get; set; }
+    public string OrderTitle { get; set; } = string.Empty;
+    public string Status { get; set; } = string.Empty;
+    public DateTimeOffset? ScheduledAt { get; set; }
+    public string? DeliveryPersonName { get; set; }
+    public string VerificationCode { get; set; } = string.Empty;
+    public string ShippingRegion { get; set; } = string.Empty;
+    public List<BuyerDeliveryItemDto> Items { get; set; } = [];
+}
+
 public interface IBuyerOrderService
 {
     Task<PaginatedResult<OrderListDto>> GetOrdersAsync(Guid userId, string? status = null, int page = 1, int limit = 20, CancellationToken cancellationToken = default);
@@ -148,4 +167,6 @@ public interface IBuyerOrderService
     Task<object> UpdateItemsAsync(Guid orderId, Guid participantId, Guid userId, UpdateItemsRequest request, CancellationToken cancellationToken = default);
     Task<object> UpdateOrderItemsAsync(Guid orderId, Guid userId, List<CreateOrderItem> items, CancellationToken cancellationToken = default);
     Task<IReadOnlyList<EligibleSupplierDto>> GetEligibleSuppliersAsync(Guid orderId, Guid userId, CancellationToken cancellationToken = default);
+    Task<object> AssignSupplierAsync(Guid orderId, Guid supplierId, Guid userId, CancellationToken cancellationToken = default);
+    Task<IReadOnlyList<BuyerDeliveryDto>> GetMyDeliveriesAsync(Guid userId, CancellationToken cancellationToken = default);
 }

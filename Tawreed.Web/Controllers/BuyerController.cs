@@ -30,9 +30,16 @@ public class BuyerController : ControllerBase
     public async Task<ActionResult<BuyerDashboardData>> GetDashboard(
         [FromQuery] Guid? regionId, CancellationToken cancellationToken)
     {
-        var userId = GetUserId();
-        var data = await _dashboardService.GetDashboardAsync(userId, regionId, cancellationToken);
-        return Ok(data);
+        try
+        {
+            var userId = GetUserId();
+            var data = await _dashboardService.GetDashboardAsync(userId, regionId, cancellationToken);
+            return Ok(data);
+        }
+        catch (KeyNotFoundException)
+        {
+            return NotFound(new { message = "Buyer profile not found." });
+        }
     }
 
     [HttpGet("orders")]
@@ -245,6 +252,44 @@ public class BuyerController : ControllerBase
         catch (InvalidOperationException ex)
         {
             return BadRequest(new { error = ex.Message });
+        }
+    }
+
+    [HttpPost("orders/{orderId:guid}/assign-supplier/{supplierId:guid}")]
+    public async Task<ActionResult> AssignSupplier(Guid orderId, Guid supplierId, CancellationToken cancellationToken)
+    {
+        try
+        {
+            var userId = GetUserId();
+            var result = await _orderService.AssignSupplierAsync(orderId, supplierId, userId, cancellationToken);
+            return Ok(result);
+        }
+        catch (KeyNotFoundException ex)
+        {
+            return NotFound(new { error = ex.Message });
+        }
+        catch (UnauthorizedAccessException ex)
+        {
+            return Unauthorized(new { error = ex.Message });
+        }
+        catch (InvalidOperationException ex)
+        {
+            return BadRequest(new { error = ex.Message });
+        }
+    }
+
+    [HttpGet("deliveries")]
+    public async Task<ActionResult> GetMyDeliveries(CancellationToken cancellationToken)
+    {
+        try
+        {
+            var userId = GetUserId();
+            var result = await _orderService.GetMyDeliveriesAsync(userId, cancellationToken);
+            return Ok(result);
+        }
+        catch (KeyNotFoundException ex)
+        {
+            return NotFound(new { error = ex.Message });
         }
     }
 

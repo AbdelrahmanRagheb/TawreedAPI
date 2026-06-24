@@ -579,27 +579,15 @@ namespace Tawreed.Infrastructure.Migrations
                         .HasColumnType("uniqueidentifier")
                         .HasColumnName("group_order_id");
 
-                    b.Property<Guid>("InvoiceId")
-                        .HasColumnType("uniqueidentifier")
-                        .HasColumnName("invoice_id");
-
                     b.Property<DateTimeOffset?>("ScheduledAt")
                         .HasColumnType("datetimeoffset")
                         .HasColumnName("scheduled_at");
 
-                    b.Property<string>("ShippingAddress")
+                    b.Property<string>("ShippingRegion")
                         .IsRequired()
                         .HasMaxLength(500)
                         .HasColumnType("nvarchar(500)")
-                        .HasColumnName("shipping_address");
-
-                    b.Property<decimal?>("ShippingLatitude")
-                        .HasColumnType("decimal(9,6)")
-                        .HasColumnName("shipping_latitude");
-
-                    b.Property<decimal?>("ShippingLongitude")
-                        .HasColumnType("decimal(9,6)")
-                        .HasColumnName("shipping_longitude");
+                        .HasColumnName("shipping_region");
 
                     b.Property<string>("Status")
                         .IsRequired()
@@ -627,10 +615,6 @@ namespace Tawreed.Infrastructure.Migrations
 
                     b.HasIndex("GroupOrderId")
                         .HasDatabaseName("ix_deliveries_group_order_id");
-
-                    b.HasIndex("InvoiceId")
-                        .IsUnique()
-                        .HasDatabaseName("ix_deliveries_invoice_id");
 
                     b.HasIndex("SupplierId")
                         .HasDatabaseName("ix_deliveries_supplier_id");
@@ -1153,10 +1137,6 @@ namespace Tawreed.Infrastructure.Migrations
                         .HasColumnType("decimal(12,2)")
                         .HasColumnName("delivery_fee");
 
-                    b.Property<decimal>("DiscountAmount")
-                        .HasColumnType("decimal(12,2)")
-                        .HasColumnName("discount_amount");
-
                     b.Property<Guid>("GroupOrderId")
                         .HasColumnType("uniqueidentifier")
                         .HasColumnName("group_order_id");
@@ -1167,15 +1147,11 @@ namespace Tawreed.Infrastructure.Migrations
                         .HasColumnType("nvarchar(50)")
                         .HasColumnName("invoice_number");
 
-                    b.Property<DateTimeOffset>("IssuedAt")
-                        .HasColumnType("datetimeoffset")
-                        .HasColumnName("issued_at");
-
                     b.Property<DateTimeOffset?>("PaidAt")
                         .HasColumnType("datetimeoffset")
                         .HasColumnName("paid_at");
 
-                    b.Property<Guid>("ParticipantId")
+                    b.Property<Guid?>("ParticipantId")
                         .HasColumnType("uniqueidentifier")
                         .HasColumnName("participant_id");
 
@@ -1191,19 +1167,11 @@ namespace Tawreed.Infrastructure.Migrations
                         .HasColumnType("nvarchar(20)")
                         .HasColumnName("payment_status");
 
-                    b.Property<string>("ShippingAddress")
+                    b.Property<string>("ShippingRegion")
                         .IsRequired()
                         .HasMaxLength(500)
                         .HasColumnType("nvarchar(500)")
                         .HasColumnName("shipping_address");
-
-                    b.Property<decimal?>("ShippingLatitude")
-                        .HasColumnType("decimal(9,6)")
-                        .HasColumnName("shipping_latitude");
-
-                    b.Property<decimal?>("ShippingLongitude")
-                        .HasColumnType("decimal(9,6)")
-                        .HasColumnName("shipping_longitude");
 
                     b.Property<decimal>("Subtotal")
                         .HasColumnType("decimal(12,2)")
@@ -1212,6 +1180,12 @@ namespace Tawreed.Infrastructure.Migrations
                     b.Property<decimal>("Total")
                         .HasColumnType("decimal(12,2)")
                         .HasColumnName("total");
+
+                    b.Property<string>("VerificationCode")
+                        .IsRequired()
+                        .HasMaxLength(10)
+                        .HasColumnType("nvarchar(10)")
+                        .HasColumnName("verification_code");
 
                     b.HasKey("Id")
                         .HasName("pk_invoices");
@@ -65427,13 +65401,6 @@ namespace Tawreed.Infrastructure.Migrations
                         .IsRequired()
                         .HasConstraintName("fk_deliveries_group_orders_group_order_id");
 
-                    b.HasOne("Tawreed.Domain.Entities.Invoice", "Invoice")
-                        .WithOne("Delivery")
-                        .HasForeignKey("Tawreed.Domain.Entities.Delivery", "InvoiceId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired()
-                        .HasConstraintName("fk_deliveries_invoices_invoice_id");
-
                     b.HasOne("Tawreed.Domain.Entities.Supplier", "Supplier")
                         .WithMany("Deliveries")
                         .HasForeignKey("SupplierId")
@@ -65444,8 +65411,6 @@ namespace Tawreed.Infrastructure.Migrations
                     b.Navigation("DeliveryPerson");
 
                     b.Navigation("GroupOrder");
-
-                    b.Navigation("Invoice");
 
                     b.Navigation("Supplier");
                 });
@@ -65570,7 +65535,6 @@ namespace Tawreed.Infrastructure.Migrations
                         .WithMany("Invoices")
                         .HasForeignKey("ParticipantId")
                         .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired()
                         .HasConstraintName("fk_invoices_group_order_participants_participant_id");
 
                     b.Navigation("Buyer");
@@ -65814,11 +65778,6 @@ namespace Tawreed.Infrastructure.Migrations
                     b.Navigation("Invoices");
 
                     b.Navigation("Items");
-                });
-
-            modelBuilder.Entity("Tawreed.Domain.Entities.Invoice", b =>
-                {
-                    b.Navigation("Delivery");
                 });
 
             modelBuilder.Entity("Tawreed.Domain.Entities.Product", b =>

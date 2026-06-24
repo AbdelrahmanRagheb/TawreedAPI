@@ -51,26 +51,27 @@ public class SupplierDashboardService : ISupplierDashboardService
                 RatingAvg = supplier.RatingAvg
             },
             PendingOrders = allOrders
-                .Where(o => o.Status == OrderStatus.Open)
+                .Where(o => o.Status == OrderStatus.PendingApproval)
                 .Select(o => new SupplierPendingOrderDto
                 {
                     Id = o.Id,
                     Title = o.Title,
                     CreatorName = o.Creator?.User?.FullName ?? "",
-                    TotalAmount = o.Items?.Sum(i => (i.UnitPrice ?? 0) * (i.ParticipantItems?.Sum(pi => pi.Quantity) ?? 0)) ?? 0,
+                    Participants = o.Participants?.Count(p => p.Status == "Joined") ?? 0,
+                    TotalAmount = o.Items?.Sum(i => (i.UnitPrice ?? 0) * i.TargetQty) ?? 0,
                     Deadline = o.DeadlineAt,
                     Region = o.Region?.NameEn ?? "",
                     ReceivedAt = o.CreatedAt
                 })
                 .ToList(),
             ActiveGroupOrders = allOrders
-                .Where(o => o.Status == OrderStatus.Open)
+                .Where(o => o.Status is OrderStatus.Open or OrderStatus.PendingApproval or OrderStatus.Locked)
                 .Select(o => new SupplierActiveGroupOrderDto
                 {
                     Id = o.Id,
                     Title = o.Title,
                     Participants = o.Participants?.Count(p => p.Status == "Joined") ?? 0,
-                    TotalValue = o.Items?.Sum(i => (i.UnitPrice ?? 0) * (i.ParticipantItems?.Sum(pi => pi.Quantity) ?? 0)) ?? 0,
+                    TotalValue = o.Items?.Sum(i => (i.UnitPrice ?? 0) * i.TargetQty) ?? 0,
                     Deadline = o.DeadlineAt,
                     Status = o.Status
                 })
@@ -95,13 +96,31 @@ public class SupplierDashboardService : ISupplierDashboardService
             },
             RecentActivity = allOrders
                 .Where(o => o.Events != null)
-                .SelectMany(o => o.Events!)
-                .OrderByDescending(e => e.CreatedAt)
+                .SelectMany(o => o.Events!.Select(e => new { Order = o, Event = e }))
+                .Where(x => x.Event.EventType is "SupplierAssigned" or "SupplierApproved" or "SupplierDeclined" or "Closed" or "Completed")
+                .OrderByDescending(x => x.Event.CreatedAt)
                 .Take(10)
-                .Select(e => new RecentActivityDto
+                .Select(x => new RecentActivityDto
                 {
-                    Action = e.EventType,
-                    Time = e.CreatedAt
+                    ActionEn = x.Event.EventType switch
+                    {
+                        "SupplierAssigned" => $"Order '{x.Order.Title}' — requires your action (accept or decline)",
+                        "SupplierApproved" => "You accepted the order",
+                        "SupplierDeclined" => "You declined the order",
+                        "Closed" => "Order closed automatically",
+                        "Completed" => "Order completed",
+                        _ => x.Event.NotesEn ?? x.Event.EventType
+                    },
+                    ActionAr = x.Event.EventType switch
+                    {
+                        "SupplierAssigned" => $"الطلب '{x.Order.Title}' — يتطلب موافقتك (قبول أو رفض)",
+                        "SupplierApproved" => "قبلت الطلب",
+                        "SupplierDeclined" => "رفضت الطلب",
+                        "Closed" => "أُغلق الطلب تلقائياً",
+                        "Completed" => "اكتمل الطلب",
+                        _ => x.Event.NotesAr ?? x.Event.EventType
+                    },
+                    Time = x.Event.CreatedAt
                 })
                 .ToList()
         };

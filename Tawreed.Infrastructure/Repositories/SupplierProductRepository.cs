@@ -24,6 +24,7 @@ public class SupplierProductRepository : GenericRepository<SupplierProduct>, ISu
         return await DbSet
             .Include(sp => sp.Product).ThenInclude(p => p.Category)
             .Include(sp => sp.Product).ThenInclude(p => p.Unit)
+            .Include(sp => sp.PricingTiers)
             .Where(sp => sp.SupplierId == supplierId)
             .ToListAsync(cancellationToken);
     }

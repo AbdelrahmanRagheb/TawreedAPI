@@ -83,6 +83,44 @@ public class SupplierController : ControllerBase
         }
     }
 
+    [HttpGet("profile/categories")]
+    public async Task<ActionResult<List<Guid>>> GetCategoryIds(CancellationToken cancellationToken)
+    {
+        try
+        {
+            var userId = GetUserId();
+            var ids = await _profileService.GetCategoryIdsAsync(userId, cancellationToken);
+            return Ok(ids);
+        }
+        catch (KeyNotFoundException ex)
+        {
+            return NotFound(new { error = ex.Message });
+        }
+        catch (InvalidOperationException ex)
+        {
+            return StatusCode(403, new { error = ex.Message });
+        }
+    }
+
+    [HttpPut("profile/categories")]
+    public async Task<ActionResult> UpdateCategories([FromBody] List<Guid> categoryIds, CancellationToken cancellationToken)
+    {
+        try
+        {
+            var userId = GetUserId();
+            await _profileService.UpdateCategoriesAsync(userId, categoryIds, cancellationToken);
+            return Ok(new { message = "Categories updated" });
+        }
+        catch (KeyNotFoundException ex)
+        {
+            return NotFound(new { error = ex.Message });
+        }
+        catch (InvalidOperationException ex)
+        {
+            return StatusCode(403, new { error = ex.Message });
+        }
+    }
+
     [HttpGet("registration-status")]
     public async Task<ActionResult<SupplierRegistrationStatusDto>> GetRegistrationStatus(CancellationToken cancellationToken)
     {
@@ -111,12 +149,12 @@ public class SupplierController : ControllerBase
     }
 
     [HttpPost("orders/{orderId:guid}/accept")]
-    public async Task<ActionResult> AcceptOrder(Guid orderId, [FromBody] string? notes, CancellationToken cancellationToken)
+    public async Task<ActionResult> AcceptOrder(Guid orderId, [FromBody] AcceptOrderRequest request, CancellationToken cancellationToken)
     {
         try
         {
             var userId = GetUserId();
-            var result = await _orderService.AcceptOrderAsync(orderId, userId, notes, cancellationToken);
+            var result = await _orderService.AcceptOrderAsync(orderId, userId, request, cancellationToken);
             return Ok(result);
         }
         catch (KeyNotFoundException ex)

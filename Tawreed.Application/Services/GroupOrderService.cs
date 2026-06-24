@@ -88,6 +88,9 @@ public class GroupOrderService : IGroupOrderService
         var order = await _groupOrderRepository.GetByIdAsync(id, cancellationToken)
             ?? throw new KeyNotFoundException($"Group order ({id}) not found.");
 
+        if (order.Status == OrderStatus.Closed && status != OrderStatus.Closed)
+            throw new InvalidOperationException("Cannot reopen a closed order.");
+
         order.Status = status;
         if (status is OrderStatus.Completed or OrderStatus.Cancelled)
             order.ClosedAt = DateTimeOffset.UtcNow;

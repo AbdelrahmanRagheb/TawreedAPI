@@ -14,14 +14,7 @@ public class DeliveryConfiguration : IEntityTypeConfiguration<Delivery>
 
         builder.Property(d => d.Status).HasMaxLength(20).IsRequired();
         builder.Property(d => d.TrackingNotes).HasColumnType("nvarchar(max)");
-        builder.Property(d => d.ShippingAddress).HasMaxLength(500).IsRequired();
-        builder.Property(d => d.ShippingLatitude).HasColumnType("decimal(9,6)");
-        builder.Property(d => d.ShippingLongitude).HasColumnType("decimal(9,6)");
-
-        builder.HasOne(d => d.Invoice)
-            .WithOne(i => i.Delivery)
-            .HasForeignKey<Delivery>(d => d.InvoiceId)
-            .OnDelete(DeleteBehavior.Cascade);
+        builder.Property(d => d.ShippingRegion).HasMaxLength(500).IsRequired();
 
         builder.HasOne(d => d.GroupOrder)
             .WithMany(o => o.Deliveries)
@@ -37,7 +30,5 @@ public class DeliveryConfiguration : IEntityTypeConfiguration<Delivery>
             .WithMany()
             .HasForeignKey(d => d.DeliveryPersonId)
             .OnDelete(DeleteBehavior.Restrict);
-
-        builder.HasIndex(d => d.InvoiceId).IsUnique();
     }
 }

@@ -12,8 +12,8 @@ using Tawreed.Infrastructure.Data;
 namespace Tawreed.Infrastructure.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20260621150553_InitialCreate")]
-    partial class InitialCreate
+    [Migration("20260624142926_AddedDeliveryVerificationCodeToDelvieryTable")]
+    partial class AddedDeliveryVerificationCodeToDelvieryTable
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -24,6 +24,40 @@ namespace Tawreed.Infrastructure.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
+
+            modelBuilder.Entity("Tawreed.Domain.Entities.AppSetting", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier")
+                        .HasColumnName("id");
+
+                    b.Property<string>("Description")
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)")
+                        .HasColumnName("description");
+
+                    b.Property<string>("Key")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)")
+                        .HasColumnName("key");
+
+                    b.Property<string>("Value")
+                        .IsRequired()
+                        .HasMaxLength(4000)
+                        .HasColumnType("nvarchar(4000)")
+                        .HasColumnName("value");
+
+                    b.HasKey("Id")
+                        .HasName("pk_app_settings");
+
+                    b.HasIndex("Key")
+                        .IsUnique()
+                        .HasDatabaseName("ix_app_settings_key");
+
+                    b.ToTable("app_settings", (string)null);
+                });
 
             modelBuilder.Entity("Tawreed.Domain.Entities.AuditLog", b =>
                 {
@@ -588,6 +622,12 @@ namespace Tawreed.Infrastructure.Migrations
                         .HasColumnType("datetime2")
                         .HasColumnName("updated_at");
 
+                    b.Property<string>("VerificationCode")
+                        .IsRequired()
+                        .HasMaxLength(10)
+                        .HasColumnType("nvarchar(10)")
+                        .HasColumnName("verification_code");
+
                     b.HasKey("Id")
                         .HasName("pk_deliveries");
 
@@ -723,7 +763,7 @@ namespace Tawreed.Infrastructure.Migrations
                             Description = "???? ???? ?????? ???????",
                             OrderNumber = "ORD-20260617-A003",
                             RegionId = new Guid("00000001-0000-0000-0000-000000000029"),
-                            Status = "PendingApproval",
+                            Status = "Open",
                             SupplierId = new Guid("590d8027-2ace-4e51-b627-9a10c5fcfce1"),
                             Title = "??? ???? ??????"
                         },
@@ -750,7 +790,7 @@ namespace Tawreed.Infrastructure.Migrations
                             Description = "????? ????? ??????",
                             OrderNumber = "ORD-20260617-A005",
                             RegionId = new Guid("00000001-0000-0000-0000-000000000029"),
-                            Status = "Locked",
+                            Status = "Closed",
                             SupplierId = new Guid("59925002-c1a0-4489-b279-943f1269819e"),
                             Title = "??? ????? ? ??????"
                         },
@@ -876,7 +916,7 @@ namespace Tawreed.Infrastructure.Migrations
                             Id = new Guid("3e42bb9d-22dd-4a16-99c7-b5c481a92baf"),
                             CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             CreatedBy = new Guid("16459628-b0fa-4465-a194-4febc611081d"),
-                            EventType = "Locked",
+                            EventType = "Closed",
                             GroupOrderId = new Guid("38e769df-7e03-4d47-82e2-4fe4c7a6d3ae"),
                             NotesAr = "?? ??? ????? ??? ?????? ?????"
                         },
@@ -3328,7 +3368,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "???  ??????",
                             NameEn = "Al Tibbin",
                             ParentId = new Guid("00000000-0000-0000-0000-000000000004"),
-                            Type = "City"
+                            Type = "Qism"
                         },
                         new
                         {
@@ -3338,7 +3378,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ?????",
                             NameEn = "Hilwan",
                             ParentId = new Guid("00000000-0000-0000-0000-000000000004"),
-                            Type = "City"
+                            Type = "Qism"
                         },
                         new
                         {
@@ -3348,7 +3388,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "???  15 ????",
                             NameEn = "15 Mayu",
                             ParentId = new Guid("00000000-0000-0000-0000-000000000004"),
-                            Type = "City"
+                            Type = "Qism"
                         },
                         new
                         {
@@ -3358,7 +3398,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ???????",
                             NameEn = "Maadi",
                             ParentId = new Guid("00000000-0000-0000-0000-000000000004"),
-                            Type = "City"
+                            Type = "Qism"
                         },
                         new
                         {
@@ -3368,7 +3408,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "???  ???",
                             NameEn = "Tura",
                             ParentId = new Guid("00000000-0000-0000-0000-000000000004"),
-                            Type = "City"
+                            Type = "Qism"
                         },
                         new
                         {
@@ -3378,7 +3418,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ???????",
                             NameEn = "Misr Al-Qadima",
                             ParentId = new Guid("00000000-0000-0000-0000-000000000004"),
-                            Type = "City"
+                            Type = "Hayy"
                         },
                         new
                         {
@@ -3388,7 +3428,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "???  ?????? ????",
                             NameEn = "Sayyida Zainab",
                             ParentId = new Guid("00000000-0000-0000-0000-000000000004"),
-                            Type = "City"
+                            Type = "Qism"
                         },
                         new
                         {
@@ -3398,7 +3438,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "???  ???????",
                             NameEn = "Al Khalifa",
                             ParentId = new Guid("00000000-0000-0000-0000-000000000004"),
-                            Type = "City"
+                            Type = "Qism"
                         },
                         new
                         {
@@ -3408,7 +3448,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ??????",
                             NameEn = "Abdin",
                             ParentId = new Guid("00000000-0000-0000-0000-000000000004"),
-                            Type = "City"
+                            Type = "Qism"
                         },
                         new
                         {
@@ -3418,7 +3458,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ???????",
                             NameEn = "Muski",
                             ParentId = new Guid("00000000-0000-0000-0000-000000000004"),
-                            Type = "City"
+                            Type = "Qism"
                         },
                         new
                         {
@@ -3428,7 +3468,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "???  ??? ?????",
                             NameEn = "Qasr Al-Nile",
                             ParentId = new Guid("00000000-0000-0000-0000-000000000004"),
-                            Type = "City"
+                            Type = "Qism"
                         },
                         new
                         {
@@ -3438,7 +3478,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ?????",
                             NameEn = "Bulaq",
                             ParentId = new Guid("00000000-0000-0000-0000-000000000004"),
-                            Type = "City"
+                            Type = "Qism"
                         },
                         new
                         {
@@ -3448,7 +3488,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "???  ????????",
                             NameEn = "Al Azbakiyya",
                             ParentId = new Guid("00000000-0000-0000-0000-000000000004"),
-                            Type = "City"
+                            Type = "Qism"
                         },
                         new
                         {
@@ -3458,7 +3498,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "???  ????? ??????",
                             NameEn = "Al Darb al-Ahmar",
                             ParentId = new Guid("00000000-0000-0000-0000-000000000004"),
-                            Type = "City"
+                            Type = "Qism"
                         },
                         new
                         {
@@ -3468,7 +3508,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "???  ????????",
                             NameEn = "Gamaliyya",
                             ParentId = new Guid("00000000-0000-0000-0000-000000000004"),
-                            Type = "City"
+                            Type = "Qism"
                         },
                         new
                         {
@@ -3478,7 +3518,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "???  ??? ???????",
                             NameEn = "Bab Al-Shariyya",
                             ParentId = new Guid("00000000-0000-0000-0000-000000000004"),
-                            Type = "City"
+                            Type = "Qism"
                         },
                         new
                         {
@@ -3488,7 +3528,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "???  ??????",
                             NameEn = "Al Zahir",
                             ParentId = new Guid("00000000-0000-0000-0000-000000000004"),
-                            Type = "City"
+                            Type = "Qism"
                         },
                         new
                         {
@@ -3498,7 +3538,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "???  ????????",
                             NameEn = "Al Sharabiyya",
                             ParentId = new Guid("00000000-0000-0000-0000-000000000004"),
-                            Type = "City"
+                            Type = "Qism"
                         },
                         new
                         {
@@ -3508,7 +3548,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ????",
                             NameEn = "Shubra",
                             ParentId = new Guid("00000000-0000-0000-0000-000000000004"),
-                            Type = "City"
+                            Type = "Qism"
                         },
                         new
                         {
@@ -3518,7 +3558,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ??? ?????",
                             NameEn = "Rud Al-Farag",
                             ParentId = new Guid("00000000-0000-0000-0000-000000000004"),
-                            Type = "City"
+                            Type = "Qism"
                         },
                         new
                         {
@@ -3528,7 +3568,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ??????",
                             NameEn = "Al Sahil",
                             ParentId = new Guid("00000000-0000-0000-0000-000000000004"),
-                            Type = "City"
+                            Type = "Qism"
                         },
                         new
                         {
@@ -3538,7 +3578,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ???????",
                             NameEn = "Al Wayli",
                             ParentId = new Guid("00000000-0000-0000-0000-000000000004"),
-                            Type = "City"
+                            Type = "Qism"
                         },
                         new
                         {
@@ -3548,7 +3588,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ????? ?????",
                             NameEn = "Hadaiq Al-Qubba",
                             ParentId = new Guid("00000000-0000-0000-0000-000000000004"),
-                            Type = "City"
+                            Type = "Qism"
                         },
                         new
                         {
@@ -3558,7 +3598,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ???????",
                             NameEn = "Al Zaytun",
                             ParentId = new Guid("00000000-0000-0000-0000-000000000004"),
-                            Type = "City"
+                            Type = "Qism"
                         },
                         new
                         {
@@ -3568,7 +3608,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ???????",
                             NameEn = "Al Matariyya",
                             ParentId = new Guid("00000000-0000-0000-0000-000000000004"),
-                            Type = "City"
+                            Type = "Qism"
                         },
                         new
                         {
@@ -3578,7 +3618,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ??? ????? ???",
                             NameEn = "Nasr City",
                             ParentId = new Guid("00000000-0000-0000-0000-000000000004"),
-                            Type = "City"
+                            Type = "Qism"
                         },
                         new
                         {
@@ -3588,7 +3628,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "???  ??? ????? ???",
                             NameEn = "Madinat Nasr-2",
                             ParentId = new Guid("00000000-0000-0000-0000-000000000004"),
-                            Type = "City"
+                            Type = "Qism"
                         },
                         new
                         {
@@ -3598,7 +3638,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ??? ???????",
                             NameEn = "Misr al-Gadida",
                             ParentId = new Guid("00000000-0000-0000-0000-000000000004"),
-                            Type = "City"
+                            Type = "Qism"
                         },
                         new
                         {
@@ -3608,7 +3648,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ??????",
                             NameEn = "Nuzha",
                             ParentId = new Guid("00000000-0000-0000-0000-000000000004"),
-                            Type = "City"
+                            Type = "Qism"
                         },
                         new
                         {
@@ -3618,7 +3658,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ??? ???",
                             NameEn = "Ain Shams",
                             ParentId = new Guid("00000000-0000-0000-0000-000000000004"),
-                            Type = "City"
+                            Type = "Qism"
                         },
                         new
                         {
@@ -3628,7 +3668,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ??????? ???????",
                             NameEn = "Zawiyya Al-Hamra",
                             ParentId = new Guid("00000000-0000-0000-0000-000000000004"),
-                            Type = "City"
+                            Type = "Qism"
                         },
                         new
                         {
@@ -3638,7 +3678,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ??????",
                             NameEn = "Al Salam",
                             ParentId = new Guid("00000000-0000-0000-0000-000000000004"),
-                            Type = "City"
+                            Type = "Qism"
                         },
                         new
                         {
@@ -3648,7 +3688,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ???????",
                             NameEn = "Zamalik",
                             ParentId = new Guid("00000000-0000-0000-0000-000000000004"),
-                            Type = "City"
+                            Type = "Qism"
                         },
                         new
                         {
@@ -3658,7 +3698,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ????",
                             NameEn = "Minshat Nasir",
                             ParentId = new Guid("00000000-0000-0000-0000-000000000004"),
-                            Type = "City"
+                            Type = "Hayy"
                         },
                         new
                         {
@@ -3668,7 +3708,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "???  ????????",
                             NameEn = "Basatin",
                             ParentId = new Guid("00000000-0000-0000-0000-000000000004"),
-                            Type = "City"
+                            Type = "Qism"
                         },
                         new
                         {
@@ -3678,7 +3718,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ?????",
                             NameEn = "Marg",
                             ParentId = new Guid("00000000-0000-0000-0000-000000000004"),
-                            Type = "City"
+                            Type = "Qism"
                         },
                         new
                         {
@@ -3688,7 +3728,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ??? ??????? ???????",
                             NameEn = "New Cairo-1",
                             ParentId = new Guid("00000000-0000-0000-0000-000000000004"),
-                            Type = "City"
+                            Type = "Qism"
                         },
                         new
                         {
@@ -3698,7 +3738,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ??? ??????? ???????",
                             NameEn = "New Cairo-2",
                             ParentId = new Guid("00000000-0000-0000-0000-000000000004"),
-                            Type = "City"
+                            Type = "Qism"
                         },
                         new
                         {
@@ -3708,7 +3748,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ???? ??????? ???????",
                             NameEn = "New Cairo-3",
                             ParentId = new Guid("00000000-0000-0000-0000-000000000004"),
-                            Type = "City"
+                            Type = "Qism"
                         },
                         new
                         {
@@ -3718,7 +3758,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ??????",
                             NameEn = "Shroq",
                             ParentId = new Guid("00000000-0000-0000-0000-000000000004"),
-                            Type = "City"
+                            Type = "Qism"
                         },
                         new
                         {
@@ -3728,7 +3768,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ???",
                             NameEn = "Badr",
                             ParentId = new Guid("00000000-0000-0000-0000-000000000004"),
-                            Type = "City"
+                            Type = "Qism"
                         },
                         new
                         {
@@ -3738,7 +3778,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "???  ???????",
                             NameEn = "Muntazah",
                             ParentId = new Guid("00000000-0000-0000-0000-000000000005"),
-                            Type = "City"
+                            Type = "Qism"
                         },
                         new
                         {
@@ -3748,7 +3788,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ??? ?????",
                             NameEn = "Al Raml",
                             ParentId = new Guid("00000000-0000-0000-0000-000000000005"),
-                            Type = "City"
+                            Type = "Qism"
                         },
                         new
                         {
@@ -3758,7 +3798,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "???  ???? ????",
                             NameEn = "Sidi Gabir",
                             ParentId = new Guid("00000000-0000-0000-0000-000000000005"),
-                            Type = "City"
+                            Type = "Qism"
                         },
                         new
                         {
@@ -3768,7 +3808,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "???  ??? ????",
                             NameEn = "Bab Sharqi",
                             ParentId = new Guid("00000000-0000-0000-0000-000000000005"),
-                            Type = "City"
+                            Type = "Qism"
                         },
                         new
                         {
@@ -3778,7 +3818,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "???  ???? ??",
                             NameEn = "Muharam Bik",
                             ParentId = new Guid("00000000-0000-0000-0000-000000000005"),
-                            Type = "City"
+                            Type = "Qism"
                         },
                         new
                         {
@@ -3788,7 +3828,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "???  ????????",
                             NameEn = "Al Attarin",
                             ParentId = new Guid("00000000-0000-0000-0000-000000000005"),
-                            Type = "City"
+                            Type = "Qism"
                         },
                         new
                         {
@@ -3798,7 +3838,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "???  ???????",
                             NameEn = "Al Manshiyya",
                             ParentId = new Guid("00000000-0000-0000-0000-000000000005"),
-                            Type = "City"
+                            Type = "Qism"
                         },
                         new
                         {
@@ -3808,7 +3848,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "???  ?????",
                             NameEn = "Karmuz",
                             ParentId = new Guid("00000000-0000-0000-0000-000000000005"),
-                            Type = "City"
+                            Type = "Qism"
                         },
                         new
                         {
@@ -3818,7 +3858,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "???  ??????",
                             NameEn = "A L Labban",
                             ParentId = new Guid("00000000-0000-0000-0000-000000000005"),
-                            Type = "City"
+                            Type = "Qism"
                         },
                         new
                         {
@@ -3828,7 +3868,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "???  ??????",
                             NameEn = "Al Gumruk",
                             ParentId = new Guid("00000000-0000-0000-0000-000000000005"),
-                            Type = "City"
+                            Type = "Qism"
                         },
                         new
                         {
@@ -3838,7 +3878,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "???  ???? ?????",
                             NameEn = "Mina Al-Basal",
                             ParentId = new Guid("00000000-0000-0000-0000-000000000005"),
-                            Type = "City"
+                            Type = "Qism"
                         },
                         new
                         {
@@ -3848,7 +3888,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "???  ???????",
                             NameEn = "Al Dikhila",
                             ParentId = new Guid("00000000-0000-0000-0000-000000000005"),
-                            Type = "City"
+                            Type = "Qism"
                         },
                         new
                         {
@@ -3858,7 +3898,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "???  ????????",
                             NameEn = "Al Amreia",
                             ParentId = new Guid("00000000-0000-0000-0000-000000000005"),
-                            Type = "City"
+                            Type = "Qism"
                         },
                         new
                         {
@@ -3868,7 +3908,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "???  ??? ?????",
                             NameEn = "Burg al-Arab",
                             ParentId = new Guid("00000000-0000-0000-0000-000000000005"),
-                            Type = "City"
+                            Type = "Qism"
                         },
                         new
                         {
@@ -3878,7 +3918,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ???? ????? ??????????",
                             NameEn = "Port Alexandria Police Department",
                             ParentId = new Guid("00000000-0000-0000-0000-000000000005"),
-                            Type = "City"
+                            Type = "PoliceDepartment"
                         },
                         new
                         {
@@ -3888,7 +3928,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ??? ????? ???????",
                             NameEn = "Burg Al-Arab City",
                             ParentId = new Guid("00000000-0000-0000-0000-000000000005"),
-                            Type = "City"
+                            Type = "Madina"
                         },
                         new
                         {
@@ -3898,7 +3938,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ??? ?????",
                             NameEn = "Kesm than Al Raml",
                             ParentId = new Guid("00000000-0000-0000-0000-000000000005"),
-                            Type = "City"
+                            Type = "Qism"
                         },
                         new
                         {
@@ -3908,7 +3948,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "?????? ???????",
                             NameEn = "North Coast",
                             ParentId = new Guid("00000000-0000-0000-0000-000000000005"),
-                            Type = "City"
+                            Type = "Region"
                         },
                         new
                         {
@@ -3918,7 +3958,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ?????",
                             NameEn = "Al-Sharq",
                             ParentId = new Guid("00000000-0000-0000-0000-000000000006"),
-                            Type = "City"
+                            Type = "Qism"
                         },
                         new
                         {
@@ -3928,7 +3968,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ?????",
                             NameEn = "Al-Arab",
                             ParentId = new Guid("00000000-0000-0000-0000-000000000006"),
-                            Type = "City"
+                            Type = "Qism"
                         },
                         new
                         {
@@ -3938,7 +3978,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ??????",
                             NameEn = "Al-Munakh",
                             ParentId = new Guid("00000000-0000-0000-0000-000000000006"),
-                            Type = "City"
+                            Type = "Qism"
                         },
                         new
                         {
@@ -3948,7 +3988,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ??? ????",
                             NameEn = "Port Fuad",
                             ParentId = new Guid("00000000-0000-0000-0000-000000000006"),
-                            Type = "City"
+                            Type = "Qism"
                         },
                         new
                         {
@@ -3956,9 +3996,9 @@ namespace Tawreed.Infrastructure.Migrations
                             CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             IsActive = true,
                             NameAr = "??? ???????",
-                            NameEn = "Al-Dawahy",
+                            NameEn = "Al-Dawahy ",
                             ParentId = new Guid("00000000-0000-0000-0000-000000000006"),
-                            Type = "City"
+                            Type = "Qism"
                         },
                         new
                         {
@@ -3968,7 +4008,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ??????",
                             NameEn = "Al-Ganoub",
                             ParentId = new Guid("00000000-0000-0000-0000-000000000006"),
-                            Type = "City"
+                            Type = "Qism"
                         },
                         new
                         {
@@ -3978,7 +4018,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ??????",
                             NameEn = "Al-Zohour",
                             ParentId = new Guid("00000000-0000-0000-0000-000000000006"),
-                            Type = "City"
+                            Type = "Qism"
                         },
                         new
                         {
@@ -3988,7 +4028,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ??? ??? ????",
                             NameEn = "Port Fuad 2",
                             ParentId = new Guid("00000000-0000-0000-0000-000000000006"),
-                            Type = "City"
+                            Type = "Qism"
                         },
                         new
                         {
@@ -3998,7 +4038,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ????? - ??? ????????",
                             NameEn = "Mubark-Sharq Tafrea",
                             ParentId = new Guid("00000000-0000-0000-0000-000000000006"),
-                            Type = "City"
+                            Type = "Qism"
                         },
                         new
                         {
@@ -4008,7 +4048,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ????????",
                             NameEn = "Al-Manasra",
                             ParentId = new Guid("00000000-0000-0000-0000-000000000006"),
-                            Type = "City"
+                            Type = "Qism"
                         },
                         new
                         {
@@ -4018,7 +4058,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ??? ??????",
                             NameEn = "Al-Ganoub 2",
                             ParentId = new Guid("00000000-0000-0000-0000-000000000006"),
-                            Type = "City"
+                            Type = "Qism"
                         },
                         new
                         {
@@ -4028,7 +4068,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ???? ????? ???????",
                             NameEn = "Police Department Port Said Port",
                             ParentId = new Guid("00000000-0000-0000-0000-000000000006"),
-                            Type = "City"
+                            Type = "PoliceDepartment"
                         },
                         new
                         {
@@ -4036,9 +4076,9 @@ namespace Tawreed.Infrastructure.Migrations
                             CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             IsActive = true,
                             NameAr = "??? ??????",
-                            NameEn = "Suez",
+                            NameEn = "Suez ",
                             ParentId = new Guid("00000000-0000-0000-0000-000000000007"),
-                            Type = "City"
+                            Type = "Qism"
                         },
                         new
                         {
@@ -4048,7 +4088,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ????????",
                             NameEn = "Al-Arbiin",
                             ParentId = new Guid("00000000-0000-0000-0000-000000000007"),
-                            Type = "City"
+                            Type = "Qism"
                         },
                         new
                         {
@@ -4058,7 +4098,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ?????",
                             NameEn = "Ataqa",
                             ParentId = new Guid("00000000-0000-0000-0000-000000000007"),
-                            Type = "City"
+                            Type = "Qism"
                         },
                         new
                         {
@@ -4068,7 +4108,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ????",
                             NameEn = "Faysal",
                             ParentId = new Guid("00000000-0000-0000-0000-000000000007"),
-                            Type = "City"
+                            Type = "Qism"
                         },
                         new
                         {
@@ -4078,7 +4118,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ???????",
                             NameEn = "Al-Ganayin",
                             ParentId = new Guid("00000000-0000-0000-0000-000000000007"),
-                            Type = "City"
+                            Type = "Qism"
                         },
                         new
                         {
@@ -4088,7 +4128,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ???? ????? ??????",
                             NameEn = "Port Suez Police Department",
                             ParentId = new Guid("00000000-0000-0000-0000-000000000007"),
-                            Type = "City"
+                            Type = "PoliceDepartment"
                         },
                         new
                         {
@@ -4098,7 +4138,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ??? ?????",
                             NameEn = "Dumyat 1",
                             ParentId = new Guid("00000000-0000-0000-0000-000000000008"),
-                            Type = "City"
+                            Type = "Qism"
                         },
                         new
                         {
@@ -4108,7 +4148,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "???? ?????",
                             NameEn = "Dumyat",
                             ParentId = new Guid("00000000-0000-0000-0000-000000000008"),
-                            Type = "City"
+                            Type = "Markaz"
                         },
                         new
                         {
@@ -4118,7 +4158,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "???? ???????",
                             NameEn = "Fariskur",
                             ParentId = new Guid("00000000-0000-0000-0000-000000000008"),
-                            Type = "City"
+                            Type = "Markaz"
                         },
                         new
                         {
@@ -4128,7 +4168,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "???? ??? ???",
                             NameEn = "Kafr Sad",
                             ParentId = new Guid("00000000-0000-0000-0000-000000000008"),
-                            Type = "City"
+                            Type = "Markaz"
                         },
                         new
                         {
@@ -4138,7 +4178,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ????? ????? ???????",
                             NameEn = "Dumyat Al-Gadida",
                             ParentId = new Guid("00000000-0000-0000-0000-000000000008"),
-                            Type = "City"
+                            Type = "Qism"
                         },
                         new
                         {
@@ -4148,7 +4188,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ??? ????",
                             NameEn = "Ras al-Bar",
                             ParentId = new Guid("00000000-0000-0000-0000-000000000008"),
-                            Type = "City"
+                            Type = "Qism"
                         },
                         new
                         {
@@ -4158,7 +4198,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "???? ??????",
                             NameEn = "Zarqa",
                             ParentId = new Guid("00000000-0000-0000-0000-000000000008"),
-                            Type = "City"
+                            Type = "Markaz"
                         },
                         new
                         {
@@ -4168,7 +4208,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ???? ????? ????? ??????",
                             NameEn = "Police Department Port of Damietta",
                             ParentId = new Guid("00000000-0000-0000-0000-000000000008"),
-                            Type = "City"
+                            Type = "Qism"
                         },
                         new
                         {
@@ -4178,7 +4218,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ??? ?????",
                             NameEn = "Dumyat 2",
                             ParentId = new Guid("00000000-0000-0000-0000-000000000008"),
-                            Type = "City"
+                            Type = "Qism"
                         },
                         new
                         {
@@ -4188,7 +4228,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ??? ????????",
                             NameEn = "El Mansora 1",
                             ParentId = new Guid("00000000-0000-0000-0000-000000000009"),
-                            Type = "City"
+                            Type = "Qism"
                         },
                         new
                         {
@@ -4198,7 +4238,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ??? ????????",
                             NameEn = "E Mansora 2",
                             ParentId = new Guid("00000000-0000-0000-0000-000000000009"),
-                            Type = "City"
+                            Type = "Qism"
                         },
                         new
                         {
@@ -4208,7 +4248,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "???? ????????",
                             NameEn = "El Mansora",
                             ParentId = new Guid("00000000-0000-0000-0000-000000000009"),
-                            Type = "City"
+                            Type = "Markaz"
                         },
                         new
                         {
@@ -4218,7 +4258,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "???? ???",
                             NameEn = "Aga",
                             ParentId = new Guid("00000000-0000-0000-0000-000000000009"),
-                            Type = "City"
+                            Type = "Markaz"
                         },
                         new
                         {
@@ -4228,7 +4268,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "???? ??????????",
                             NameEn = "Sinbillawin",
                             ParentId = new Guid("00000000-0000-0000-0000-000000000009"),
-                            Type = "City"
+                            Type = "Markaz"
                         },
                         new
                         {
@@ -4238,7 +4278,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "???? ???????",
                             NameEn = "Matariyya",
                             ParentId = new Guid("00000000-0000-0000-0000-000000000009"),
-                            Type = "City"
+                            Type = "Markaz"
                         },
                         new
                         {
@@ -4248,7 +4288,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "???? ???????",
                             NameEn = "Manzala",
                             ParentId = new Guid("00000000-0000-0000-0000-000000000009"),
-                            Type = "City"
+                            Type = "Markaz"
                         },
                         new
                         {
@@ -4258,7 +4298,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "???? ?????",
                             NameEn = "Bilqas",
                             ParentId = new Guid("00000000-0000-0000-0000-000000000009"),
-                            Type = "City"
+                            Type = "Markaz"
                         },
                         new
                         {
@@ -4268,7 +4308,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "???? ?????",
                             NameEn = "Dikirnis",
                             ParentId = new Guid("00000000-0000-0000-0000-000000000009"),
-                            Type = "City"
+                            Type = "Markaz"
                         },
                         new
                         {
@@ -4278,7 +4318,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "???? ?????",
                             NameEn = "Shirbin",
                             ParentId = new Guid("00000000-0000-0000-0000-000000000009"),
-                            Type = "City"
+                            Type = "Markaz"
                         },
                         new
                         {
@@ -4288,7 +4328,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "???? ????",
                             NameEn = "Talkha",
                             ParentId = new Guid("00000000-0000-0000-0000-000000000009"),
-                            Type = "City"
+                            Type = "Markaz"
                         },
                         new
                         {
@@ -4298,7 +4338,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ??? ???",
                             NameEn = "Mit Ghamr",
                             ParentId = new Guid("00000000-0000-0000-0000-000000000009"),
-                            Type = "City"
+                            Type = "Qism"
                         },
                         new
                         {
@@ -4308,7 +4348,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "???? ??? ???",
                             NameEn = "Mit Ghamr",
                             ParentId = new Guid("00000000-0000-0000-0000-000000000009"),
-                            Type = "City"
+                            Type = "Markaz"
                         },
                         new
                         {
@@ -4318,7 +4358,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "???? ???? ?????",
                             NameEn = "Minya Al-Nasr",
                             ParentId = new Guid("00000000-0000-0000-0000-000000000009"),
-                            Type = "City"
+                            Type = "Markaz"
                         },
                         new
                         {
@@ -4328,7 +4368,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "???? ????????",
                             NameEn = "Gamaliyya",
                             ParentId = new Guid("00000000-0000-0000-0000-000000000009"),
-                            Type = "City"
+                            Type = "Markaz"
                         },
                         new
                         {
@@ -4338,7 +4378,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "???? ??? ???????",
                             NameEn = "Tamy Al-Amdid",
                             ParentId = new Guid("00000000-0000-0000-0000-000000000009"),
-                            Type = "City"
+                            Type = "Markaz"
                         },
                         new
                         {
@@ -4348,7 +4388,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "???? ??? ?????",
                             NameEn = "MIt Salsil",
                             ParentId = new Guid("00000000-0000-0000-0000-000000000009"),
-                            Type = "City"
+                            Type = "Markaz"
                         },
                         new
                         {
@@ -4358,7 +4398,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "???? ??? ????",
                             NameEn = "Bany Abeed",
                             ParentId = new Guid("00000000-0000-0000-0000-000000000009"),
-                            Type = "City"
+                            Type = "Markaz"
                         },
                         new
                         {
@@ -4368,7 +4408,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "???? ???? ????",
                             NameEn = "Mahalet Demna",
                             ParentId = new Guid("00000000-0000-0000-0000-000000000009"),
-                            Type = "City"
+                            Type = "Markaz"
                         },
                         new
                         {
@@ -4378,7 +4418,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ????",
                             NameEn = "Gamsa",
                             ParentId = new Guid("00000000-0000-0000-0000-000000000009"),
-                            Type = "City"
+                            Type = "Qism"
                         },
                         new
                         {
@@ -4388,7 +4428,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "???? ?????",
                             NameEn = "Nebro",
                             ParentId = new Guid("00000000-0000-0000-0000-000000000009"),
-                            Type = "City"
+                            Type = "Markaz"
                         },
                         new
                         {
@@ -4398,7 +4438,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ??? ????????",
                             NameEn = "Zaqaziq 1",
                             ParentId = new Guid("00000000-0000-0000-0000-000000000010"),
-                            Type = "City"
+                            Type = "Qism"
                         },
                         new
                         {
@@ -4408,7 +4448,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ??? ????????",
                             NameEn = "Zaqaziq 2",
                             ParentId = new Guid("00000000-0000-0000-0000-000000000010"),
-                            Type = "City"
+                            Type = "Qism"
                         },
                         new
                         {
@@ -4418,7 +4458,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "???? ????????",
                             NameEn = "Zaqaziq",
                             ParentId = new Guid("00000000-0000-0000-0000-000000000010"),
-                            Type = "City"
+                            Type = "Markaz"
                         },
                         new
                         {
@@ -4428,7 +4468,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "???? ??? ????",
                             NameEn = "Abu Hammad",
                             ParentId = new Guid("00000000-0000-0000-0000-000000000010"),
-                            Type = "City"
+                            Type = "Markaz"
                         },
                         new
                         {
@@ -4438,7 +4478,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "???? ???????",
                             NameEn = "Abu Kabir",
                             ParentId = new Guid("00000000-0000-0000-0000-000000000010"),
-                            Type = "City"
+                            Type = "Markaz"
                         },
                         new
                         {
@@ -4448,7 +4488,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "???? ????????",
                             NameEn = "Al-Husayniya",
                             ParentId = new Guid("00000000-0000-0000-0000-000000000010"),
-                            Type = "City"
+                            Type = "Markaz"
                         },
                         new
                         {
@@ -4458,7 +4498,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ???????? ???????",
                             NameEn = "Al-Salhiyya",
                             ParentId = new Guid("00000000-0000-0000-0000-000000000010"),
-                            Type = "City"
+                            Type = "Qism"
                         },
                         new
                         {
@@ -4468,7 +4508,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "???? ?????",
                             NameEn = "Bilbis",
                             ParentId = new Guid("00000000-0000-0000-0000-000000000010"),
-                            Type = "City"
+                            Type = "Markaz"
                         },
                         new
                         {
@@ -4478,7 +4518,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ??? ????? ?????? ?? ?????",
                             NameEn = "10 Ramadan 1",
                             ParentId = new Guid("00000000-0000-0000-0000-000000000010"),
-                            Type = "City"
+                            Type = "Qism"
                         },
                         new
                         {
@@ -4488,7 +4528,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "???? ???? ???",
                             NameEn = "Dyarb Nigm",
                             ParentId = new Guid("00000000-0000-0000-0000-000000000010"),
-                            Type = "City"
+                            Type = "Markaz"
                         },
                         new
                         {
@@ -4498,7 +4538,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ?????",
                             NameEn = "Faqus",
                             ParentId = new Guid("00000000-0000-0000-0000-000000000010"),
-                            Type = "City"
+                            Type = "Qism"
                         },
                         new
                         {
@@ -4508,7 +4548,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "???? ?????",
                             NameEn = "Faqus",
                             ParentId = new Guid("00000000-0000-0000-0000-000000000010"),
-                            Type = "City"
+                            Type = "Markaz"
                         },
                         new
                         {
@@ -4518,7 +4558,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "???? ??? ???",
                             NameEn = "Kafr Saqr",
                             ParentId = new Guid("00000000-0000-0000-0000-000000000010"),
-                            Type = "City"
+                            Type = "Markaz"
                         },
                         new
                         {
@@ -4528,7 +4568,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "???? ???? ?????",
                             NameEn = "Minya al-Qamh",
                             ParentId = new Guid("00000000-0000-0000-0000-000000000010"),
-                            Type = "City"
+                            Type = "Markaz"
                         },
                         new
                         {
@@ -4538,7 +4578,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "???? ????",
                             NameEn = "Hihya",
                             ParentId = new Guid("00000000-0000-0000-0000-000000000010"),
-                            Type = "City"
+                            Type = "Markaz"
                         },
                         new
                         {
@@ -4548,7 +4588,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "???? ????? ?????",
                             NameEn = "Mashtul Al-Suq",
                             ParentId = new Guid("00000000-0000-0000-0000-000000000010"),
-                            Type = "City"
+                            Type = "Markaz"
                         },
                         new
                         {
@@ -4558,7 +4598,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "???? ???????????",
                             NameEn = "El-Ibrahimiya",
                             ParentId = new Guid("00000000-0000-0000-0000-000000000010"),
-                            Type = "City"
+                            Type = "Markaz"
                         },
                         new
                         {
@@ -4568,7 +4608,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ????????",
                             NameEn = "Al-Qanayat",
                             ParentId = new Guid("00000000-0000-0000-0000-000000000010"),
-                            Type = "City"
+                            Type = "Qism"
                         },
                         new
                         {
@@ -4578,7 +4618,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "???? ????? ???",
                             NameEn = "Awlad Saqr",
                             ParentId = new Guid("00000000-0000-0000-0000-000000000010"),
-                            Type = "City"
+                            Type = "Markaz"
                         },
                         new
                         {
@@ -4588,7 +4628,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ??????",
                             NameEn = "Qurin",
                             ParentId = new Guid("00000000-0000-0000-0000-000000000010"),
-                            Type = "City"
+                            Type = "Qism"
                         },
                         new
                         {
@@ -4598,7 +4638,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ??? ????? ?????? ?? ?????",
                             NameEn = "10 Ramadan 2",
                             ParentId = new Guid("00000000-0000-0000-0000-000000000010"),
-                            Type = "City"
+                            Type = "Qism"
                         },
                         new
                         {
@@ -4608,7 +4648,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ????",
                             NameEn = "Banha",
                             ParentId = new Guid("00000000-0000-0000-0000-000000000011"),
-                            Type = "City"
+                            Type = "Qism"
                         },
                         new
                         {
@@ -4618,7 +4658,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "???? ????",
                             NameEn = "Banha",
                             ParentId = new Guid("00000000-0000-0000-0000-000000000011"),
-                            Type = "City"
+                            Type = "Markaz"
                         },
                         new
                         {
@@ -4628,7 +4668,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "???? ???????",
                             NameEn = "Al Khanka",
                             ParentId = new Guid("00000000-0000-0000-0000-000000000011"),
-                            Type = "City"
+                            Type = "Markaz"
                         },
                         new
                         {
@@ -4638,7 +4678,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "???? ??????? ???????",
                             NameEn = "Qanatir Al-Khayriyya",
                             ParentId = new Guid("00000000-0000-0000-0000-000000000011"),
-                            Type = "City"
+                            Type = "Markaz"
                         },
                         new
                         {
@@ -4648,7 +4688,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "???? ???? ???????",
                             NameEn = "Shibin al-Qanatir",
                             ParentId = new Guid("00000000-0000-0000-0000-000000000011"),
-                            Type = "City"
+                            Type = "Markaz"
                         },
                         new
                         {
@@ -4658,7 +4698,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ??? ???? ??????",
                             NameEn = "Shubra Al-Khayma 1",
                             ParentId = new Guid("00000000-0000-0000-0000-000000000011"),
-                            Type = "City"
+                            Type = "Qism"
                         },
                         new
                         {
@@ -4668,7 +4708,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ??? ???? ??????",
                             NameEn = "Shubra Al-Khayma 2",
                             ParentId = new Guid("00000000-0000-0000-0000-000000000011"),
-                            Type = "City"
+                            Type = "Qism"
                         },
                         new
                         {
@@ -4678,7 +4718,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "???? ???",
                             NameEn = "Tukh",
                             ParentId = new Guid("00000000-0000-0000-0000-000000000011"),
-                            Type = "City"
+                            Type = "Markaz"
                         },
                         new
                         {
@@ -4688,7 +4728,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ?????",
                             NameEn = "Qalyub",
                             ParentId = new Guid("00000000-0000-0000-0000-000000000011"),
-                            Type = "City"
+                            Type = "Qism"
                         },
                         new
                         {
@@ -4698,7 +4738,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "???? ?????",
                             NameEn = "Qalyub",
                             ParentId = new Guid("00000000-0000-0000-0000-000000000011"),
-                            Type = "City"
+                            Type = "Markaz"
                         },
                         new
                         {
@@ -4708,7 +4748,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "???? ??? ???",
                             NameEn = "Kafr Shukr",
                             ParentId = new Guid("00000000-0000-0000-0000-000000000011"),
-                            Type = "City"
+                            Type = "Markaz"
                         },
                         new
                         {
@@ -4718,7 +4758,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ??????",
                             NameEn = "Khsos",
                             ParentId = new Guid("00000000-0000-0000-0000-000000000011"),
-                            Type = "City"
+                            Type = "Qism"
                         },
                         new
                         {
@@ -4728,7 +4768,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ??????",
                             NameEn = "Abour",
                             ParentId = new Guid("00000000-0000-0000-0000-000000000011"),
-                            Type = "City"
+                            Type = "Qism"
                         },
                         new
                         {
@@ -4738,7 +4778,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ???",
                             NameEn = "Qaha",
                             ParentId = new Guid("00000000-0000-0000-0000-000000000011"),
-                            Type = "City"
+                            Type = "Qism"
                         },
                         new
                         {
@@ -4748,7 +4788,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ??? ?????",
                             NameEn = "Kafr Al-Shaykh",
                             ParentId = new Guid("00000000-0000-0000-0000-000000000012"),
-                            Type = "City"
+                            Type = "Qism"
                         },
                         new
                         {
@@ -4758,7 +4798,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "???? ??? ?????",
                             NameEn = "Kafr Al-Shaykh",
                             ParentId = new Guid("00000000-0000-0000-0000-000000000012"),
-                            Type = "City"
+                            Type = "Markaz"
                         },
                         new
                         {
@@ -4768,7 +4808,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "???? ??????",
                             NameEn = "Burullus",
                             ParentId = new Guid("00000000-0000-0000-0000-000000000012"),
-                            Type = "City"
+                            Type = "Markaz"
                         },
                         new
                         {
@@ -4778,7 +4818,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "???? ????",
                             NameEn = "Biyalu",
                             ParentId = new Guid("00000000-0000-0000-0000-000000000012"),
-                            Type = "City"
+                            Type = "Markaz"
                         },
                         new
                         {
@@ -4788,7 +4828,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ????",
                             NameEn = "Disuq",
                             ParentId = new Guid("00000000-0000-0000-0000-000000000012"),
-                            Type = "City"
+                            Type = "Qism"
                         },
                         new
                         {
@@ -4798,7 +4838,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "???? ????",
                             NameEn = "Disuq",
                             ParentId = new Guid("00000000-0000-0000-0000-000000000012"),
-                            Type = "City"
+                            Type = "Markaz"
                         },
                         new
                         {
@@ -4808,7 +4848,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "???? ???? ????",
                             NameEn = "Sidi Salim",
                             ParentId = new Guid("00000000-0000-0000-0000-000000000012"),
-                            Type = "City"
+                            Type = "Markaz"
                         },
                         new
                         {
@@ -4818,7 +4858,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "???? ???",
                             NameEn = "Fuwwa",
                             ParentId = new Guid("00000000-0000-0000-0000-000000000012"),
-                            Type = "City"
+                            Type = "Markaz"
                         },
                         new
                         {
@@ -4828,7 +4868,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "???? ????",
                             NameEn = "Qillin",
                             ParentId = new Guid("00000000-0000-0000-0000-000000000012"),
-                            Type = "City"
+                            Type = "Markaz"
                         },
                         new
                         {
@@ -4838,7 +4878,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "???? ?????",
                             NameEn = "Mitubas",
                             ParentId = new Guid("00000000-0000-0000-0000-000000000012"),
-                            Type = "City"
+                            Type = "Markaz"
                         },
                         new
                         {
@@ -4848,7 +4888,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "???? ???????",
                             NameEn = "Al Hamul",
                             ParentId = new Guid("00000000-0000-0000-0000-000000000012"),
-                            Type = "City"
+                            Type = "Markaz"
                         },
                         new
                         {
@@ -4858,7 +4898,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "???? ??????",
                             NameEn = "Riyad",
                             ParentId = new Guid("00000000-0000-0000-0000-000000000012"),
-                            Type = "City"
+                            Type = "Markaz"
                         },
                         new
                         {
@@ -4868,7 +4908,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ??? ????",
                             NameEn = "Tanta 1",
                             ParentId = new Guid("00000000-0000-0000-0000-000000000013"),
-                            Type = "City"
+                            Type = "Qism"
                         },
                         new
                         {
@@ -4878,7 +4918,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ??? ????",
                             NameEn = "Tanta 2",
                             ParentId = new Guid("00000000-0000-0000-0000-000000000013"),
-                            Type = "City"
+                            Type = "Qism"
                         },
                         new
                         {
@@ -4888,7 +4928,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "???? ????",
                             NameEn = "Tanta",
                             ParentId = new Guid("00000000-0000-0000-0000-000000000013"),
-                            Type = "City"
+                            Type = "Markaz"
                         },
                         new
                         {
@@ -4898,7 +4938,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "???? ??????",
                             NameEn = "Santa",
                             ParentId = new Guid("00000000-0000-0000-0000-000000000013"),
-                            Type = "City"
+                            Type = "Markaz"
                         },
                         new
                         {
@@ -4908,7 +4948,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ??? ?????? ??????",
                             NameEn = "El Mahalla El Kobra 1",
                             ParentId = new Guid("00000000-0000-0000-0000-000000000013"),
-                            Type = "City"
+                            Type = "Qism"
                         },
                         new
                         {
@@ -4918,7 +4958,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ??? ?????? ??????",
                             NameEn = "El Mahalla El Kobra 2",
                             ParentId = new Guid("00000000-0000-0000-0000-000000000013"),
-                            Type = "City"
+                            Type = "Qism"
                         },
                         new
                         {
@@ -4928,7 +4968,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "???? ?????? ??????",
                             NameEn = "El Mahalla El Kobra",
                             ParentId = new Guid("00000000-0000-0000-0000-000000000013"),
-                            Type = "City"
+                            Type = "Markaz"
                         },
                         new
                         {
@@ -4938,7 +4978,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "???? ?????",
                             NameEn = "Basyun",
                             ParentId = new Guid("00000000-0000-0000-0000-000000000013"),
-                            Type = "City"
+                            Type = "Markaz"
                         },
                         new
                         {
@@ -4948,7 +4988,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "???? ????",
                             NameEn = "Zifta",
                             ParentId = new Guid("00000000-0000-0000-0000-000000000013"),
-                            Type = "City"
+                            Type = "Markaz"
                         },
                         new
                         {
@@ -4958,7 +4998,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "???? ?????",
                             NameEn = "Samannud",
                             ParentId = new Guid("00000000-0000-0000-0000-000000000013"),
-                            Type = "City"
+                            Type = "Markaz"
                         },
                         new
                         {
@@ -4968,7 +5008,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "???? ????",
                             NameEn = "Qutur",
                             ParentId = new Guid("00000000-0000-0000-0000-000000000013"),
-                            Type = "City"
+                            Type = "Markaz"
                         },
                         new
                         {
@@ -4978,7 +5018,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "???? ??? ??????",
                             NameEn = "Kafr Al-Zayyat",
                             ParentId = new Guid("00000000-0000-0000-0000-000000000013"),
-                            Type = "City"
+                            Type = "Markaz"
                         },
                         new
                         {
@@ -4988,7 +5028,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ???? ?????",
                             NameEn = "Shibin al-Kum",
                             ParentId = new Guid("00000000-0000-0000-0000-000000000014"),
-                            Type = "City"
+                            Type = "Qism"
                         },
                         new
                         {
@@ -4998,7 +5038,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "???? ???? ?????",
                             NameEn = "Shibin al-Kum",
                             ParentId = new Guid("00000000-0000-0000-0000-000000000014"),
-                            Type = "City"
+                            Type = "Markaz"
                         },
                         new
                         {
@@ -5008,7 +5048,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "???? ?????",
                             NameEn = "Ashmun",
                             ParentId = new Guid("00000000-0000-0000-0000-000000000014"),
-                            Type = "City"
+                            Type = "Markaz"
                         },
                         new
                         {
@@ -5018,7 +5058,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "???? ???????",
                             NameEn = "Al-Bagur",
                             ParentId = new Guid("00000000-0000-0000-0000-000000000014"),
-                            Type = "City"
+                            Type = "Markaz"
                         },
                         new
                         {
@@ -5028,7 +5068,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "???? ???????",
                             NameEn = "Al-Shuhada",
                             ParentId = new Guid("00000000-0000-0000-0000-000000000014"),
-                            Type = "City"
+                            Type = "Markaz"
                         },
                         new
                         {
@@ -5038,7 +5078,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "???? ???? ?????",
                             NameEn = "Birkat Al-Sab",
                             ParentId = new Guid("00000000-0000-0000-0000-000000000014"),
-                            Type = "City"
+                            Type = "Markaz"
                         },
                         new
                         {
@@ -5048,7 +5088,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "???? ???",
                             NameEn = "Tala",
                             ParentId = new Guid("00000000-0000-0000-0000-000000000014"),
-                            Type = "City"
+                            Type = "Markaz"
                         },
                         new
                         {
@@ -5058,7 +5098,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "???? ??????",
                             NameEn = "Quwisna",
                             ParentId = new Guid("00000000-0000-0000-0000-000000000014"),
-                            Type = "City"
+                            Type = "Markaz"
                         },
                         new
                         {
@@ -5068,7 +5108,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "???? ????",
                             NameEn = "Minuf",
                             ParentId = new Guid("00000000-0000-0000-0000-000000000014"),
-                            Type = "City"
+                            Type = "Markaz"
                         },
                         new
                         {
@@ -5078,7 +5118,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ????? ??? ???????",
                             NameEn = "Sirs Al-Layyana City",
                             ParentId = new Guid("00000000-0000-0000-0000-000000000014"),
-                            Type = "City"
+                            Type = "Qism"
                         },
                         new
                         {
@@ -5088,7 +5128,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "???? ???????",
                             NameEn = "Sadat City",
                             ParentId = new Guid("00000000-0000-0000-0000-000000000014"),
-                            Type = "City"
+                            Type = "Markaz"
                         },
                         new
                         {
@@ -5098,7 +5138,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ????? ????",
                             NameEn = "Minuf City",
                             ParentId = new Guid("00000000-0000-0000-0000-000000000014"),
-                            Type = "City"
+                            Type = "Qism"
                         },
                         new
                         {
@@ -5108,7 +5148,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ??????",
                             NameEn = "Damanhur",
                             ParentId = new Guid("00000000-0000-0000-0000-000000000015"),
-                            Type = "City"
+                            Type = "Qism"
                         },
                         new
                         {
@@ -5118,7 +5158,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "???? ??????",
                             NameEn = "Damanhur",
                             ParentId = new Guid("00000000-0000-0000-0000-000000000015"),
-                            Type = "City"
+                            Type = "Markaz"
                         },
                         new
                         {
@@ -5128,7 +5168,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "???? ???????????",
                             NameEn = "Abu-l-Matamir",
                             ParentId = new Guid("00000000-0000-0000-0000-000000000015"),
-                            Type = "City"
+                            Type = "Markaz"
                         },
                         new
                         {
@@ -5138,7 +5178,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "???? ??????",
                             NameEn = "Abu Hummus",
                             ParentId = new Guid("00000000-0000-0000-0000-000000000015"),
-                            Type = "City"
+                            Type = "Markaz"
                         },
                         new
                         {
@@ -5148,7 +5188,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "???? ????????",
                             NameEn = "Al-Dilingat",
                             ParentId = new Guid("00000000-0000-0000-0000-000000000015"),
-                            Type = "City"
+                            Type = "Markaz"
                         },
                         new
                         {
@@ -5158,7 +5198,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "???? ?????????",
                             NameEn = "Al-Mahmudiyya",
                             ParentId = new Guid("00000000-0000-0000-0000-000000000015"),
-                            Type = "City"
+                            Type = "Markaz"
                         },
                         new
                         {
@@ -5168,7 +5208,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "???? ????? ???????",
                             NameEn = "Itay Al-Barud",
                             ParentId = new Guid("00000000-0000-0000-0000-000000000015"),
-                            Type = "City"
+                            Type = "Markaz"
                         },
                         new
                         {
@@ -5178,7 +5218,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "???? ??? ????",
                             NameEn = "Hush Isa",
                             ParentId = new Guid("00000000-0000-0000-0000-000000000015"),
-                            Type = "City"
+                            Type = "Markaz"
                         },
                         new
                         {
@@ -5188,7 +5228,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "???? ????",
                             NameEn = "Rashid",
                             ParentId = new Guid("00000000-0000-0000-0000-000000000015"),
-                            Type = "City"
+                            Type = "Markaz"
                         },
                         new
                         {
@@ -5198,7 +5238,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "???? ???????",
                             NameEn = "Shubra Khît",
                             ParentId = new Guid("00000000-0000-0000-0000-000000000015"),
-                            Type = "City"
+                            Type = "Markaz"
                         },
                         new
                         {
@@ -5208,7 +5248,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ?????????",
                             NameEn = "Kafr Al-Dawwar",
                             ParentId = new Guid("00000000-0000-0000-0000-000000000015"),
-                            Type = "City"
+                            Type = "Qism"
                         },
                         new
                         {
@@ -5218,7 +5258,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "???? ??? ??????",
                             NameEn = "Kafr Al-Dawwar",
                             ParentId = new Guid("00000000-0000-0000-0000-000000000015"),
-                            Type = "City"
+                            Type = "Markaz"
                         },
                         new
                         {
@@ -5228,7 +5268,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "???? ??? ?????",
                             NameEn = "Kum Hamada",
                             ParentId = new Guid("00000000-0000-0000-0000-000000000015"),
-                            Type = "City"
+                            Type = "Markaz"
                         },
                         new
                         {
@@ -5238,7 +5278,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "???? ???? ???????",
                             NameEn = "Wadi Al-NatrUn",
                             ParentId = new Guid("00000000-0000-0000-0000-000000000015"),
-                            Type = "City"
+                            Type = "Markaz"
                         },
                         new
                         {
@@ -5248,7 +5288,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "???? ?????????",
                             NameEn = "Al-Rahmaniyya",
                             ParentId = new Guid("00000000-0000-0000-0000-000000000015"),
-                            Type = "City"
+                            Type = "Markaz"
                         },
                         new
                         {
@@ -5258,7 +5298,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "???? ????",
                             NameEn = "Idku",
                             ParentId = new Guid("00000000-0000-0000-0000-000000000015"),
-                            Type = "City"
+                            Type = "Markaz"
                         },
                         new
                         {
@@ -5268,7 +5308,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ??? ?????????",
                             NameEn = "Nubariyya West",
                             ParentId = new Guid("00000000-0000-0000-0000-000000000015"),
-                            Type = "City"
+                            Type = "Qism"
                         },
                         new
                         {
@@ -5278,7 +5318,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "???? ???",
                             NameEn = "Badr",
                             ParentId = new Guid("00000000-0000-0000-0000-000000000015"),
-                            Type = "City"
+                            Type = "Markaz"
                         },
                         new
                         {
@@ -5288,7 +5328,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ??? ???????????",
                             NameEn = "Ismailiyya 1",
                             ParentId = new Guid("00000000-0000-0000-0000-000000000016"),
-                            Type = "City"
+                            Type = "Qism"
                         },
                         new
                         {
@@ -5298,7 +5338,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ??? ???????????",
                             NameEn = "Ismailiyya 2",
                             ParentId = new Guid("00000000-0000-0000-0000-000000000016"),
-                            Type = "City"
+                            Type = "Qism"
                         },
                         new
                         {
@@ -5308,7 +5348,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ???? ???????????",
                             NameEn = "Ismailiyya 3",
                             ParentId = new Guid("00000000-0000-0000-0000-000000000016"),
-                            Type = "City"
+                            Type = "Qism"
                         },
                         new
                         {
@@ -5318,7 +5358,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "???? ???????????",
                             NameEn = "Ismailiyya",
                             ParentId = new Guid("00000000-0000-0000-0000-000000000016"),
-                            Type = "City"
+                            Type = "Markaz"
                         },
                         new
                         {
@@ -5328,7 +5368,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "???? ???? ??????",
                             NameEn = "Tal al-Kabir, al-",
                             ParentId = new Guid("00000000-0000-0000-0000-000000000016"),
-                            Type = "City"
+                            Type = "Markaz"
                         },
                         new
                         {
@@ -5338,7 +5378,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "???? ???????",
                             NameEn = "Qantara Gharb, al-",
                             ParentId = new Guid("00000000-0000-0000-0000-000000000016"),
-                            Type = "City"
+                            Type = "Markaz"
                         },
                         new
                         {
@@ -5348,7 +5388,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "???? ????",
                             NameEn = "Fayid",
                             ParentId = new Guid("00000000-0000-0000-0000-000000000016"),
-                            Type = "City"
+                            Type = "Markaz"
                         },
                         new
                         {
@@ -5358,7 +5398,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ??????? ???",
                             NameEn = "Qantara Sharq, al-",
                             ParentId = new Guid("00000000-0000-0000-0000-000000000016"),
-                            Type = "City"
+                            Type = "Qism"
                         },
                         new
                         {
@@ -5368,7 +5408,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ??????",
                             NameEn = "Imbaba",
                             ParentId = new Guid("00000000-0000-0000-0000-000000000017"),
-                            Type = "City"
+                            Type = "Qism"
                         },
                         new
                         {
@@ -5378,7 +5418,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ???????",
                             NameEn = "Al-Aguza",
                             ParentId = new Guid("00000000-0000-0000-0000-000000000017"),
-                            Type = "City"
+                            Type = "Qism"
                         },
                         new
                         {
@@ -5388,7 +5428,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ?????",
                             NameEn = "DuqqI",
                             ParentId = new Guid("00000000-0000-0000-0000-000000000017"),
-                            Type = "City"
+                            Type = "Qism"
                         },
                         new
                         {
@@ -5398,7 +5438,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ??????",
                             NameEn = "Giza",
                             ParentId = new Guid("00000000-0000-0000-0000-000000000017"),
-                            Type = "City"
+                            Type = "Qism"
                         },
                         new
                         {
@@ -5408,7 +5448,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ????? ???????",
                             NameEn = "Bulaq Al-DakrUr",
                             ParentId = new Guid("00000000-0000-0000-0000-000000000017"),
-                            Type = "City"
+                            Type = "Qism"
                         },
                         new
                         {
@@ -5418,7 +5458,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ???????",
                             NameEn = "Al-Ahram",
                             ParentId = new Guid("00000000-0000-0000-0000-000000000017"),
-                            Type = "City"
+                            Type = "Qism"
                         },
                         new
                         {
@@ -5428,7 +5468,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ??? 6 ??????",
                             NameEn = "6 October-1",
                             ParentId = new Guid("00000000-0000-0000-0000-000000000017"),
-                            Type = "City"
+                            Type = "Qism"
                         },
                         new
                         {
@@ -5438,7 +5478,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ?????????",
                             NameEn = "Hwamdeia",
                             ParentId = new Guid("00000000-0000-0000-0000-000000000017"),
-                            Type = "City"
+                            Type = "Qism"
                         },
                         new
                         {
@@ -5448,7 +5488,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "???? ??????",
                             NameEn = "Giza",
                             ParentId = new Guid("00000000-0000-0000-0000-000000000017"),
-                            Type = "City"
+                            Type = "Markaz"
                         },
                         new
                         {
@@ -5458,7 +5498,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "???? ????????",
                             NameEn = "Badrashain",
                             ParentId = new Guid("00000000-0000-0000-0000-000000000017"),
-                            Type = "City"
+                            Type = "Markaz"
                         },
                         new
                         {
@@ -5468,7 +5508,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "???? ????",
                             NameEn = "Saf",
                             ParentId = new Guid("00000000-0000-0000-0000-000000000017"),
-                            Type = "City"
+                            Type = "Markaz"
                         },
                         new
                         {
@@ -5478,7 +5518,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "???? ??????",
                             NameEn = "Ayat",
                             ParentId = new Guid("00000000-0000-0000-0000-000000000017"),
-                            Type = "City"
+                            Type = "Markaz"
                         },
                         new
                         {
@@ -5488,7 +5528,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "???? ??????",
                             NameEn = "Imbaba",
                             ParentId = new Guid("00000000-0000-0000-0000-000000000017"),
-                            Type = "City"
+                            Type = "Markaz"
                         },
                         new
                         {
@@ -5498,7 +5538,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ??????? ???????",
                             NameEn = "Bahariya Oasis",
                             ParentId = new Guid("00000000-0000-0000-0000-000000000017"),
-                            Type = "City"
+                            Type = "Qism"
                         },
                         new
                         {
@@ -5508,7 +5548,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "???? ?????",
                             NameEn = "Atfeh",
                             ParentId = new Guid("00000000-0000-0000-0000-000000000017"),
-                            Type = "City"
+                            Type = "Markaz"
                         },
                         new
                         {
@@ -5518,7 +5558,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "???? ?????",
                             NameEn = "Auseem",
                             ParentId = new Guid("00000000-0000-0000-0000-000000000017"),
-                            Type = "City"
+                            Type = "Markaz"
                         },
                         new
                         {
@@ -5528,7 +5568,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ??????",
                             NameEn = "Waraq",
                             ParentId = new Guid("00000000-0000-0000-0000-000000000017"),
-                            Type = "City"
+                            Type = "Qism"
                         },
                         new
                         {
@@ -5538,7 +5578,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ?????????",
                             NameEn = "Umraniyya",
                             ParentId = new Guid("00000000-0000-0000-0000-000000000017"),
-                            Type = "City"
+                            Type = "Qism"
                         },
                         new
                         {
@@ -5548,7 +5588,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ????? ????",
                             NameEn = "Shaykh Zayed",
                             ParentId = new Guid("00000000-0000-0000-0000-000000000017"),
-                            Type = "City"
+                            Type = "Qism"
                         },
                         new
                         {
@@ -5558,7 +5598,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "???? ??????",
                             NameEn = "Kardasa",
                             ParentId = new Guid("00000000-0000-0000-0000-000000000017"),
-                            Type = "City"
+                            Type = "Markaz"
                         },
                         new
                         {
@@ -5568,7 +5608,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ??? 6 ??????",
                             NameEn = "6 October-2",
                             ParentId = new Guid("00000000-0000-0000-0000-000000000017"),
-                            Type = "City"
+                            Type = "Qism"
                         },
                         new
                         {
@@ -5578,7 +5618,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ??? ????",
                             NameEn = "Bani Swayf",
                             ParentId = new Guid("00000000-0000-0000-0000-000000000018"),
-                            Type = "City"
+                            Type = "Qism"
                         },
                         new
                         {
@@ -5588,7 +5628,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "???? ??? ????",
                             NameEn = "Bani Swayf",
                             ParentId = new Guid("00000000-0000-0000-0000-000000000018"),
-                            Type = "City"
+                            Type = "Markaz"
                         },
                         new
                         {
@@ -5598,7 +5638,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ????? ??? ???? ???????",
                             NameEn = "Bani Swayf City",
                             ParentId = new Guid("00000000-0000-0000-0000-000000000018"),
-                            Type = "City"
+                            Type = "Qism"
                         },
                         new
                         {
@@ -5608,7 +5648,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "???? ?????",
                             NameEn = "Al Fashn",
                             ParentId = new Guid("00000000-0000-0000-0000-000000000018"),
-                            Type = "City"
+                            Type = "Markaz"
                         },
                         new
                         {
@@ -5618,7 +5658,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "???? ???????",
                             NameEn = "Al Wasta",
                             ParentId = new Guid("00000000-0000-0000-0000-000000000018"),
-                            Type = "City"
+                            Type = "Markaz"
                         },
                         new
                         {
@@ -5628,7 +5668,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "???? ???????",
                             NameEn = "Ahnasya",
                             ParentId = new Guid("00000000-0000-0000-0000-000000000018"),
-                            Type = "City"
+                            Type = "Markaz"
                         },
                         new
                         {
@@ -5638,7 +5678,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "???? ???",
                             NameEn = "Biba",
                             ParentId = new Guid("00000000-0000-0000-0000-000000000018"),
-                            Type = "City"
+                            Type = "Markaz"
                         },
                         new
                         {
@@ -5648,7 +5688,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "???? ?????",
                             NameEn = "Sumusta",
                             ParentId = new Guid("00000000-0000-0000-0000-000000000018"),
-                            Type = "City"
+                            Type = "Markaz"
                         },
                         new
                         {
@@ -5658,7 +5698,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "???? ????",
                             NameEn = "Nasir",
                             ParentId = new Guid("00000000-0000-0000-0000-000000000018"),
-                            Type = "City"
+                            Type = "Markaz"
                         },
                         new
                         {
@@ -5668,7 +5708,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ??????",
                             NameEn = "Fayyum",
                             ParentId = new Guid("00000000-0000-0000-0000-000000000019"),
-                            Type = "City"
+                            Type = "Qism"
                         },
                         new
                         {
@@ -5678,7 +5718,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "???? ??????",
                             NameEn = "Fayyum",
                             ParentId = new Guid("00000000-0000-0000-0000-000000000019"),
-                            Type = "City"
+                            Type = "Markaz"
                         },
                         new
                         {
@@ -5688,7 +5728,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "???? ??????",
                             NameEn = "Abshaway",
                             ParentId = new Guid("00000000-0000-0000-0000-000000000019"),
-                            Type = "City"
+                            Type = "Markaz"
                         },
                         new
                         {
@@ -5698,7 +5738,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "???? ????",
                             NameEn = "Atsa",
                             ParentId = new Guid("00000000-0000-0000-0000-000000000019"),
-                            Type = "City"
+                            Type = "Markaz"
                         },
                         new
                         {
@@ -5708,7 +5748,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "???? ?????",
                             NameEn = "Sinuras",
                             ParentId = new Guid("00000000-0000-0000-0000-000000000019"),
-                            Type = "City"
+                            Type = "Markaz"
                         },
                         new
                         {
@@ -5718,7 +5758,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "???? ?????",
                             NameEn = "Tamya",
                             ParentId = new Guid("00000000-0000-0000-0000-000000000019"),
-                            Type = "City"
+                            Type = "Markaz"
                         },
                         new
                         {
@@ -5728,7 +5768,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "???? ???? ??????",
                             NameEn = "Yousef El sadeq",
                             ParentId = new Guid("00000000-0000-0000-0000-000000000019"),
-                            Type = "City"
+                            Type = "Markaz"
                         },
                         new
                         {
@@ -5738,7 +5778,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ?????? ???????",
                             NameEn = "Fayyum City",
                             ParentId = new Guid("00000000-0000-0000-0000-000000000019"),
-                            Type = "City"
+                            Type = "Madina"
                         },
                         new
                         {
@@ -5748,7 +5788,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ??????",
                             NameEn = "Kesm Al-minya",
                             ParentId = new Guid("00000000-0000-0000-0000-000000000020"),
-                            Type = "City"
+                            Type = "Qism"
                         },
                         new
                         {
@@ -5758,7 +5798,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "???? ??????",
                             NameEn = "Markz Al Minya",
                             ParentId = new Guid("00000000-0000-0000-0000-000000000020"),
-                            Type = "City"
+                            Type = "Markaz"
                         },
                         new
                         {
@@ -5768,7 +5808,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ?????? ???????",
                             NameEn = "New Minya",
                             ParentId = new Guid("00000000-0000-0000-0000-000000000020"),
-                            Type = "City"
+                            Type = "Madina"
                         },
                         new
                         {
@@ -5778,7 +5818,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "???? ??? ?????",
                             NameEn = "Markz Abu Qurqas",
                             ParentId = new Guid("00000000-0000-0000-0000-000000000020"),
-                            Type = "City"
+                            Type = "Markaz"
                         },
                         new
                         {
@@ -5788,7 +5828,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "???? ??????",
                             NameEn = "Markz Al Idwa",
                             ParentId = new Guid("00000000-0000-0000-0000-000000000020"),
-                            Type = "City"
+                            Type = "Markaz"
                         },
                         new
                         {
@@ -5798,7 +5838,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "???? ??? ????",
                             NameEn = "Markz Bani Mazar",
                             ParentId = new Guid("00000000-0000-0000-0000-000000000020"),
-                            Type = "City"
+                            Type = "Markaz"
                         },
                         new
                         {
@@ -5808,7 +5848,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "???? ??? ????",
                             NameEn = "Markz Dir Mawas",
                             ParentId = new Guid("00000000-0000-0000-0000-000000000020"),
-                            Type = "City"
+                            Type = "Markaz"
                         },
                         new
                         {
@@ -5818,7 +5858,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "???? ??????",
                             NameEn = "Markz Samalut",
                             ParentId = new Guid("00000000-0000-0000-0000-000000000020"),
-                            Type = "City"
+                            Type = "Markaz"
                         },
                         new
                         {
@@ -5828,7 +5868,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "???? ????",
                             NameEn = "Markz Matay",
                             ParentId = new Guid("00000000-0000-0000-0000-000000000020"),
-                            Type = "City"
+                            Type = "Markaz"
                         },
                         new
                         {
@@ -5838,7 +5878,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "???? ?????",
                             NameEn = "Markz Maghagha",
                             ParentId = new Guid("00000000-0000-0000-0000-000000000020"),
-                            Type = "City"
+                            Type = "Markaz"
                         },
                         new
                         {
@@ -5848,7 +5888,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ????",
                             NameEn = "Kesm Mallawi",
                             ParentId = new Guid("00000000-0000-0000-0000-000000000020"),
-                            Type = "City"
+                            Type = "Qism"
                         },
                         new
                         {
@@ -5858,7 +5898,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "???? ????",
                             NameEn = "Markz Mallawi",
                             ParentId = new Guid("00000000-0000-0000-0000-000000000020"),
-                            Type = "City"
+                            Type = "Markaz"
                         },
                         new
                         {
@@ -5868,7 +5908,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ??? ?????",
                             NameEn = "Kesm Awal Assuit",
                             ParentId = new Guid("00000000-0000-0000-0000-000000000021"),
-                            Type = "City"
+                            Type = "Qism"
                         },
                         new
                         {
@@ -5878,7 +5918,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ??? ?????",
                             NameEn = "Kesm Than Assuit",
                             ParentId = new Guid("00000000-0000-0000-0000-000000000021"),
-                            Type = "City"
+                            Type = "Qism"
                         },
                         new
                         {
@@ -5888,7 +5928,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "???? ?????",
                             NameEn = "Assuit",
                             ParentId = new Guid("00000000-0000-0000-0000-000000000021"),
-                            Type = "City"
+                            Type = "Markaz"
                         },
                         new
                         {
@@ -5898,7 +5938,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "???? ?????",
                             NameEn = "Abnub",
                             ParentId = new Guid("00000000-0000-0000-0000-000000000021"),
-                            Type = "City"
+                            Type = "Markaz"
                         },
                         new
                         {
@@ -5908,7 +5948,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "???? ??????",
                             NameEn = "Abu Tig",
                             ParentId = new Guid("00000000-0000-0000-0000-000000000021"),
-                            Type = "City"
+                            Type = "Markaz"
                         },
                         new
                         {
@@ -5918,7 +5958,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "???? ???????",
                             NameEn = "Al- Badari",
                             ParentId = new Guid("00000000-0000-0000-0000-000000000021"),
-                            Type = "City"
+                            Type = "Markaz"
                         },
                         new
                         {
@@ -5928,7 +5968,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "???? ???? ????",
                             NameEn = "Sahil Silim",
                             ParentId = new Guid("00000000-0000-0000-0000-000000000021"),
-                            Type = "City"
+                            Type = "Markaz"
                         },
                         new
                         {
@@ -5938,7 +5978,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "???? ???????",
                             NameEn = "Al-Ghanayem",
                             ParentId = new Guid("00000000-0000-0000-0000-000000000021"),
-                            Type = "City"
+                            Type = "Markaz"
                         },
                         new
                         {
@@ -5948,7 +5988,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "???? ???????",
                             NameEn = "Al-Qusia",
                             ParentId = new Guid("00000000-0000-0000-0000-000000000021"),
-                            Type = "City"
+                            Type = "Markaz"
                         },
                         new
                         {
@@ -5958,7 +5998,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "???? ?????",
                             NameEn = "Dayrut",
                             ParentId = new Guid("00000000-0000-0000-0000-000000000021"),
-                            Type = "City"
+                            Type = "Markaz"
                         },
                         new
                         {
@@ -5968,7 +6008,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "???? ????",
                             NameEn = "Sidfa",
                             ParentId = new Guid("00000000-0000-0000-0000-000000000021"),
-                            Type = "City"
+                            Type = "Markaz"
                         },
                         new
                         {
@@ -5978,7 +6018,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "???? ??????",
                             NameEn = "Manfalut",
                             ParentId = new Guid("00000000-0000-0000-0000-000000000021"),
-                            Type = "City"
+                            Type = "Markaz"
                         },
                         new
                         {
@@ -5988,7 +6028,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "???? ?????",
                             NameEn = "Alfath",
                             ParentId = new Guid("00000000-0000-0000-0000-000000000021"),
-                            Type = "City"
+                            Type = "Markaz"
                         },
                         new
                         {
@@ -5998,7 +6038,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ????? ???????",
                             NameEn = "Assuit City",
                             ParentId = new Guid("00000000-0000-0000-0000-000000000021"),
-                            Type = "City"
+                            Type = "Madina"
                         },
                         new
                         {
@@ -6008,7 +6048,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ??? ?????",
                             NameEn = "Suhag",
                             ParentId = new Guid("00000000-0000-0000-0000-000000000022"),
-                            Type = "City"
+                            Type = "Qism"
                         },
                         new
                         {
@@ -6018,7 +6058,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ??? ?????",
                             NameEn = "Suhag-2",
                             ParentId = new Guid("00000000-0000-0000-0000-000000000022"),
-                            Type = "City"
+                            Type = "Qism"
                         },
                         new
                         {
@@ -6028,7 +6068,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "???? ?????",
                             NameEn = "Suhag",
                             ParentId = new Guid("00000000-0000-0000-0000-000000000022"),
-                            Type = "City"
+                            Type = "Markaz"
                         },
                         new
                         {
@@ -6038,7 +6078,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "???? ?????",
                             NameEn = "Akhmim",
                             ParentId = new Guid("00000000-0000-0000-0000-000000000022"),
-                            Type = "City"
+                            Type = "Markaz"
                         },
                         new
                         {
@@ -6048,7 +6088,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "???? ???????",
                             NameEn = "Al-Balyana",
                             ParentId = new Guid("00000000-0000-0000-0000-000000000022"),
-                            Type = "City"
+                            Type = "Markaz"
                         },
                         new
                         {
@@ -6056,9 +6096,9 @@ namespace Tawreed.Infrastructure.Migrations
                             CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             IsActive = true,
                             NameAr = "???? ???????",
-                            NameEn = "Al-Maragha",
+                            NameEn = "Al-Maragha ",
                             ParentId = new Guid("00000000-0000-0000-0000-000000000022"),
-                            Type = "City"
+                            Type = "Markaz"
                         },
                         new
                         {
@@ -6068,7 +6108,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "???? ???????",
                             NameEn = "Al-Minshat",
                             ParentId = new Guid("00000000-0000-0000-0000-000000000022"),
-                            Type = "City"
+                            Type = "Markaz"
                         },
                         new
                         {
@@ -6076,9 +6116,9 @@ namespace Tawreed.Infrastructure.Migrations
                             CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             IsActive = true,
                             NameAr = "???? ??? ??????",
-                            NameEn = "Dar al-Salam",
+                            NameEn = "Dar al-Salam ",
                             ParentId = new Guid("00000000-0000-0000-0000-000000000022"),
-                            Type = "City"
+                            Type = "Markaz"
                         },
                         new
                         {
@@ -6088,7 +6128,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ????",
                             NameEn = "Girga",
                             ParentId = new Guid("00000000-0000-0000-0000-000000000022"),
-                            Type = "City"
+                            Type = "Qism"
                         },
                         new
                         {
@@ -6098,7 +6138,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "???? ????",
                             NameEn = "Girga",
                             ParentId = new Guid("00000000-0000-0000-0000-000000000022"),
-                            Type = "City"
+                            Type = "Markaz"
                         },
                         new
                         {
@@ -6108,7 +6148,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "???? ????? ???????",
                             NameEn = "Guhayna Al-Gharbiyya",
                             ParentId = new Guid("00000000-0000-0000-0000-000000000022"),
-                            Type = "City"
+                            Type = "Markaz"
                         },
                         new
                         {
@@ -6118,7 +6158,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "???? ??????",
                             NameEn = "Saqulta",
                             ParentId = new Guid("00000000-0000-0000-0000-000000000022"),
-                            Type = "City"
+                            Type = "Markaz"
                         },
                         new
                         {
@@ -6128,7 +6168,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "???? ???",
                             NameEn = "Tama",
                             ParentId = new Guid("00000000-0000-0000-0000-000000000022"),
-                            Type = "City"
+                            Type = "Markaz"
                         },
                         new
                         {
@@ -6138,7 +6178,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "???? ????",
                             NameEn = "Tahta",
                             ParentId = new Guid("00000000-0000-0000-0000-000000000022"),
-                            Type = "City"
+                            Type = "Markaz"
                         },
                         new
                         {
@@ -6148,7 +6188,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ????",
                             NameEn = "Kesm Tahta",
                             ParentId = new Guid("00000000-0000-0000-0000-000000000022"),
-                            Type = "City"
+                            Type = "Qism"
                         },
                         new
                         {
@@ -6158,7 +6198,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ??????",
                             NameEn = "Kawther",
                             ParentId = new Guid("00000000-0000-0000-0000-000000000022"),
-                            Type = "City"
+                            Type = "Qism"
                         },
                         new
                         {
@@ -6168,7 +6208,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "???? ????????",
                             NameEn = "Al Usayrat",
                             ParentId = new Guid("00000000-0000-0000-0000-000000000022"),
-                            Type = "City"
+                            Type = "Markaz"
                         },
                         new
                         {
@@ -6178,7 +6218,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ????? ???????",
                             NameEn = "Akhmim City",
                             ParentId = new Guid("00000000-0000-0000-0000-000000000022"),
-                            Type = "City"
+                            Type = "Madina"
                         },
                         new
                         {
@@ -6188,7 +6228,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ????? ???????",
                             NameEn = "Suhag City",
                             ParentId = new Guid("00000000-0000-0000-0000-000000000022"),
-                            Type = "City"
+                            Type = "Madina"
                         },
                         new
                         {
@@ -6198,7 +6238,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ???",
                             NameEn = "Qina",
                             ParentId = new Guid("00000000-0000-0000-0000-000000000023"),
-                            Type = "City"
+                            Type = "Qism"
                         },
                         new
                         {
@@ -6208,7 +6248,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "???? ???",
                             NameEn = "Qina",
                             ParentId = new Guid("00000000-0000-0000-0000-000000000023"),
-                            Type = "City"
+                            Type = "Markaz"
                         },
                         new
                         {
@@ -6218,7 +6258,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "???? ??? ???",
                             NameEn = "Abu Tisht",
                             ParentId = new Guid("00000000-0000-0000-0000-000000000023"),
-                            Type = "City"
+                            Type = "Markaz"
                         },
                         new
                         {
@@ -6228,7 +6268,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "???? ?????",
                             NameEn = "Armant",
                             ParentId = new Guid("00000000-0000-0000-0000-000000000023"),
-                            Type = "City"
+                            Type = "Markaz"
                         },
                         new
                         {
@@ -6238,7 +6278,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "???? ????",
                             NameEn = "Isna",
                             ParentId = new Guid("00000000-0000-0000-0000-000000000023"),
-                            Type = "City"
+                            Type = "Markaz"
                         },
                         new
                         {
@@ -6248,7 +6288,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "???? ????",
                             NameEn = "Dishna",
                             ParentId = new Guid("00000000-0000-0000-0000-000000000023"),
-                            Type = "City"
+                            Type = "Markaz"
                         },
                         new
                         {
@@ -6258,7 +6298,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "???? ???",
                             NameEn = "Qus",
                             ParentId = new Guid("00000000-0000-0000-0000-000000000023"),
-                            Type = "City"
+                            Type = "Markaz"
                         },
                         new
                         {
@@ -6268,7 +6308,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "???? ??? ?????",
                             NameEn = "Nag Hammadi",
                             ParentId = new Guid("00000000-0000-0000-0000-000000000023"),
-                            Type = "City"
+                            Type = "Markaz"
                         },
                         new
                         {
@@ -6278,7 +6318,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "???? ?????",
                             NameEn = "Naqada",
                             ParentId = new Guid("00000000-0000-0000-0000-000000000023"),
-                            Type = "City"
+                            Type = "Markaz"
                         },
                         new
                         {
@@ -6288,7 +6328,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "???? ?????",
                             NameEn = "Farshut",
                             ParentId = new Guid("00000000-0000-0000-0000-000000000023"),
-                            Type = "City"
+                            Type = "Markaz"
                         },
                         new
                         {
@@ -6298,7 +6338,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "???? ???",
                             NameEn = "Qift",
                             ParentId = new Guid("00000000-0000-0000-0000-000000000023"),
-                            Type = "City"
+                            Type = "Markaz"
                         },
                         new
                         {
@@ -6308,7 +6348,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "???? ?????",
                             NameEn = "Al Waqf",
                             ParentId = new Guid("00000000-0000-0000-0000-000000000023"),
-                            Type = "City"
+                            Type = "Markaz"
                         },
                         new
                         {
@@ -6318,7 +6358,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ??? ???????",
                             NameEn = "Qina City",
                             ParentId = new Guid("00000000-0000-0000-0000-000000000023"),
-                            Type = "City"
+                            Type = "Madina"
                         },
                         new
                         {
@@ -6328,7 +6368,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ?????",
                             NameEn = "Aswan",
                             ParentId = new Guid("00000000-0000-0000-0000-000000000024"),
-                            Type = "City"
+                            Type = "Qism"
                         },
                         new
                         {
@@ -6338,7 +6378,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "???? ?????",
                             NameEn = "Aswan",
                             ParentId = new Guid("00000000-0000-0000-0000-000000000024"),
-                            Type = "City"
+                            Type = "Markaz"
                         },
                         new
                         {
@@ -6348,7 +6388,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "???? ????",
                             NameEn = "Adfu",
                             ParentId = new Guid("00000000-0000-0000-0000-000000000024"),
-                            Type = "City"
+                            Type = "Markaz"
                         },
                         new
                         {
@@ -6358,7 +6398,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "???? ??? ????",
                             NameEn = "Kum Umbu",
                             ParentId = new Guid("00000000-0000-0000-0000-000000000024"),
-                            Type = "City"
+                            Type = "Markaz"
                         },
                         new
                         {
@@ -6368,7 +6408,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "???? ???",
                             NameEn = "Nasr",
                             ParentId = new Guid("00000000-0000-0000-0000-000000000024"),
-                            Type = "City"
+                            Type = "Markaz"
                         },
                         new
                         {
@@ -6378,7 +6418,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "???? ????",
                             NameEn = "Daraw",
                             ParentId = new Guid("00000000-0000-0000-0000-000000000024"),
-                            Type = "City"
+                            Type = "Markaz"
                         },
                         new
                         {
@@ -6388,7 +6428,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "???? ???????",
                             NameEn = "Abu Simbel",
                             ParentId = new Guid("00000000-0000-0000-0000-000000000024"),
-                            Type = "City"
+                            Type = "Markaz"
                         },
                         new
                         {
@@ -6398,7 +6438,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ????? ???????",
                             NameEn = "Aswan City",
                             ParentId = new Guid("00000000-0000-0000-0000-000000000024"),
-                            Type = "City"
+                            Type = "Madina"
                         },
                         new
                         {
@@ -6408,7 +6448,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ????? ???????",
                             NameEn = "Tushaka",
                             ParentId = new Guid("00000000-0000-0000-0000-000000000024"),
-                            Type = "City"
+                            Type = "Madina"
                         },
                         new
                         {
@@ -6418,7 +6458,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ??????",
                             NameEn = "Luxor",
                             ParentId = new Guid("00000000-0000-0000-0000-000000000025"),
-                            Type = "City"
+                            Type = "Qism"
                         },
                         new
                         {
@@ -6428,7 +6468,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "???? ??????",
                             NameEn = "Luxor",
                             ParentId = new Guid("00000000-0000-0000-0000-000000000025"),
-                            Type = "City"
+                            Type = "Markaz"
                         },
                         new
                         {
@@ -6438,7 +6478,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "???? ???? ????",
                             NameEn = "Tiba police station",
                             ParentId = new Guid("00000000-0000-0000-0000-000000000025"),
-                            Type = "City"
+                            Type = "Markaz"
                         },
                         new
                         {
@@ -6448,7 +6488,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ??? ???????",
                             NameEn = "Hurghada 1",
                             ParentId = new Guid("00000000-0000-0000-0000-000000000026"),
-                            Type = "City"
+                            Type = "Qism"
                         },
                         new
                         {
@@ -6458,7 +6498,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ??????",
                             NameEn = "Qusir",
                             ParentId = new Guid("00000000-0000-0000-0000-000000000026"),
-                            Type = "City"
+                            Type = "Qism"
                         },
                         new
                         {
@@ -6468,7 +6508,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ?????",
                             NameEn = "Safaga",
                             ParentId = new Guid("00000000-0000-0000-0000-000000000026"),
-                            Type = "City"
+                            Type = "Qism"
                         },
                         new
                         {
@@ -6478,7 +6518,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ???? ???",
                             NameEn = "Marsa Alam",
                             ParentId = new Guid("00000000-0000-0000-0000-000000000026"),
-                            Type = "City"
+                            Type = "Qism"
                         },
                         new
                         {
@@ -6488,7 +6528,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ??? ????",
                             NameEn = "Ras Gharib",
                             ParentId = new Guid("00000000-0000-0000-0000-000000000026"),
-                            Type = "City"
+                            Type = "Qism"
                         },
                         new
                         {
@@ -6498,7 +6538,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ??????",
                             NameEn = "Shallatin",
                             ParentId = new Guid("00000000-0000-0000-0000-000000000026"),
-                            Type = "City"
+                            Type = "Qism"
                         },
                         new
                         {
@@ -6508,7 +6548,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ?????",
                             NameEn = "Halayib",
                             ParentId = new Guid("00000000-0000-0000-0000-000000000026"),
-                            Type = "City"
+                            Type = "Qism"
                         },
                         new
                         {
@@ -6518,7 +6558,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ??? ???????",
                             NameEn = "Hurghada 2",
                             ParentId = new Guid("00000000-0000-0000-0000-000000000026"),
-                            Type = "City"
+                            Type = "Qism"
                         },
                         new
                         {
@@ -6528,7 +6568,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "???? ??????? ???????",
                             NameEn = "Al-Kharga Oasis",
                             ParentId = new Guid("00000000-0000-0000-0000-000000000027"),
-                            Type = "City"
+                            Type = "Markaz"
                         },
                         new
                         {
@@ -6538,7 +6578,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "???? ?????? ???????",
                             NameEn = "A-Dakhla Oasis",
                             ParentId = new Guid("00000000-0000-0000-0000-000000000027"),
-                            Type = "City"
+                            Type = "Markaz"
                         },
                         new
                         {
@@ -6548,7 +6588,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "???? ????????",
                             NameEn = "Al Farafra Oasis",
                             ParentId = new Guid("00000000-0000-0000-0000-000000000027"),
-                            Type = "City"
+                            Type = "Markaz"
                         },
                         new
                         {
@@ -6558,7 +6598,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "???? ?????",
                             NameEn = "Paris Paris",
                             ParentId = new Guid("00000000-0000-0000-0000-000000000027"),
-                            Type = "City"
+                            Type = "Markaz"
                         },
                         new
                         {
@@ -6568,7 +6608,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ???? ?????",
                             NameEn = "Marsa Matruh",
                             ParentId = new Guid("00000000-0000-0000-0000-000000000028"),
-                            Type = "City"
+                            Type = "Qism"
                         },
                         new
                         {
@@ -6578,7 +6618,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ??????",
                             NameEn = "Al-Hammam",
                             ParentId = new Guid("00000000-0000-0000-0000-000000000028"),
-                            Type = "City"
+                            Type = "Qism"
                         },
                         new
                         {
@@ -6588,7 +6628,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ??????",
                             NameEn = "Salloum",
                             ParentId = new Guid("00000000-0000-0000-0000-000000000028"),
-                            Type = "City"
+                            Type = "Qism"
                         },
                         new
                         {
@@ -6598,7 +6638,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "???? ??????",
                             NameEn = "Daba",
                             ParentId = new Guid("00000000-0000-0000-0000-000000000028"),
-                            Type = "City"
+                            Type = "Markaz"
                         },
                         new
                         {
@@ -6608,7 +6648,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ???? ?????",
                             NameEn = "Sidi Barani",
                             ParentId = new Guid("00000000-0000-0000-0000-000000000028"),
-                            Type = "City"
+                            Type = "Qism"
                         },
                         new
                         {
@@ -6618,7 +6658,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "???? ????",
                             NameEn = "Siwa",
                             ParentId = new Guid("00000000-0000-0000-0000-000000000028"),
-                            Type = "City"
+                            Type = "Markaz"
                         },
                         new
                         {
@@ -6628,7 +6668,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ?????? ??????? ????????",
                             NameEn = "Alamn",
                             ParentId = new Guid("00000000-0000-0000-0000-000000000028"),
-                            Type = "City"
+                            Type = "Qism"
                         },
                         new
                         {
@@ -6638,7 +6678,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ?????? ???????-???",
                             NameEn = "North Coast",
                             ParentId = new Guid("00000000-0000-0000-0000-000000000028"),
-                            Type = "City"
+                            Type = "Qism"
                         },
                         new
                         {
@@ -6648,7 +6688,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ??? ??????",
                             NameEn = "El Arish 1",
                             ParentId = new Guid("00000000-0000-0000-0000-000000000029"),
-                            Type = "City"
+                            Type = "Qism"
                         },
                         new
                         {
@@ -6658,7 +6698,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ??? ??????",
                             NameEn = "El Arish 2",
                             ParentId = new Guid("00000000-0000-0000-0000-000000000029"),
-                            Type = "City"
+                            Type = "Qism"
                         },
                         new
                         {
@@ -6668,7 +6708,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ???? ??????",
                             NameEn = "El Arish 3",
                             ParentId = new Guid("00000000-0000-0000-0000-000000000029"),
-                            Type = "City"
+                            Type = "Qism"
                         },
                         new
                         {
@@ -6678,7 +6718,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ???? ??????",
                             NameEn = "El Arish 4",
                             ParentId = new Guid("00000000-0000-0000-0000-000000000029"),
-                            Type = "City"
+                            Type = "Qism"
                         },
                         new
                         {
@@ -6688,7 +6728,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ??? ?????",
                             NameEn = "Bir Al-Abd",
                             ParentId = new Guid("00000000-0000-0000-0000-000000000029"),
-                            Type = "City"
+                            Type = "Qism"
                         },
                         new
                         {
@@ -6698,7 +6738,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ??????",
                             NameEn = "Al-Hasna",
                             ParentId = new Guid("00000000-0000-0000-0000-000000000029"),
-                            Type = "City"
+                            Type = "Qism"
                         },
                         new
                         {
@@ -6708,7 +6748,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ???",
                             NameEn = "Nakhl",
                             ParentId = new Guid("00000000-0000-0000-0000-000000000029"),
-                            Type = "City"
+                            Type = "Qism"
                         },
                         new
                         {
@@ -6718,7 +6758,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ????? ????",
                             NameEn = "Shaykh Zuwayd",
                             ParentId = new Guid("00000000-0000-0000-0000-000000000029"),
-                            Type = "City"
+                            Type = "Qism"
                         },
                         new
                         {
@@ -6728,7 +6768,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ???",
                             NameEn = "Rafah",
                             ParentId = new Guid("00000000-0000-0000-0000-000000000029"),
-                            Type = "City"
+                            Type = "Qism"
                         },
                         new
                         {
@@ -6738,7 +6778,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ?????",
                             NameEn = "Rummana",
                             ParentId = new Guid("00000000-0000-0000-0000-000000000029"),
-                            Type = "City"
+                            Type = "Qism"
                         },
                         new
                         {
@@ -6748,7 +6788,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ???????",
                             NameEn = "Qasima",
                             ParentId = new Guid("00000000-0000-0000-0000-000000000029"),
-                            Type = "City"
+                            Type = "Qism"
                         },
                         new
                         {
@@ -6758,7 +6798,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ?????",
                             NameEn = "Al-Tur",
                             ParentId = new Guid("00000000-0000-0000-0000-000000000030"),
-                            Type = "City"
+                            Type = "Qism"
                         },
                         new
                         {
@@ -6768,7 +6808,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ??? ???",
                             NameEn = "Ras Sidr",
                             ParentId = new Guid("00000000-0000-0000-0000-000000000030"),
-                            Type = "City"
+                            Type = "Qism"
                         },
                         new
                         {
@@ -6778,7 +6818,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ??? ????",
                             NameEn = "Abu Radis",
                             ParentId = new Guid("00000000-0000-0000-0000-000000000030"),
-                            Type = "City"
+                            Type = "Qism"
                         },
                         new
                         {
@@ -6788,7 +6828,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ???? ??????",
                             NameEn = "Sant Katrin",
                             ParentId = new Guid("00000000-0000-0000-0000-000000000030"),
-                            Type = "City"
+                            Type = "Qism"
                         },
                         new
                         {
@@ -6798,7 +6838,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ??? ?????",
                             NameEn = "Sharm el-Sheikh",
                             ParentId = new Guid("00000000-0000-0000-0000-000000000030"),
-                            Type = "City"
+                            Type = "Qism"
                         },
                         new
                         {
@@ -6808,7 +6848,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ???",
                             NameEn = "Dahab",
                             ParentId = new Guid("00000000-0000-0000-0000-000000000030"),
-                            Type = "City"
+                            Type = "Qism"
                         },
                         new
                         {
@@ -6818,7 +6858,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ?????",
                             NameEn = "Nuweiba",
                             ParentId = new Guid("00000000-0000-0000-0000-000000000030"),
-                            Type = "City"
+                            Type = "Qism"
                         },
                         new
                         {
@@ -6828,7 +6868,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ????",
                             NameEn = "Taba",
                             ParentId = new Guid("00000000-0000-0000-0000-000000000030"),
-                            Type = "City"
+                            Type = "Qism"
                         },
                         new
                         {
@@ -6868,7 +6908,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ?????",
                             NameEn = "????? ?????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000004"),
-                            Type = "Village"
+                            Type = "City"
                         },
                         new
                         {
@@ -6968,7 +7008,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ?????",
                             NameEn = "??? ?????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000005"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -6978,7 +7018,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ????",
                             NameEn = "????? ????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000005"),
-                            Type = "Village"
+                            Type = "Manshaat"
                         },
                         new
                         {
@@ -6998,7 +7038,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??????? ??????",
                             NameEn = "??????? ??????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000006"),
-                            Type = "Village"
+                            Type = "Shiyakha"
                         },
                         new
                         {
@@ -7008,7 +7048,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??????? ??????? ? ???? ????????? ?? 7 ??? 21",
                             NameEn = "??????? ??????? ? ???? ????????? ?? 7 ??? 21",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000006"),
-                            Type = "Village"
+                            Type = "Shiyakha"
                         },
                         new
                         {
@@ -7018,7 +7058,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??????? ??????? ? ???? ????????? ?? 2 ??? 52",
                             NameEn = "??????? ??????? ? ???? ????????? ?? 2 ??? 52",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000006"),
-                            Type = "Village"
+                            Type = "Shiyakha"
                         },
                         new
                         {
@@ -7118,7 +7158,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ??????",
                             NameEn = "????? ??????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000008"),
-                            Type = "Village"
+                            Type = "Manshaat"
                         },
                         new
                         {
@@ -7725,8 +7765,8 @@ namespace Tawreed.Infrastructure.Migrations
                             Id = new Guid("00000002-0000-0000-0000-000000000090"),
                             CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             IsActive = true,
-                            NameAr = "??????",
-                            NameEn = "??????",
+                            NameAr = "?????? ",
+                            NameEn = "?????? ",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000013"),
                             Type = "Village"
                         },
@@ -8005,8 +8045,8 @@ namespace Tawreed.Infrastructure.Migrations
                             Id = new Guid("00000002-0000-0000-0000-000000000118"),
                             CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             IsActive = true,
-                            NameAr = "??? ?????",
-                            NameEn = "??? ?????",
+                            NameAr = "??? ????? ",
+                            NameEn = "??? ????? ",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000015"),
                             Type = "Village"
                         },
@@ -8705,8 +8745,8 @@ namespace Tawreed.Infrastructure.Migrations
                             Id = new Guid("00000002-0000-0000-0000-000000000188"),
                             CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             IsActive = true,
-                            NameAr = "??? ????? ?????",
-                            NameEn = "??? ????? ?????",
+                            NameAr = "??? ????? ????? ",
+                            NameEn = "??? ????? ????? ",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000023"),
                             Type = "Village"
                         },
@@ -8988,7 +9028,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ?????",
                             NameEn = "????? ?????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000026"),
-                            Type = "Village"
+                            Type = "Manshaat"
                         },
                         new
                         {
@@ -9278,7 +9318,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "???? ???????",
                             NameEn = "???? ???????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000029"),
-                            Type = "Village"
+                            Type = "Ezba"
                         },
                         new
                         {
@@ -9358,7 +9398,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "???? ?????",
                             NameEn = "???? ?????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000030"),
-                            Type = "Village"
+                            Type = "Ezba"
                         },
                         new
                         {
@@ -9408,7 +9448,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ??????",
                             NameEn = "????? ??????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000031"),
-                            Type = "Village"
+                            Type = "Manshaat"
                         },
                         new
                         {
@@ -9508,7 +9548,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ???????",
                             NameEn = "????? ???????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000033"),
-                            Type = "Village"
+                            Type = "Manshaat"
                         },
                         new
                         {
@@ -9688,7 +9728,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ????",
                             NameEn = "????? ????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000037"),
-                            Type = "Village"
+                            Type = "Manshaat"
                         },
                         new
                         {
@@ -9748,7 +9788,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "???? ?????",
                             NameEn = "???? ?????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000038"),
-                            Type = "Village"
+                            Type = "Ezba"
                         },
                         new
                         {
@@ -9758,7 +9798,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "???? ????",
                             NameEn = "???? ????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000038"),
-                            Type = "Village"
+                            Type = "Ezba"
                         },
                         new
                         {
@@ -9768,7 +9808,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "???? ????",
                             NameEn = "???? ????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000038"),
-                            Type = "Village"
+                            Type = "Ezba"
                         },
                         new
                         {
@@ -9808,7 +9848,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "???? ?????",
                             NameEn = "???? ?????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000039"),
-                            Type = "Village"
+                            Type = "Ezba"
                         },
                         new
                         {
@@ -9818,7 +9858,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ??? ???",
                             NameEn = "??? ??? ???",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000039"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -9828,7 +9868,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ??????",
                             NameEn = "??? ??????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000039"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -9838,7 +9878,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ??????",
                             NameEn = "??? ??????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000039"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -9968,7 +10008,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ?????? 1",
                             NameEn = "????? ?????? 1",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000043"),
-                            Type = "Village"
+                            Type = "Shiyakha"
                         },
                         new
                         {
@@ -9978,7 +10018,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ?????? 2",
                             NameEn = "????? ?????? 2",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000043"),
-                            Type = "Village"
+                            Type = "Shiyakha"
                         },
                         new
                         {
@@ -9988,7 +10028,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ????? ??????",
                             NameEn = "????? ????? ??????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000043"),
-                            Type = "Village"
+                            Type = "Shiyakha"
                         },
                         new
                         {
@@ -9998,7 +10038,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ??? 1",
                             NameEn = "????? ??? 1",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000044"),
-                            Type = "Village"
+                            Type = "Shiyakha"
                         },
                         new
                         {
@@ -10008,7 +10048,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ???? ????? ???????? ????????",
                             NameEn = "????? ???? ????? ???????? ????????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000044"),
-                            Type = "Village"
+                            Type = "Shiyakha"
                         },
                         new
                         {
@@ -10018,7 +10058,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ???? ?????? ?????? ???????? ?????????",
                             NameEn = "????? ???? ?????? ?????? ???????? ?????????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000044"),
-                            Type = "Village"
+                            Type = "Shiyakha"
                         },
                         new
                         {
@@ -10028,7 +10068,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ???? ?????? ???????? ?????????",
                             NameEn = "????? ???? ?????? ???????? ?????????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000044"),
-                            Type = "Village"
+                            Type = "Shiyakha"
                         },
                         new
                         {
@@ -10038,7 +10078,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ???? ??????",
                             NameEn = "????? ???? ??????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000044"),
-                            Type = "Village"
+                            Type = "Shiyakha"
                         },
                         new
                         {
@@ -10048,7 +10088,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ???? ???????",
                             NameEn = "????? ???? ???????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000044"),
-                            Type = "Village"
+                            Type = "Shiyakha"
                         },
                         new
                         {
@@ -10058,7 +10098,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ??????? ???????? ?????? ???????? ?????????",
                             NameEn = "????? ??????? ???????? ?????? ???????? ?????????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000044"),
-                            Type = "Village"
+                            Type = "Shiyakha"
                         },
                         new
                         {
@@ -10068,7 +10108,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ??????? ???????? ??? ???? ????????",
                             NameEn = "????? ??????? ???????? ??? ???? ????????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000044"),
-                            Type = "Village"
+                            Type = "Shiyakha"
                         },
                         new
                         {
@@ -10328,7 +10368,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "???? ??????",
                             NameEn = "???? ??????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000047"),
-                            Type = "Village"
+                            Type = "Ezba"
                         },
                         new
                         {
@@ -10338,7 +10378,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????  ???",
                             NameEn = "????  ???",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000047"),
-                            Type = "Village"
+                            Type = "Ezba"
                         },
                         new
                         {
@@ -10358,7 +10398,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ??????????? ???? ????? ????",
                             NameEn = "????? ??????????? ???? ????? ????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000048"),
-                            Type = "Village"
+                            Type = "Shiyakha"
                         },
                         new
                         {
@@ -10368,7 +10408,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ??????????? ???? ??????? ????",
                             NameEn = "????? ??????????? ???? ??????? ????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000048"),
-                            Type = "Village"
+                            Type = "Shiyakha"
                         },
                         new
                         {
@@ -10378,7 +10418,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ?????????  ????????",
                             NameEn = "????? ?????????  ????????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000048"),
-                            Type = "Village"
+                            Type = "Shiyakha"
                         },
                         new
                         {
@@ -10388,7 +10428,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ?????? ????",
                             NameEn = "????? ?????? ????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000048"),
-                            Type = "Village"
+                            Type = "Shiyakha"
                         },
                         new
                         {
@@ -10398,7 +10438,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ??? ???? ??????  ??????",
                             NameEn = "????? ??? ???? ??????  ??????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000048"),
-                            Type = "Village"
+                            Type = "Shiyakha"
                         },
                         new
                         {
@@ -10408,7 +10448,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ???? ??????",
                             NameEn = "????? ???? ??????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000048"),
-                            Type = "Village"
+                            Type = "Shiyakha"
                         },
                         new
                         {
@@ -11298,7 +11338,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ??? ?????",
                             NameEn = "????? ??? ?????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000058"),
-                            Type = "Village"
+                            Type = "City"
                         },
                         new
                         {
@@ -11398,7 +11438,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??????? ????????",
                             NameEn = "??????? ????????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000059"),
-                            Type = "Village"
+                            Type = "CustomsZone"
                         },
                         new
                         {
@@ -11408,7 +11448,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ??? ????? ???????",
                             NameEn = "????? ??? ????? ???????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000060"),
-                            Type = "Village"
+                            Type = "City"
                         },
                         new
                         {
@@ -11698,7 +11738,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??????? ????????",
                             NameEn = "??????? ????????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000074"),
-                            Type = "Village"
+                            Type = "CustomsZone"
                         },
                         new
                         {
@@ -11708,7 +11748,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ???",
                             NameEn = "??? ???",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000075"),
-                            Type = "Village"
+                            Type = "QismSection"
                         },
                         new
                         {
@@ -11718,7 +11758,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ???",
                             NameEn = "??? ???",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000075"),
-                            Type = "Village"
+                            Type = "QismSection"
                         },
                         new
                         {
@@ -11728,7 +11768,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ????",
                             NameEn = "??? ????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000076"),
-                            Type = "Village"
+                            Type = "QismSection"
                         },
                         new
                         {
@@ -11738,7 +11778,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ????",
                             NameEn = "??? ????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000076"),
-                            Type = "Village"
+                            Type = "QismSection"
                         },
                         new
                         {
@@ -11748,7 +11788,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ?????",
                             NameEn = "????? ?????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000077"),
-                            Type = "Village"
+                            Type = "City"
                         },
                         new
                         {
@@ -11758,7 +11798,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ??????",
                             NameEn = "????? ??????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000077"),
-                            Type = "Village"
+                            Type = "City"
                         },
                         new
                         {
@@ -11858,7 +11898,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "???? ?????? ???? ???????",
                             NameEn = "???? ?????? ???? ???????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000078"),
-                            Type = "Village"
+                            Type = "Zone"
                         },
                         new
                         {
@@ -11868,7 +11908,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ???? ????? ??????? ?????????",
                             NameEn = "????? ???? ????? ??????? ?????????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000079"),
-                            Type = "Village"
+                            Type = "Shiyakha"
                         },
                         new
                         {
@@ -11888,7 +11928,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ??? ???",
                             NameEn = "????? ??? ???",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000081"),
-                            Type = "Village"
+                            Type = "Shiyakha"
                         },
                         new
                         {
@@ -11898,7 +11938,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ??? ???",
                             NameEn = "????? ??? ???",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000081"),
-                            Type = "Village"
+                            Type = "Shiyakha"
                         },
                         new
                         {
@@ -11908,7 +11948,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ???? ?????",
                             NameEn = "????? ???? ?????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000082"),
-                            Type = "Village"
+                            Type = "City"
                         },
                         new
                         {
@@ -12088,7 +12128,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ???????",
                             NameEn = "????? ???????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000083"),
-                            Type = "Village"
+                            Type = "City"
                         },
                         new
                         {
@@ -12098,7 +12138,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ??????",
                             NameEn = "????? ??????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000083"),
-                            Type = "Village"
+                            Type = "City"
                         },
                         new
                         {
@@ -12288,7 +12328,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ???????",
                             NameEn = "??? ???????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000083"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -12298,7 +12338,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ?????",
                             NameEn = "??? ?????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000083"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -12308,7 +12348,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ??? ?????",
                             NameEn = "????? ??? ?????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000083"),
-                            Type = "Village"
+                            Type = "Manshaat"
                         },
                         new
                         {
@@ -12328,7 +12368,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ????????",
                             NameEn = "??? ????????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000083"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -12338,7 +12378,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ??? ???",
                             NameEn = "????? ??? ???",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000084"),
-                            Type = "Village"
+                            Type = "City"
                         },
                         new
                         {
@@ -12348,7 +12388,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ??? ??????",
                             NameEn = "????? ??? ??????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000084"),
-                            Type = "Village"
+                            Type = "City"
                         },
                         new
                         {
@@ -12358,7 +12398,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ??? ??? ????",
                             NameEn = "????? ??? ??? ????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000084"),
-                            Type = "Village"
+                            Type = "City"
                         },
                         new
                         {
@@ -12588,7 +12628,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ??? ???",
                             NameEn = "??? ??? ???",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000084"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -12598,7 +12638,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ????????? ???????",
                             NameEn = "??? ????????? ???????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000084"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -12608,7 +12648,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ????????",
                             NameEn = "??? ????????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000084"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -12618,7 +12658,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ????????",
                             NameEn = "??? ????????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000084"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -12628,7 +12668,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ?????? ??????",
                             NameEn = "??? ?????? ??????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000084"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -12658,7 +12698,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ????",
                             NameEn = "????? ????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000084"),
-                            Type = "Village"
+                            Type = "Manshaat"
                         },
                         new
                         {
@@ -12695,8 +12735,8 @@ namespace Tawreed.Infrastructure.Migrations
                             Id = new Guid("00000002-0000-0000-0000-000000000587"),
                             CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             IsActive = true,
-                            NameAr = "?? ????? ???????",
-                            NameEn = "?? ????? ???????",
+                            NameAr = " ?? ????? ???????",
+                            NameEn = " ?? ????? ???????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000084"),
                             Type = "Village"
                         },
@@ -12708,7 +12748,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "???? ??????",
                             NameEn = "???? ??????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000084"),
-                            Type = "Village"
+                            Type = "Ezba"
                         },
                         new
                         {
@@ -12728,7 +12768,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ????? ???????",
                             NameEn = "????? ????? ???????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000085"),
-                            Type = "Village"
+                            Type = "City"
                         },
                         new
                         {
@@ -12738,7 +12778,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ??? ????",
                             NameEn = "????? ??? ????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000086"),
-                            Type = "Village"
+                            Type = "City"
                         },
                         new
                         {
@@ -12748,7 +12788,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ??????",
                             NameEn = "????? ??????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000087"),
-                            Type = "Village"
+                            Type = "City"
                         },
                         new
                         {
@@ -12758,7 +12798,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ?????",
                             NameEn = "????? ?????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000087"),
-                            Type = "Village"
+                            Type = "City"
                         },
                         new
                         {
@@ -12828,7 +12868,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ????????",
                             NameEn = "??? ????????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000087"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -12838,7 +12878,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ???",
                             NameEn = "??? ???",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000087"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -12858,7 +12898,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "???? ?????",
                             NameEn = "???? ?????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000087"),
-                            Type = "Village"
+                            Type = "Ezba"
                         },
                         new
                         {
@@ -12878,7 +12918,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ??? ????",
                             NameEn = "????? ??? ????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000089"),
-                            Type = "Village"
+                            Type = "Shiyakha"
                         },
                         new
                         {
@@ -12888,7 +12928,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ??? ????",
                             NameEn = "????? ??? ????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000089"),
-                            Type = "Village"
+                            Type = "Shiyakha"
                         },
                         new
                         {
@@ -12898,7 +12938,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ??? ??? ????",
                             NameEn = "??? ??? ??? ????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000090"),
-                            Type = "Village"
+                            Type = "QismSection"
                         },
                         new
                         {
@@ -12908,7 +12948,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ??? ??????",
                             NameEn = "??? ??? ??????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000090"),
-                            Type = "Village"
+                            Type = "QismSection"
                         },
                         new
                         {
@@ -12918,7 +12958,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ???? ???????",
                             NameEn = "??? ???? ???????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000090"),
-                            Type = "Village"
+                            Type = "QismSection"
                         },
                         new
                         {
@@ -12928,7 +12968,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ???? ??????",
                             NameEn = "??? ???? ??????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000090"),
-                            Type = "Village"
+                            Type = "QismSection"
                         },
                         new
                         {
@@ -12948,7 +12988,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ???? ????",
                             NameEn = "??? ???? ????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000091"),
-                            Type = "Village"
+                            Type = "QismSection"
                         },
                         new
                         {
@@ -12958,7 +12998,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ???? ??? ????",
                             NameEn = "??? ???? ??? ????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000091"),
-                            Type = "Village"
+                            Type = "QismSection"
                         },
                         new
                         {
@@ -12968,7 +13008,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ???? ????? ??????",
                             NameEn = "??? ???? ????? ??????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000091"),
-                            Type = "Village"
+                            Type = "QismSection"
                         },
                         new
                         {
@@ -12978,7 +13018,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ????????",
                             NameEn = "??? ????????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000091"),
-                            Type = "Village"
+                            Type = "QismSection"
                         },
                         new
                         {
@@ -12988,7 +13028,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ??? ???????",
                             NameEn = "??? ??? ???????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000091"),
-                            Type = "Village"
+                            Type = "QismSection"
                         },
                         new
                         {
@@ -13348,7 +13388,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ????????",
                             NameEn = "??? ????????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000092"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -13358,7 +13398,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ????????",
                             NameEn = "??? ????????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000092"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -13368,7 +13408,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ???????",
                             NameEn = "??? ???????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000092"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -13378,7 +13418,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ????? ??????",
                             NameEn = "??? ????? ??????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000092"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -13388,7 +13428,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ????? ??????",
                             NameEn = "??? ????? ??????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000092"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -13398,7 +13438,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ??????",
                             NameEn = "??? ??????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000092"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -13408,7 +13448,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ????",
                             NameEn = "??? ????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000092"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -13418,7 +13458,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ??? ????",
                             NameEn = "??? ??? ????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000092"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -13565,8 +13605,8 @@ namespace Tawreed.Infrastructure.Migrations
                             Id = new Guid("00000002-0000-0000-0000-000000000674"),
                             CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             IsActive = true,
-                            NameAr = "??? ?????",
-                            NameEn = "??? ?????",
+                            NameAr = "??? ????? ",
+                            NameEn = "??? ????? ",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000092"),
                             Type = "Village"
                         },
@@ -13608,7 +13648,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ????????",
                             NameEn = "??? ????????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000092"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -13628,7 +13668,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ???",
                             NameEn = "????? ???",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000093"),
-                            Type = "Village"
+                            Type = "City"
                         },
                         new
                         {
@@ -13985,8 +14025,8 @@ namespace Tawreed.Infrastructure.Migrations
                             Id = new Guid("00000002-0000-0000-0000-000000000716"),
                             CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             IsActive = true,
-                            NameAr = "????? ?????",
-                            NameEn = "????? ?????",
+                            NameAr = "????? ????? ",
+                            NameEn = "????? ????? ",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000093"),
                             Type = "Village"
                         },
@@ -13998,7 +14038,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ???????? ???????",
                             NameEn = "??? ???????? ???????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000093"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -14008,7 +14048,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ????????",
                             NameEn = "??? ????????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000093"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -14018,7 +14058,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ???????",
                             NameEn = "??? ???????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000093"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -14028,7 +14068,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ??????",
                             NameEn = "??? ??????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000093"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -14038,7 +14078,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ???? ??????",
                             NameEn = "??? ???? ??????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000093"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -14048,7 +14088,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ??? ???????",
                             NameEn = "??? ??? ???????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000093"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -14058,7 +14098,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ??????",
                             NameEn = "????? ??????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000093"),
-                            Type = "Village"
+                            Type = "Manshaat"
                         },
                         new
                         {
@@ -14078,7 +14118,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ??? ?????",
                             NameEn = "????? ??? ?????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000093"),
-                            Type = "Village"
+                            Type = "Manshaat"
                         },
                         new
                         {
@@ -14088,7 +14128,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ?????",
                             NameEn = "????? ?????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000093"),
-                            Type = "Village"
+                            Type = "Manshaat"
                         },
                         new
                         {
@@ -14228,7 +14268,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ??????????",
                             NameEn = "????? ??????????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000094"),
-                            Type = "Village"
+                            Type = "City"
                         },
                         new
                         {
@@ -14415,8 +14455,8 @@ namespace Tawreed.Infrastructure.Migrations
                             Id = new Guid("00000002-0000-0000-0000-000000000759"),
                             CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             IsActive = true,
-                            NameAr = "??????",
-                            NameEn = "??????",
+                            NameAr = "?????? ",
+                            NameEn = "?????? ",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000094"),
                             Type = "Village"
                         },
@@ -14618,7 +14658,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ????? ???",
                             NameEn = "??? ????? ???",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000094"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -14628,7 +14668,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ?????",
                             NameEn = "??? ?????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000094"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -14638,7 +14678,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ??????",
                             NameEn = "??? ??????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000094"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -14648,7 +14688,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ?????? ????? ?????",
                             NameEn = "??? ?????? ????? ?????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000094"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -14658,7 +14698,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ???????",
                             NameEn = "??? ???????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000094"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -14668,7 +14708,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ????????",
                             NameEn = "??? ????????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000094"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -14678,7 +14718,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ???? ????",
                             NameEn = "??? ???? ????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000094"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -14688,7 +14728,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ??? ????",
                             NameEn = "??? ??? ????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000094"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -14698,7 +14738,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ???",
                             NameEn = "??? ???",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000094"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -14708,7 +14748,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ?????",
                             NameEn = "??? ?????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000094"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -14718,7 +14758,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ???? ???",
                             NameEn = "??? ???? ???",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000094"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -14728,7 +14768,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ????? ??????",
                             NameEn = "??? ????? ??????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000094"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -14738,7 +14778,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ??? ?????? ??? ????",
                             NameEn = "??? ??? ?????? ??? ????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000094"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -14748,7 +14788,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ????",
                             NameEn = "??? ????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000094"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -14758,7 +14798,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ????",
                             NameEn = "??? ????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000094"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -14768,7 +14808,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ?????",
                             NameEn = "??? ?????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000094"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -14778,7 +14818,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ???? ???????",
                             NameEn = "??? ???? ???????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000094"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -14788,7 +14828,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ??? ????",
                             NameEn = "??? ??? ????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000094"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -14798,7 +14838,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ???? ???",
                             NameEn = "??? ???? ???",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000094"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -14808,7 +14848,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ???",
                             NameEn = "????? ???",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000094"),
-                            Type = "Village"
+                            Type = "Manshaat"
                         },
                         new
                         {
@@ -14818,7 +14858,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ????",
                             NameEn = "????? ????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000094"),
-                            Type = "Village"
+                            Type = "Manshaat"
                         },
                         new
                         {
@@ -14828,7 +14868,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ???",
                             NameEn = "????? ???",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000094"),
-                            Type = "Village"
+                            Type = "Manshaat"
                         },
                         new
                         {
@@ -14865,8 +14905,8 @@ namespace Tawreed.Infrastructure.Migrations
                             Id = new Guid("00000002-0000-0000-0000-000000000804"),
                             CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             IsActive = true,
-                            NameAr = "?????",
-                            NameEn = "?????",
+                            NameAr = " ?????",
+                            NameEn = " ?????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000094"),
                             Type = "Village"
                         },
@@ -14908,7 +14948,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ????",
                             NameEn = "????? ????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000094"),
-                            Type = "Village"
+                            Type = "Manshaat"
                         },
                         new
                         {
@@ -14918,7 +14958,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ???????",
                             NameEn = "????? ???????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000095"),
-                            Type = "Village"
+                            Type = "City"
                         },
                         new
                         {
@@ -14958,7 +14998,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ???????",
                             NameEn = "????? ???????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000096"),
-                            Type = "Village"
+                            Type = "City"
                         },
                         new
                         {
@@ -15278,7 +15318,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "???? ????????",
                             NameEn = "???? ????????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000096"),
-                            Type = "Village"
+                            Type = "Ezba"
                         },
                         new
                         {
@@ -15288,7 +15328,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ????",
                             NameEn = "??? ????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000096"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -15328,7 +15368,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ?????",
                             NameEn = "????? ?????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000097"),
-                            Type = "Village"
+                            Type = "City"
                         },
                         new
                         {
@@ -15548,7 +15588,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ???????",
                             NameEn = "??? ???????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000097"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -15558,7 +15598,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ?????",
                             NameEn = "??? ?????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000097"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -15568,7 +15608,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ???????",
                             NameEn = "????? ???????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000097"),
-                            Type = "Village"
+                            Type = "Manshaat"
                         },
                         new
                         {
@@ -15578,7 +15618,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ?????",
                             NameEn = "????? ?????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000097"),
-                            Type = "Village"
+                            Type = "Manshaat"
                         },
                         new
                         {
@@ -15588,7 +15628,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ??? ??????",
                             NameEn = "????? ??? ??????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000097"),
-                            Type = "Village"
+                            Type = "Manshaat"
                         },
                         new
                         {
@@ -15628,7 +15668,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ?????",
                             NameEn = "????? ?????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000098"),
-                            Type = "Village"
+                            Type = "City"
                         },
                         new
                         {
@@ -15795,8 +15835,8 @@ namespace Tawreed.Infrastructure.Migrations
                             Id = new Guid("00000002-0000-0000-0000-000000000897"),
                             CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             IsActive = true,
-                            NameAr = "???????",
-                            NameEn = "???????",
+                            NameAr = " ???????",
+                            NameEn = " ???????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000098"),
                             Type = "Village"
                         },
@@ -15828,7 +15868,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ??? ???",
                             NameEn = "??? ??? ???",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000098"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -15838,7 +15878,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ??? ????",
                             NameEn = "??? ??? ????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000098"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -15848,7 +15888,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ?????",
                             NameEn = "??? ?????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000098"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -15858,7 +15898,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ????????",
                             NameEn = "??? ????????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000098"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -15868,7 +15908,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ??????",
                             NameEn = "??? ??????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000098"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -15878,7 +15918,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ??? ?????? ?????? ?????",
                             NameEn = "??? ??? ?????? ?????? ?????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000098"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -15888,7 +15928,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ??? ??????",
                             NameEn = "????? ??? ??????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000098"),
-                            Type = "Village"
+                            Type = "Manshaat"
                         },
                         new
                         {
@@ -15988,7 +16028,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ?????",
                             NameEn = "????? ?????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000099"),
-                            Type = "Village"
+                            Type = "City"
                         },
                         new
                         {
@@ -16138,7 +16178,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ??? ???? ??????",
                             NameEn = "??? ??? ???? ??????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000099"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -16148,7 +16188,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ??????",
                             NameEn = "??? ??????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000099"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -16158,7 +16198,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ?????? ???????",
                             NameEn = "??? ?????? ???????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000099"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -16168,7 +16208,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ?????? ??????",
                             NameEn = "??? ?????? ??????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000099"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -16178,7 +16218,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ????? ??????",
                             NameEn = "??? ????? ??????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000099"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -16188,7 +16228,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ??????",
                             NameEn = "??? ??????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000099"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -16198,7 +16238,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ???????",
                             NameEn = "??? ???????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000099"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -16208,7 +16248,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ????? ????",
                             NameEn = "??? ????? ????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000099"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -16218,7 +16258,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ???????",
                             NameEn = "??? ???????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000099"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -16228,7 +16268,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ????? ?????",
                             NameEn = "??? ????? ?????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000099"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -16238,15 +16278,15 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ????",
                             NameEn = "??? ????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000099"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
                             Id = new Guid("00000002-0000-0000-0000-000000000942"),
                             CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             IsActive = true,
-                            NameAr = "???? ?????",
-                            NameEn = "???? ?????",
+                            NameAr = "???? ????? ",
+                            NameEn = "???? ????? ",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000099"),
                             Type = "Village"
                         },
@@ -16258,7 +16298,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ????",
                             NameEn = "????? ????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000100"),
-                            Type = "Village"
+                            Type = "City"
                         },
                         new
                         {
@@ -16378,7 +16418,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ???????",
                             NameEn = "??? ???????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000100"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -16388,7 +16428,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ???????",
                             NameEn = "??? ???????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000100"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -16398,7 +16438,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ?????",
                             NameEn = "??? ?????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000100"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -16408,7 +16448,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ???????",
                             NameEn = "??? ???????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000100"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -16418,7 +16458,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ????",
                             NameEn = "??? ????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000100"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -16428,7 +16468,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ????? ??????",
                             NameEn = "??? ????? ??????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000100"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -16438,7 +16478,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ????? ??????",
                             NameEn = "??? ????? ??????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000100"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -16458,7 +16498,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ??????",
                             NameEn = "????? ??????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000100"),
-                            Type = "Village"
+                            Type = "Manshaat"
                         },
                         new
                         {
@@ -16518,7 +16558,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ??? ??? ? ???? ??????",
                             NameEn = "????? ??? ??? ? ???? ??????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000101"),
-                            Type = "Village"
+                            Type = "City"
                         },
                         new
                         {
@@ -16728,7 +16768,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ??????? ????",
                             NameEn = "??? ??????? ????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000102"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -16738,7 +16778,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ??? ??????",
                             NameEn = "??? ??? ??????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000102"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -16748,7 +16788,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ??? ?????",
                             NameEn = "??? ??? ?????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000102"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -16758,7 +16798,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ???????",
                             NameEn = "??? ???????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000102"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -16768,7 +16808,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ???????",
                             NameEn = "??? ???????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000102"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -16778,7 +16818,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ????????",
                             NameEn = "??? ????????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000102"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -16788,7 +16828,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ??????",
                             NameEn = "??? ??????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000102"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -16798,7 +16838,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ?????",
                             NameEn = "??? ?????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000102"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -16808,7 +16848,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ????????",
                             NameEn = "??? ????????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000102"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -16818,7 +16858,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ???????",
                             NameEn = "??? ???????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000102"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -16828,7 +16868,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ??????",
                             NameEn = "??? ??????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000102"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -16838,7 +16878,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ??????",
                             NameEn = "??? ??????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000102"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -16848,7 +16888,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ????? ??????",
                             NameEn = "??? ????? ??????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000102"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -16858,7 +16898,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ???? ???",
                             NameEn = "??? ???? ???",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000102"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -16868,7 +16908,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ????",
                             NameEn = "??? ????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000102"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -16878,7 +16918,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ?????",
                             NameEn = "??? ?????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000102"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -16888,7 +16928,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ?????? ?????",
                             NameEn = "??? ?????? ?????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000102"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -16898,7 +16938,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ???",
                             NameEn = "??? ???",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000102"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -16908,7 +16948,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ??? ???? ??????",
                             NameEn = "??? ??? ???? ??????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000102"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -16918,7 +16958,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ??? ??? ????",
                             NameEn = "??? ??? ??? ????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000102"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -16928,7 +16968,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ??? ????",
                             NameEn = "??? ??? ????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000102"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -16938,7 +16978,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ?????",
                             NameEn = "??? ?????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000102"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -16948,7 +16988,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ?????",
                             NameEn = "??? ?????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000102"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -17058,7 +17098,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ???? ?????",
                             NameEn = "????? ???? ?????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000103"),
-                            Type = "Village"
+                            Type = "City"
                         },
                         new
                         {
@@ -17068,15 +17108,15 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ??????",
                             NameEn = "????? ??????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000103"),
-                            Type = "Village"
+                            Type = "City"
                         },
                         new
                         {
                             Id = new Guid("00000002-0000-0000-0000-000000001025"),
                             CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             IsActive = true,
-                            NameAr = "???????",
-                            NameEn = "???????",
+                            NameAr = "??????? ",
+                            NameEn = "??????? ",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000103"),
                             Type = "Village"
                         },
@@ -17158,7 +17198,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ??? ????",
                             NameEn = "??? ??? ????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000103"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -17168,7 +17208,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ????",
                             NameEn = "??? ????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000103"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -17178,7 +17218,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ????",
                             NameEn = "??? ????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000103"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -17188,7 +17228,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ??????",
                             NameEn = "????? ??????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000103"),
-                            Type = "Village"
+                            Type = "Manshaat"
                         },
                         new
                         {
@@ -17198,7 +17238,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ????",
                             NameEn = "????? ????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000103"),
-                            Type = "Village"
+                            Type = "Manshaat"
                         },
                         new
                         {
@@ -17208,7 +17248,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ?????",
                             NameEn = "????? ?????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000103"),
-                            Type = "Village"
+                            Type = "Manshaat"
                         },
                         new
                         {
@@ -17268,7 +17308,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ????????",
                             NameEn = "????? ????????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000104"),
-                            Type = "Village"
+                            Type = "City"
                         },
                         new
                         {
@@ -17315,10 +17355,10 @@ namespace Tawreed.Infrastructure.Migrations
                             Id = new Guid("00000002-0000-0000-0000-000000001049"),
                             CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             IsActive = true,
-                            NameAr = "????? ??? ???????",
-                            NameEn = "????? ??? ???????",
+                            NameAr = "????? ??? ??????? ",
+                            NameEn = "????? ??? ??????? ",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000105"),
-                            Type = "Village"
+                            Type = "City"
                         },
                         new
                         {
@@ -17468,7 +17508,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ?????? ??? ????",
                             NameEn = "??? ?????? ??? ????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000105"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -17478,7 +17518,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ?????",
                             NameEn = "??? ?????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000105"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -17488,7 +17528,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ????????",
                             NameEn = "????? ????????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000105"),
-                            Type = "Village"
+                            Type = "Manshaat"
                         },
                         new
                         {
@@ -17498,7 +17538,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ????",
                             NameEn = "????? ????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000105"),
-                            Type = "Village"
+                            Type = "Manshaat"
                         },
                         new
                         {
@@ -17508,7 +17548,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ??????",
                             NameEn = "????? ??????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000105"),
-                            Type = "Village"
+                            Type = "Manshaat"
                         },
                         new
                         {
@@ -17548,7 +17588,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ?????",
                             NameEn = "????? ?????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000106"),
-                            Type = "Village"
+                            Type = "City"
                         },
                         new
                         {
@@ -17598,7 +17638,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ??? ????",
                             NameEn = "????? ??? ????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000107"),
-                            Type = "Village"
+                            Type = "City"
                         },
                         new
                         {
@@ -17688,7 +17728,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ????????",
                             NameEn = "??? ????????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000107"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -17698,7 +17738,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ??? ????",
                             NameEn = "??? ??? ????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000107"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -17718,7 +17758,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ????",
                             NameEn = "????? ????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000107"),
-                            Type = "Village"
+                            Type = "Manshaat"
                         },
                         new
                         {
@@ -17778,7 +17818,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ?????",
                             NameEn = "??? ?????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000108"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -17788,7 +17828,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ?????",
                             NameEn = "??? ?????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000108"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -17808,7 +17848,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ??????",
                             NameEn = "????? ??????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000108"),
-                            Type = "Village"
+                            Type = "Manshaat"
                         },
                         new
                         {
@@ -17828,7 +17868,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ???? - ???? ????",
                             NameEn = "????? ???? - ???? ????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000109"),
-                            Type = "Village"
+                            Type = "City"
                         },
                         new
                         {
@@ -17838,7 +17878,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ?????",
                             NameEn = "????? ?????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000110"),
-                            Type = "Village"
+                            Type = "City"
                         },
                         new
                         {
@@ -17885,8 +17925,8 @@ namespace Tawreed.Infrastructure.Migrations
                             Id = new Guid("00000002-0000-0000-0000-000000001106"),
                             CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             IsActive = true,
-                            NameAr = "??????",
-                            NameEn = "??????",
+                            NameAr = "?????? ",
+                            NameEn = "?????? ",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000110"),
                             Type = "Village"
                         },
@@ -17958,7 +17998,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ??????",
                             NameEn = "??? ??????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000110"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -17968,7 +18008,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ??????? ??????",
                             NameEn = "??? ??????? ??????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000110"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -17978,7 +18018,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ?????",
                             NameEn = "??? ?????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000110"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -17988,7 +18028,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ????????",
                             NameEn = "??? ????????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000110"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -17998,7 +18038,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ????",
                             NameEn = "??? ????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000110"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -18168,7 +18208,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ??? ??????",
                             NameEn = "??? ??? ??????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000112"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -18588,7 +18628,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ?????",
                             NameEn = "??? ?????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000113"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -18598,7 +18638,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ??? ???",
                             NameEn = "??? ??? ???",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000113"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -18608,7 +18648,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ??? ????",
                             NameEn = "??? ??? ????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000113"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -18618,7 +18658,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ???? ?????",
                             NameEn = "??? ???? ?????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000113"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -18628,7 +18668,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ???? ?????",
                             NameEn = "??? ???? ?????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000113"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -18638,7 +18678,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ???? ????",
                             NameEn = "??? ???? ????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000113"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -18648,7 +18688,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ???????",
                             NameEn = "??? ???????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000113"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -18658,7 +18698,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ???????",
                             NameEn = "??? ???????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000113"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -18668,7 +18708,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ?????",
                             NameEn = "??? ?????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000113"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -18678,7 +18718,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ??????",
                             NameEn = "??? ??????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000113"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -18688,7 +18728,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ????????",
                             NameEn = "??? ????????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000113"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -18698,7 +18738,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ?????????",
                             NameEn = "??? ?????????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000113"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -18708,7 +18748,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ??????",
                             NameEn = "??? ??????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000113"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -18718,7 +18758,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ????? ???? ?????",
                             NameEn = "??? ????? ???? ?????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000113"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -18728,7 +18768,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ??????",
                             NameEn = "??? ??????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000113"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -18738,7 +18778,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ?????? ????",
                             NameEn = "??? ?????? ????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000113"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -18748,7 +18788,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ??? ????? ?????",
                             NameEn = "??? ??? ????? ?????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000113"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -18758,7 +18798,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ??? ???? ?????",
                             NameEn = "??? ??? ???? ?????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000113"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -18768,7 +18808,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ??? ???? ?????",
                             NameEn = "??? ??? ???? ?????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000113"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -18778,7 +18818,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ???? ????",
                             NameEn = "??? ???? ????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000113"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -18788,7 +18828,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ???? ?????",
                             NameEn = "??? ???? ?????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000113"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -18798,7 +18838,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ????? ?????",
                             NameEn = "??? ????? ?????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000113"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -18808,7 +18848,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ???? ???",
                             NameEn = "??? ???? ???",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000113"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -18818,7 +18858,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ???? ?????",
                             NameEn = "??? ???? ?????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000113"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -18828,7 +18868,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ?????",
                             NameEn = "??? ?????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000113"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -18855,10 +18895,10 @@ namespace Tawreed.Infrastructure.Migrations
                             Id = new Guid("00000002-0000-0000-0000-000000001203"),
                             CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             IsActive = true,
-                            NameAr = "????? ??? ??????",
-                            NameEn = "????? ??? ??????",
+                            NameAr = "????? ??? ?????? ",
+                            NameEn = "????? ??? ?????? ",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000113"),
-                            Type = "Village"
+                            Type = "Manshaat"
                         },
                         new
                         {
@@ -18928,7 +18968,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ????",
                             NameEn = "??? ????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000113"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -18938,7 +18978,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ??? ????",
                             NameEn = "????? ??? ????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000114"),
-                            Type = "Village"
+                            Type = "City"
                         },
                         new
                         {
@@ -19198,7 +19238,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ??? ????",
                             NameEn = "??? ??? ????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000114"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -19218,7 +19258,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ???????",
                             NameEn = "??? ???????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000114"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -19228,7 +19268,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ??? ???",
                             NameEn = "??? ??? ???",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000114"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -19238,7 +19278,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ????",
                             NameEn = "??? ????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000114"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -19248,7 +19288,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ????? ?????",
                             NameEn = "??? ????? ?????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000114"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -19258,7 +19298,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ???? ????",
                             NameEn = "??? ???? ????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000114"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -19268,7 +19308,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ???????",
                             NameEn = "????? ???????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000114"),
-                            Type = "Village"
+                            Type = "Manshaat"
                         },
                         new
                         {
@@ -19288,7 +19328,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ??? ????",
                             NameEn = "????? ??? ????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000115"),
-                            Type = "Village"
+                            Type = "City"
                         },
                         new
                         {
@@ -19468,7 +19508,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ???????",
                             NameEn = "??? ???????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000115"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -19478,7 +19518,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ???????",
                             NameEn = "??? ???????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000115"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -19488,7 +19528,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ?????",
                             NameEn = "??? ?????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000115"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -19508,7 +19548,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ??????????",
                             NameEn = "????? ??????????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000115"),
-                            Type = "Village"
+                            Type = "Manshaat"
                         },
                         new
                         {
@@ -19518,7 +19558,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ?????",
                             NameEn = "????? ?????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000115"),
-                            Type = "Village"
+                            Type = "Manshaat"
                         },
                         new
                         {
@@ -19528,7 +19568,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ????",
                             NameEn = "????? ????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000115"),
-                            Type = "Village"
+                            Type = "Manshaat"
                         },
                         new
                         {
@@ -19568,7 +19608,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ????????",
                             NameEn = "????? ????????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000116"),
-                            Type = "Village"
+                            Type = "City"
                         },
                         new
                         {
@@ -19848,7 +19888,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ??? ???",
                             NameEn = "????? ??? ???",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000116"),
-                            Type = "Village"
+                            Type = "Manshaat"
                         },
                         new
                         {
@@ -19858,7 +19898,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ???? ???????",
                             NameEn = "????? ???? ???????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000116"),
-                            Type = "Village"
+                            Type = "Manshaat"
                         },
                         new
                         {
@@ -19868,7 +19908,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "?????  ????? ????",
                             NameEn = "?????  ????? ????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000116"),
-                            Type = "Village"
+                            Type = "Manshaat"
                         },
                         new
                         {
@@ -19878,7 +19918,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ??? ????",
                             NameEn = "????? ??? ????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000116"),
-                            Type = "Village"
+                            Type = "Manshaat"
                         },
                         new
                         {
@@ -19888,7 +19928,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ????? ???????",
                             NameEn = "????? ????? ???????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000116"),
-                            Type = "Village"
+                            Type = "Manshaat"
                         },
                         new
                         {
@@ -19908,7 +19948,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ???????? ???????",
                             NameEn = "????? ???????? ???????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000117"),
-                            Type = "Village"
+                            Type = "City"
                         },
                         new
                         {
@@ -19918,7 +19958,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ?????",
                             NameEn = "????? ?????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000118"),
-                            Type = "Village"
+                            Type = "City"
                         },
                         new
                         {
@@ -20058,7 +20098,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ???????",
                             NameEn = "??? ???????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000118"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -20248,7 +20288,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ??????? ???????",
                             NameEn = "??? ??????? ???????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000118"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -20258,7 +20298,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ?????",
                             NameEn = "??? ?????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000118"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -20268,7 +20308,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ????? ????",
                             NameEn = "??? ????? ????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000118"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -20278,7 +20318,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ?????",
                             NameEn = "??? ?????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000118"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -20288,7 +20328,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ???? ??????",
                             NameEn = "??? ???? ??????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000118"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -20298,7 +20338,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ??? ????",
                             NameEn = "??? ??? ????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000118"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -20308,7 +20348,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ????",
                             NameEn = "??? ????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000118"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -20318,7 +20358,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ????? ?????",
                             NameEn = "??? ????? ?????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000118"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -20398,7 +20438,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ??????",
                             NameEn = "????? ??????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000118"),
-                            Type = "Village"
+                            Type = "Manshaat"
                         },
                         new
                         {
@@ -20438,7 +20478,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ???? ???",
                             NameEn = "????? ???? ???",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000120"),
-                            Type = "Village"
+                            Type = "City"
                         },
                         new
                         {
@@ -20748,7 +20788,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ??? ???",
                             NameEn = "??? ??? ???",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000120"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -20758,7 +20798,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ??? ????",
                             NameEn = "??? ??? ????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000120"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -20768,7 +20808,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ??????",
                             NameEn = "??? ??????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000120"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -20778,7 +20818,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ????? ???",
                             NameEn = "??? ????? ???",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000120"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -20788,7 +20828,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ?????",
                             NameEn = "??? ?????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000120"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -20798,7 +20838,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ?????",
                             NameEn = "??? ?????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000120"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -20808,7 +20848,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ?????",
                             NameEn = "??? ?????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000120"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -20828,7 +20868,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ????",
                             NameEn = "????? ????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000120"),
-                            Type = "Village"
+                            Type = "Manshaat"
                         },
                         new
                         {
@@ -20838,7 +20878,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ?????",
                             NameEn = "????? ?????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000120"),
-                            Type = "Village"
+                            Type = "Manshaat"
                         },
                         new
                         {
@@ -20848,7 +20888,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ???? ????",
                             NameEn = "????? ???? ????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000120"),
-                            Type = "Village"
+                            Type = "Manshaat"
                         },
                         new
                         {
@@ -20858,7 +20898,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ????",
                             NameEn = "????? ????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000120"),
-                            Type = "Village"
+                            Type = "Manshaat"
                         },
                         new
                         {
@@ -20868,7 +20908,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ???",
                             NameEn = "????? ???",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000120"),
-                            Type = "Village"
+                            Type = "Manshaat"
                         },
                         new
                         {
@@ -20878,7 +20918,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ????????",
                             NameEn = "????? ????????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000120"),
-                            Type = "Village"
+                            Type = "Manshaat"
                         },
                         new
                         {
@@ -20888,7 +20928,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ?????",
                             NameEn = "????? ?????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000121"),
-                            Type = "Village"
+                            Type = "City"
                         },
                         new
                         {
@@ -21278,7 +21318,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ??????? ?????",
                             NameEn = "??? ??????? ?????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000122"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -21288,7 +21328,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ??????",
                             NameEn = "??? ??????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000122"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -21298,7 +21338,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ????? ???",
                             NameEn = "??? ????? ???",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000122"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -21308,7 +21348,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ???????",
                             NameEn = "??? ???????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000122"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -21318,7 +21358,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ?????",
                             NameEn = "??? ?????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000122"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -21328,7 +21368,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ???",
                             NameEn = "??? ???",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000122"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -21338,7 +21378,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ??????",
                             NameEn = "????? ??????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000122"),
-                            Type = "Village"
+                            Type = "Manshaat"
                         },
                         new
                         {
@@ -21358,7 +21398,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ?????",
                             NameEn = "????? ?????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000122"),
-                            Type = "Village"
+                            Type = "Manshaat"
                         },
                         new
                         {
@@ -21368,7 +21408,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ??? ???",
                             NameEn = "????? ??? ???",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000123"),
-                            Type = "Village"
+                            Type = "City"
                         },
                         new
                         {
@@ -21568,7 +21608,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ??? ??????",
                             NameEn = "??? ??? ??????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000123"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -21578,7 +21618,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ???????",
                             NameEn = "??? ???????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000123"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -21588,7 +21628,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ????",
                             NameEn = "??? ????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000123"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -21598,7 +21638,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ??? ?????? ?????",
                             NameEn = "??? ??? ?????? ?????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000123"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -21608,7 +21648,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ?? ??????",
                             NameEn = "????? ?? ??????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000123"),
-                            Type = "Village"
+                            Type = "Manshaat"
                         },
                         new
                         {
@@ -21618,7 +21658,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ????",
                             NameEn = "????? ????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000123"),
-                            Type = "Village"
+                            Type = "Manshaat"
                         },
                         new
                         {
@@ -21628,7 +21668,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ???? ?????",
                             NameEn = "????? ???? ?????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000123"),
-                            Type = "Village"
+                            Type = "Manshaat"
                         },
                         new
                         {
@@ -21638,7 +21678,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ??? ?????? ????",
                             NameEn = "????? ??? ?????? ????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000123"),
-                            Type = "Village"
+                            Type = "Manshaat"
                         },
                         new
                         {
@@ -21668,7 +21708,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ???? ?????",
                             NameEn = "????? ???? ?????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000124"),
-                            Type = "Village"
+                            Type = "City"
                         },
                         new
                         {
@@ -22078,7 +22118,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ??? ???",
                             NameEn = "??? ??? ???",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000124"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -22088,7 +22128,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ?????",
                             NameEn = "??? ?????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000124"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -22098,7 +22138,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ???????? ??????",
                             NameEn = "??? ???????? ??????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000124"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -22108,7 +22148,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ????????",
                             NameEn = "??? ????????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000124"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -22118,7 +22158,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ????? ?????",
                             NameEn = "??? ????? ?????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000124"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -22128,7 +22168,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ????????",
                             NameEn = "??? ????????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000124"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -22138,7 +22178,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ???????",
                             NameEn = "??? ???????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000124"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -22148,7 +22188,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ???? ???",
                             NameEn = "??? ???? ???",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000124"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -22158,7 +22198,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ?????",
                             NameEn = "??? ?????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000124"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -22168,7 +22208,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ???? ???",
                             NameEn = "??? ???? ???",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000124"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -22178,7 +22218,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ??? ??? ????",
                             NameEn = "??? ??? ??? ????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000124"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -22188,7 +22228,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ??? ?????",
                             NameEn = "??? ??? ?????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000124"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -22198,7 +22238,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ??? ???",
                             NameEn = "??? ??? ???",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000124"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -22208,7 +22248,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ???? ???????",
                             NameEn = "??? ???? ???????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000124"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -22218,7 +22258,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ????? ???????",
                             NameEn = "??? ????? ???????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000124"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -22228,7 +22268,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ????? ?????",
                             NameEn = "??? ????? ?????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000124"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -22238,7 +22278,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ???????",
                             NameEn = "??? ???????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000124"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -22248,7 +22288,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ???? ???",
                             NameEn = "??? ???? ???",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000124"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -22258,7 +22298,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ??? ???? ?????",
                             NameEn = "??? ??? ???? ?????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000124"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -22268,7 +22308,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ??? ???? ?????",
                             NameEn = "??? ??? ???? ?????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000124"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -22278,7 +22318,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ??? ?????",
                             NameEn = "??? ??? ?????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000124"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -22288,7 +22328,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ????? ???",
                             NameEn = "??? ????? ???",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000124"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -22298,7 +22338,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ??? ????",
                             NameEn = "??? ??? ????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000124"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -22308,7 +22348,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ??? ?????",
                             NameEn = "??? ??? ?????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000124"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -22318,7 +22358,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ??? ????",
                             NameEn = "??? ??? ????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000124"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -22328,7 +22368,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ???? ????",
                             NameEn = "??? ???? ????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000124"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -22338,7 +22378,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ???? ???????",
                             NameEn = "??? ???? ???????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000124"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -22348,7 +22388,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ?????",
                             NameEn = "??? ?????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000124"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -22358,7 +22398,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ???? ?????",
                             NameEn = "??? ???? ?????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000124"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -22368,7 +22408,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ??? ????",
                             NameEn = "??? ??? ????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000124"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -22378,7 +22418,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ?????",
                             NameEn = "??? ?????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000124"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -22388,7 +22428,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ??? ????",
                             NameEn = "??? ??? ????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000124"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -22398,7 +22438,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ????",
                             NameEn = "??? ????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000124"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -22408,7 +22448,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ???? ????",
                             NameEn = "??? ???? ????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000124"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -22438,7 +22478,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ????",
                             NameEn = "????? ????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000124"),
-                            Type = "Village"
+                            Type = "Manshaat"
                         },
                         new
                         {
@@ -22488,7 +22528,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ????????",
                             NameEn = "??? ????????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000124"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -22498,7 +22538,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ???????",
                             NameEn = "??? ???????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000124"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -22508,7 +22548,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ????",
                             NameEn = "????? ????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000125"),
-                            Type = "Village"
+                            Type = "City"
                         },
                         new
                         {
@@ -22678,7 +22718,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ??? ???",
                             NameEn = "??? ??? ???",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000125"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -22688,7 +22728,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ????? ????????",
                             NameEn = "??? ????? ????????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000125"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -22698,7 +22738,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ???????",
                             NameEn = "??? ???????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000125"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -22708,7 +22748,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ??????",
                             NameEn = "??? ??????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000125"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -22718,7 +22758,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ?????????",
                             NameEn = "??? ?????????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000125"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -22728,7 +22768,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ????? ????",
                             NameEn = "??? ????? ????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000125"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -22738,7 +22778,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ????? ???????",
                             NameEn = "??? ????? ???????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000125"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -22748,7 +22788,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ????",
                             NameEn = "??? ????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000125"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -22758,7 +22798,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ?????",
                             NameEn = "??? ?????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000125"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -22778,7 +22818,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ???? ?????",
                             NameEn = "????? ???? ?????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000125"),
-                            Type = "Village"
+                            Type = "Manshaat"
                         },
                         new
                         {
@@ -22798,7 +22838,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ????? ?????",
                             NameEn = "????? ????? ?????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000126"),
-                            Type = "Village"
+                            Type = "City"
                         },
                         new
                         {
@@ -22898,7 +22938,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ?????",
                             NameEn = "??? ?????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000126"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -22908,7 +22948,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ????????",
                             NameEn = "??? ????????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000126"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -22918,7 +22958,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ?????",
                             NameEn = "??? ?????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000126"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -22928,7 +22968,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ???? ?????",
                             NameEn = "??? ???? ?????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000126"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -22948,7 +22988,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ???????????",
                             NameEn = "????? ???????????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000127"),
-                            Type = "Village"
+                            Type = "City"
                         },
                         new
                         {
@@ -23048,7 +23088,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ????????",
                             NameEn = "??? ????????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000127"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -23058,7 +23098,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ?????? ??????",
                             NameEn = "??? ?????? ??????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000127"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -23068,7 +23108,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ????? ????",
                             NameEn = "??? ????? ????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000127"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -23078,7 +23118,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ??? ?????",
                             NameEn = "??? ??? ?????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000127"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -23088,7 +23128,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ??? ??????",
                             NameEn = "??? ??? ??????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000127"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -23098,7 +23138,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ????",
                             NameEn = "??? ????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000127"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -23128,7 +23168,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ???????",
                             NameEn = "????? ???????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000127"),
-                            Type = "Village"
+                            Type = "Manshaat"
                         },
                         new
                         {
@@ -23138,7 +23178,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ????????",
                             NameEn = "????? ????????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000128"),
-                            Type = "Village"
+                            Type = "City"
                         },
                         new
                         {
@@ -23148,7 +23188,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ????? ???",
                             NameEn = "????? ????? ???",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000129"),
-                            Type = "Village"
+                            Type = "City"
                         },
                         new
                         {
@@ -23258,7 +23298,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ????????",
                             NameEn = "??? ????????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000129"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -23268,7 +23308,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ????????",
                             NameEn = "??? ????????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000129"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -23278,7 +23318,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ????",
                             NameEn = "????? ????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000129"),
-                            Type = "Village"
+                            Type = "Manshaat"
                         },
                         new
                         {
@@ -23288,7 +23328,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ???????",
                             NameEn = "????? ???????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000129"),
-                            Type = "Village"
+                            Type = "Manshaat"
                         },
                         new
                         {
@@ -23298,7 +23338,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ??????",
                             NameEn = "????? ??????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000129"),
-                            Type = "Village"
+                            Type = "Manshaat"
                         },
                         new
                         {
@@ -23318,7 +23358,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ??????",
                             NameEn = "????? ??????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000130"),
-                            Type = "Village"
+                            Type = "City"
                         },
                         new
                         {
@@ -23378,7 +23418,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ?????",
                             NameEn = "??? ?????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000132"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -23518,7 +23558,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ??? ????",
                             NameEn = "??? ??? ????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000133"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -23528,7 +23568,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ??? ????",
                             NameEn = "??? ??? ????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000133"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -23538,7 +23578,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ????????",
                             NameEn = "??? ????????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000133"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -23548,7 +23588,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ??????",
                             NameEn = "??? ??????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000133"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -23558,7 +23598,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ?????",
                             NameEn = "??? ?????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000133"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -23568,7 +23608,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ??????",
                             NameEn = "??? ??????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000133"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -23578,7 +23618,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ??????",
                             NameEn = "??? ??????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000133"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -23588,7 +23628,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ????? ???????",
                             NameEn = "??? ????? ???????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000133"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -23598,7 +23638,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ?????",
                             NameEn = "??? ?????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000133"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -23608,7 +23648,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ???",
                             NameEn = "??? ???",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000133"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -23618,7 +23658,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ???",
                             NameEn = "??? ???",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000133"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -23628,7 +23668,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ????????",
                             NameEn = "??? ????????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000133"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -23638,7 +23678,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ????",
                             NameEn = "??? ????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000133"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -23648,7 +23688,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ??? ????",
                             NameEn = "??? ??? ????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000133"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -23658,7 +23698,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ?????",
                             NameEn = "??? ?????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000133"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -23668,7 +23708,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ????",
                             NameEn = "??? ????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000133"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -23698,7 +23738,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ??? ????",
                             NameEn = "????? ??? ????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000133"),
-                            Type = "Village"
+                            Type = "Manshaat"
                         },
                         new
                         {
@@ -23708,7 +23748,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ????",
                             NameEn = "????? ????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000133"),
-                            Type = "Village"
+                            Type = "Manshaat"
                         },
                         new
                         {
@@ -23798,7 +23838,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ???????",
                             NameEn = "????? ???????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000134"),
-                            Type = "Village"
+                            Type = "City"
                         },
                         new
                         {
@@ -23908,7 +23948,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ????",
                             NameEn = "??? ????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000134"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -23918,7 +23958,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ?????",
                             NameEn = "??? ?????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000134"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -23938,7 +23978,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ??????? ???????",
                             NameEn = "????? ??????? ???????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000135"),
-                            Type = "Village"
+                            Type = "City"
                         },
                         new
                         {
@@ -24078,7 +24118,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ??????",
                             NameEn = "??? ??????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000135"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -24088,7 +24128,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ?????? ??????",
                             NameEn = "??? ?????? ??????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000135"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -24098,7 +24138,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ????",
                             NameEn = "??? ????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000135"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -24108,7 +24148,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ????",
                             NameEn = "??? ????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000135"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -24118,7 +24158,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ???? ???????",
                             NameEn = "????? ???? ???????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000136"),
-                            Type = "Village"
+                            Type = "City"
                         },
                         new
                         {
@@ -24155,8 +24195,8 @@ namespace Tawreed.Infrastructure.Migrations
                             Id = new Guid("00000002-0000-0000-0000-000000001733"),
                             CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             IsActive = true,
-                            NameAr = "????????",
-                            NameEn = "????????",
+                            NameAr = "???????? ",
+                            NameEn = "???????? ",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000136"),
                             Type = "Village"
                         },
@@ -24318,7 +24358,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ?????",
                             NameEn = "??? ?????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000136"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -24328,7 +24368,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ?????? ??????",
                             NameEn = "??? ?????? ??????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000136"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -24338,7 +24378,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ??????",
                             NameEn = "??? ??????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000136"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -24348,7 +24388,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ?????? ?????",
                             NameEn = "??? ?????? ?????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000136"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -24358,7 +24398,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ??????",
                             NameEn = "??? ??????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000136"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -24368,7 +24408,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ??? ?????",
                             NameEn = "??? ??? ?????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000136"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -24378,7 +24418,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ?????",
                             NameEn = "??? ?????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000136"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -24388,7 +24428,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ????",
                             NameEn = "??? ????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000136"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -24398,7 +24438,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ???",
                             NameEn = "??? ???",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000136"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -24408,7 +24448,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ??????",
                             NameEn = "??? ??????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000136"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -24428,7 +24468,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ?????? ????",
                             NameEn = "??? ?????? ????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000136"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -24438,7 +24478,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ??????",
                             NameEn = "????? ??????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000136"),
-                            Type = "Village"
+                            Type = "Manshaat"
                         },
                         new
                         {
@@ -24488,7 +24528,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ???? ??????",
                             NameEn = "????? ???? ??????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000137"),
-                            Type = "Village"
+                            Type = "City"
                         },
                         new
                         {
@@ -24538,7 +24578,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ???",
                             NameEn = "????? ???",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000139"),
-                            Type = "Village"
+                            Type = "City"
                         },
                         new
                         {
@@ -24848,7 +24888,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ??????",
                             NameEn = "??? ??????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000139"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -24858,7 +24898,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ????????",
                             NameEn = "??? ????????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000139"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -24868,7 +24908,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ???????",
                             NameEn = "??? ???????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000139"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -24878,7 +24918,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ????????",
                             NameEn = "??? ????????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000139"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -24888,7 +24928,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ??????",
                             NameEn = "??? ??????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000139"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -24898,7 +24938,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ???????",
                             NameEn = "??? ???????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000139"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -24908,7 +24948,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ??????",
                             NameEn = "??? ??????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000139"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -24918,7 +24958,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ??? ???",
                             NameEn = "??? ??? ???",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000139"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -24928,7 +24968,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ?????",
                             NameEn = "??? ?????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000139"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -24938,7 +24978,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ?????",
                             NameEn = "??? ?????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000139"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -24978,7 +25018,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ??????",
                             NameEn = "????? ??????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000139"),
-                            Type = "Village"
+                            Type = "Manshaat"
                         },
                         new
                         {
@@ -25028,7 +25068,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ?????",
                             NameEn = "????? ?????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000140"),
-                            Type = "Village"
+                            Type = "City"
                         },
                         new
                         {
@@ -25148,7 +25188,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ??? ????",
                             NameEn = "??? ??? ????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000141"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -25158,7 +25198,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ????? ?????????",
                             NameEn = "??? ????? ?????????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000141"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -25218,7 +25258,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ??? ???",
                             NameEn = "????? ??? ???",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000142"),
-                            Type = "Village"
+                            Type = "City"
                         },
                         new
                         {
@@ -25318,7 +25358,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ??????? ????",
                             NameEn = "??? ??????? ????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000142"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -25328,7 +25368,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ??????",
                             NameEn = "??? ??????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000142"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -25338,7 +25378,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ???",
                             NameEn = "??? ???",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000142"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -25348,7 +25388,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ??? ?????",
                             NameEn = "??? ??? ?????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000142"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -25358,7 +25398,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ???? ?????",
                             NameEn = "??? ???? ?????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000142"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -25368,7 +25408,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ????",
                             NameEn = "??? ????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000142"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -25378,7 +25418,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ??? ????? ????",
                             NameEn = "??? ??? ????? ????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000142"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -25388,7 +25428,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ??? ????",
                             NameEn = "??? ??? ????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000142"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -25398,7 +25438,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ?????",
                             NameEn = "??? ?????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000142"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -25408,7 +25448,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ?????",
                             NameEn = "??? ?????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000142"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -25438,7 +25478,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ????? ? ???? ??? ????? ?????",
                             NameEn = "??? ????? ? ???? ??? ????? ?????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000142"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -25448,7 +25488,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ??????",
                             NameEn = "??? ??????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000143"),
-                            Type = "Village"
+                            Type = "QismSection"
                         },
                         new
                         {
@@ -25458,7 +25498,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ??????",
                             NameEn = "????? ??????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000144"),
-                            Type = "Village"
+                            Type = "City"
                         },
                         new
                         {
@@ -25468,7 +25508,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ???",
                             NameEn = "????? ???",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000145"),
-                            Type = "Village"
+                            Type = "City"
                         },
                         new
                         {
@@ -25878,7 +25918,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ??? ???",
                             NameEn = "??? ??? ???",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000147"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -25888,7 +25928,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ????????",
                             NameEn = "??? ????????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000147"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -25898,7 +25938,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ???????",
                             NameEn = "??? ???????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000147"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -25908,7 +25948,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ?????????",
                             NameEn = "??? ?????????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000147"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -25918,7 +25958,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ?????? ??????",
                             NameEn = "??? ?????? ??????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000147"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -25928,7 +25968,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ?????",
                             NameEn = "??? ?????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000147"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -25938,7 +25978,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ????",
                             NameEn = "??? ????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000147"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -25948,7 +25988,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ?????",
                             NameEn = "??? ?????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000147"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -25985,8 +26025,8 @@ namespace Tawreed.Infrastructure.Migrations
                             Id = new Guid("00000002-0000-0000-0000-000000001916"),
                             CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             IsActive = true,
-                            NameAr = "????",
-                            NameEn = "????",
+                            NameAr = " ????",
+                            NameEn = " ????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000147"),
                             Type = "Village"
                         },
@@ -26028,7 +26068,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ?????",
                             NameEn = "????? ?????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000147"),
-                            Type = "Village"
+                            Type = "Manshaat"
                         },
                         new
                         {
@@ -26038,7 +26078,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ?????",
                             NameEn = "????? ?????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000148"),
-                            Type = "Village"
+                            Type = "City"
                         },
                         new
                         {
@@ -26148,7 +26188,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ????",
                             NameEn = "????? ????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000149"),
-                            Type = "Village"
+                            Type = "City"
                         },
                         new
                         {
@@ -26238,7 +26278,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "???? ????",
                             NameEn = "???? ????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000149"),
-                            Type = "Village"
+                            Type = "Ezba"
                         },
                         new
                         {
@@ -26248,7 +26288,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ????????",
                             NameEn = "??? ????????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000149"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -26258,7 +26298,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ??????",
                             NameEn = "??? ??????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000149"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -26268,7 +26308,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ?????",
                             NameEn = "??? ?????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000149"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -26298,7 +26338,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ????",
                             NameEn = "????? ????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000150"),
-                            Type = "Village"
+                            Type = "City"
                         },
                         new
                         {
@@ -26488,7 +26528,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ???????",
                             NameEn = "??? ???????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000151"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -26498,7 +26538,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ??? ?????",
                             NameEn = "??? ??? ?????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000151"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -26508,7 +26548,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ?????",
                             NameEn = "??? ?????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000151"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -26518,7 +26558,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ???????",
                             NameEn = "??? ???????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000151"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -26528,7 +26568,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ?????",
                             NameEn = "??? ?????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000151"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -26538,7 +26578,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ?? ????",
                             NameEn = "??? ?? ????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000151"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -26548,7 +26588,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ??? ??????",
                             NameEn = "??? ??? ??????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000151"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -26558,7 +26598,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ???",
                             NameEn = "??? ???",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000151"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -26618,7 +26658,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ????",
                             NameEn = "????? ????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000151"),
-                            Type = "Village"
+                            Type = "Manshaat"
                         },
                         new
                         {
@@ -26628,7 +26668,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ?????",
                             NameEn = "????? ?????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000151"),
-                            Type = "Village"
+                            Type = "Manshaat"
                         },
                         new
                         {
@@ -26638,7 +26678,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ??? ???",
                             NameEn = "????? ??? ???",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000151"),
-                            Type = "Village"
+                            Type = "Manshaat"
                         },
                         new
                         {
@@ -26658,7 +26698,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ???? ????",
                             NameEn = "????? ???? ????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000152"),
-                            Type = "Village"
+                            Type = "City"
                         },
                         new
                         {
@@ -26868,7 +26908,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ????????",
                             NameEn = "??? ????????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000152"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -26878,7 +26918,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ????",
                             NameEn = "??? ????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000152"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -26888,7 +26928,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ??? ???",
                             NameEn = "????? ??? ???",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000152"),
-                            Type = "Village"
+                            Type = "Manshaat"
                         },
                         new
                         {
@@ -26898,7 +26938,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ??????",
                             NameEn = "????? ??????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000152"),
-                            Type = "Village"
+                            Type = "Manshaat"
                         },
                         new
                         {
@@ -26908,7 +26948,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ????",
                             NameEn = "????? ????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000152"),
-                            Type = "Village"
+                            Type = "Manshaat"
                         },
                         new
                         {
@@ -26918,7 +26958,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ???",
                             NameEn = "????? ???",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000152"),
-                            Type = "Village"
+                            Type = "Manshaat"
                         },
                         new
                         {
@@ -26938,7 +26978,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ???",
                             NameEn = "????? ???",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000153"),
-                            Type = "Village"
+                            Type = "City"
                         },
                         new
                         {
@@ -27038,7 +27078,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ????",
                             NameEn = "????? ????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000154"),
-                            Type = "Village"
+                            Type = "City"
                         },
                         new
                         {
@@ -27198,7 +27238,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ???????",
                             NameEn = "??? ???????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000154"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -27208,7 +27248,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ????????",
                             NameEn = "??? ????????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000154"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -27218,7 +27258,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ???????",
                             NameEn = "??? ???????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000154"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -27228,17 +27268,17 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ???? ???",
                             NameEn = "??? ???? ???",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000154"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
                             Id = new Guid("00000002-0000-0000-0000-000000002041"),
                             CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             IsActive = true,
-                            NameAr = "??? ???? ????",
-                            NameEn = "??? ???? ????",
+                            NameAr = "??? ???? ???? ",
+                            NameEn = "??? ???? ???? ",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000154"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -27248,7 +27288,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ???????",
                             NameEn = "????? ???????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000154"),
-                            Type = "Village"
+                            Type = "Manshaat"
                         },
                         new
                         {
@@ -27258,7 +27298,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ??????",
                             NameEn = "????? ??????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000154"),
-                            Type = "Village"
+                            Type = "Manshaat"
                         },
                         new
                         {
@@ -27288,7 +27328,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ?????",
                             NameEn = "????? ?????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000154"),
-                            Type = "Village"
+                            Type = "Manshaat"
                         },
                         new
                         {
@@ -27308,7 +27348,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ?????",
                             NameEn = "????? ?????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000155"),
-                            Type = "Village"
+                            Type = "City"
                         },
                         new
                         {
@@ -27405,8 +27445,8 @@ namespace Tawreed.Infrastructure.Migrations
                             Id = new Guid("00000002-0000-0000-0000-000000002058"),
                             CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             IsActive = true,
-                            NameAr = "??? ??????",
-                            NameEn = "??? ??????",
+                            NameAr = "??? ?????? ",
+                            NameEn = "??? ?????? ",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000155"),
                             Type = "Village"
                         },
@@ -27458,7 +27498,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "???? ????",
                             NameEn = "???? ????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000155"),
-                            Type = "Village"
+                            Type = "Ezba"
                         },
                         new
                         {
@@ -27488,7 +27528,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ???????",
                             NameEn = "????? ???????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000156"),
-                            Type = "Village"
+                            Type = "City"
                         },
                         new
                         {
@@ -27578,7 +27618,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ??????",
                             NameEn = "????? ??????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000157"),
-                            Type = "Village"
+                            Type = "City"
                         },
                         new
                         {
@@ -27738,7 +27778,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ?????",
                             NameEn = "????? ?????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000157"),
-                            Type = "Village"
+                            Type = "Manshaat"
                         },
                         new
                         {
@@ -27778,7 +27818,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ????",
                             NameEn = "??? ????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000158"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -28138,7 +28178,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ??? ????",
                             NameEn = "??? ??? ????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000160"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -28148,7 +28188,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ?????",
                             NameEn = "??? ?????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000160"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -28158,7 +28198,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ??????",
                             NameEn = "??? ??????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000160"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -28168,7 +28208,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ?????? ??????",
                             NameEn = "??? ?????? ??????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000160"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -28178,7 +28218,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ????? ????",
                             NameEn = "??? ????? ????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000160"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -28188,7 +28228,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ???????",
                             NameEn = "??? ???????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000160"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -28198,7 +28238,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ?????? ??????",
                             NameEn = "??? ?????? ??????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000160"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -28208,7 +28248,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ????????",
                             NameEn = "??? ????????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000160"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -28218,7 +28258,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ???",
                             NameEn = "??? ???",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000160"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -28228,7 +28268,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ?????",
                             NameEn = "??? ?????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000160"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -28238,7 +28278,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ????",
                             NameEn = "??? ????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000160"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -28248,7 +28288,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ????",
                             NameEn = "??? ????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000160"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -28258,7 +28298,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ?????",
                             NameEn = "??? ?????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000160"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -28268,7 +28308,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ?????",
                             NameEn = "??? ?????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000160"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -28318,7 +28358,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ???????",
                             NameEn = "????? ???????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000160"),
-                            Type = "Village"
+                            Type = "Manshaat"
                         },
                         new
                         {
@@ -28328,7 +28368,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ???????",
                             NameEn = "????? ???????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000160"),
-                            Type = "Village"
+                            Type = "Manshaat"
                         },
                         new
                         {
@@ -28338,7 +28378,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ?????",
                             NameEn = "????? ?????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000160"),
-                            Type = "Village"
+                            Type = "Manshaat"
                         },
                         new
                         {
@@ -28408,7 +28448,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ??????",
                             NameEn = "????? ??????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000161"),
-                            Type = "Village"
+                            Type = "City"
                         },
                         new
                         {
@@ -28678,7 +28718,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "???? ???",
                             NameEn = "???? ???",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000161"),
-                            Type = "Village"
+                            Type = "Ezba"
                         },
                         new
                         {
@@ -28688,7 +28728,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ????? ????",
                             NameEn = "??? ????? ????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000161"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -28698,7 +28738,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ????? ?????",
                             NameEn = "??? ????? ?????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000161"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -28708,7 +28748,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ?????",
                             NameEn = "??? ?????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000161"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -28718,7 +28758,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ???? ??????",
                             NameEn = "??? ???? ??????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000161"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -28728,17 +28768,17 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ?????? ???",
                             NameEn = "??? ?????? ???",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000161"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
                             Id = new Guid("00000002-0000-0000-0000-000000002191"),
                             CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             IsActive = true,
-                            NameAr = "??? ?????",
-                            NameEn = "??? ?????",
+                            NameAr = "??? ????? ",
+                            NameEn = "??? ????? ",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000161"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -28748,7 +28788,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ??? ?????",
                             NameEn = "??? ??? ?????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000161"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -28758,7 +28798,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ???  ????",
                             NameEn = "??? ???  ????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000161"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -28778,7 +28818,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ??? ??? ????",
                             NameEn = "????? ??? ??? ????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000161"),
-                            Type = "Village"
+                            Type = "Manshaat"
                         },
                         new
                         {
@@ -29298,7 +29338,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ?????????",
                             NameEn = "??? ?????????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000164"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -29308,7 +29348,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ??????? ??????",
                             NameEn = "??? ??????? ??????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000164"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -29318,7 +29358,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ????????",
                             NameEn = "??? ????????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000164"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -29328,7 +29368,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ?????",
                             NameEn = "??? ?????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000164"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -29338,7 +29378,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ?????",
                             NameEn = "??? ?????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000164"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -29348,7 +29388,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ?????",
                             NameEn = "??? ?????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000164"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -29358,7 +29398,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ????",
                             NameEn = "??? ????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000164"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -29368,7 +29408,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ?????",
                             NameEn = "??? ?????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000164"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -29378,7 +29418,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ??????",
                             NameEn = "??? ??????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000164"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -29438,7 +29478,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ???????",
                             NameEn = "????? ???????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000164"),
-                            Type = "Village"
+                            Type = "Manshaat"
                         },
                         new
                         {
@@ -29448,7 +29488,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ???????",
                             NameEn = "????? ???????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000164"),
-                            Type = "Village"
+                            Type = "Manshaat"
                         },
                         new
                         {
@@ -29458,7 +29498,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ??????",
                             NameEn = "????? ??????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000164"),
-                            Type = "Village"
+                            Type = "Manshaat"
                         },
                         new
                         {
@@ -29508,7 +29548,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ?????",
                             NameEn = "????? ?????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000165"),
-                            Type = "Village"
+                            Type = "City"
                         },
                         new
                         {
@@ -29648,7 +29688,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ??????",
                             NameEn = "??? ??????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000165"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -29658,7 +29698,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ??????",
                             NameEn = "??? ??????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000165"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -29668,7 +29708,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ?????? ??? ???",
                             NameEn = "??? ?????? ??? ???",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000165"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -29678,7 +29718,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ???? ??????",
                             NameEn = "??? ???? ??????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000165"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -29688,7 +29728,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ??????",
                             NameEn = "??? ??????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000165"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -29698,15 +29738,15 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ????",
                             NameEn = "??? ????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000165"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
                             Id = new Guid("00000002-0000-0000-0000-000000002288"),
                             CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             IsActive = true,
-                            NameAr = "????? ??????",
-                            NameEn = "????? ??????",
+                            NameAr = "????? ?????? ",
+                            NameEn = "????? ?????? ",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000165"),
                             Type = "Village"
                         },
@@ -29748,7 +29788,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ?????????",
                             NameEn = "????? ?????????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000165"),
-                            Type = "Village"
+                            Type = "Manshaat"
                         },
                         new
                         {
@@ -29758,7 +29798,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ?????",
                             NameEn = "????? ?????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000165"),
-                            Type = "Village"
+                            Type = "Manshaat"
                         },
                         new
                         {
@@ -29798,7 +29838,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ????",
                             NameEn = "????? ????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000166"),
-                            Type = "Village"
+                            Type = "City"
                         },
                         new
                         {
@@ -29988,7 +30028,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ????",
                             NameEn = "??? ????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000166"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -29998,7 +30038,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ???????",
                             NameEn = "??? ???????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000166"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -30008,7 +30048,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ???????",
                             NameEn = "??? ???????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000166"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -30018,7 +30058,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ???????",
                             NameEn = "??? ???????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000166"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -30028,7 +30068,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ????????",
                             NameEn = "??? ????????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000166"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -30038,7 +30078,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ?????",
                             NameEn = "??? ?????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000166"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -30048,7 +30088,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ???????",
                             NameEn = "??? ???????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000166"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -30058,7 +30098,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ????????",
                             NameEn = "??? ????????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000166"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -30068,7 +30108,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ????????",
                             NameEn = "??? ????????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000166"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -30078,7 +30118,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ?????? ??????",
                             NameEn = "??? ?????? ??????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000166"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -30088,7 +30128,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ?????",
                             NameEn = "??? ?????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000166"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -30098,17 +30138,17 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ????? ??????",
                             NameEn = "??? ????? ??????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000166"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
                             Id = new Guid("00000002-0000-0000-0000-000000002328"),
                             CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             IsActive = true,
-                            NameAr = "??? ????? ??????",
-                            NameEn = "??? ????? ??????",
+                            NameAr = "??? ????? ?????? ",
+                            NameEn = "??? ????? ?????? ",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000166"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -30118,7 +30158,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ????",
                             NameEn = "??? ????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000166"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -30128,7 +30168,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ?????? ??????",
                             NameEn = "??? ?????? ??????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000166"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -30138,7 +30178,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ?????",
                             NameEn = "??? ?????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000166"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -30148,7 +30188,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ????",
                             NameEn = "??? ????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000166"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -30158,7 +30198,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ?????",
                             NameEn = "??? ?????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000166"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -30168,7 +30208,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ???? ?????",
                             NameEn = "??? ???? ?????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000166"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -30178,7 +30218,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ???? ????",
                             NameEn = "??? ???? ????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000166"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -30188,7 +30228,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ????",
                             NameEn = "??? ????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000166"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -30198,7 +30238,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ?????",
                             NameEn = "??? ?????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000166"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -30208,7 +30248,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ??? ??????",
                             NameEn = "??? ??? ??????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000166"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -30218,7 +30258,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ????",
                             NameEn = "??? ????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000166"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -30228,7 +30268,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ?????",
                             NameEn = "??? ?????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000166"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -30238,7 +30278,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ??? ???????",
                             NameEn = "??? ??? ???????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000166"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -30248,7 +30288,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ????",
                             NameEn = "??? ????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000166"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -30268,7 +30308,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ????",
                             NameEn = "????? ????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000166"),
-                            Type = "Village"
+                            Type = "Manshaat"
                         },
                         new
                         {
@@ -30278,7 +30318,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ???",
                             NameEn = "????? ???",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000166"),
-                            Type = "Village"
+                            Type = "Manshaat"
                         },
                         new
                         {
@@ -30348,7 +30388,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ?????",
                             NameEn = "????? ?????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000167"),
-                            Type = "Village"
+                            Type = "City"
                         },
                         new
                         {
@@ -30438,7 +30478,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ?????????",
                             NameEn = "??? ?????????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000167"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -30448,7 +30488,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ????????",
                             NameEn = "??? ????????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000167"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -30458,7 +30498,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ?????? ??????",
                             NameEn = "??? ?????? ??????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000167"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -30468,7 +30508,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ????????",
                             NameEn = "??? ????????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000167"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -30478,7 +30518,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ????",
                             NameEn = "??? ????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000167"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -30518,7 +30558,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ????",
                             NameEn = "????? ????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000167"),
-                            Type = "Village"
+                            Type = "Manshaat"
                         },
                         new
                         {
@@ -30568,7 +30608,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ????",
                             NameEn = "????? ????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000168"),
-                            Type = "Village"
+                            Type = "City"
                         },
                         new
                         {
@@ -30768,7 +30808,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ??? ????",
                             NameEn = "??? ??? ????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000168"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -30788,7 +30828,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ????????",
                             NameEn = "??? ????????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000168"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -30798,7 +30838,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ????",
                             NameEn = "??? ????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000168"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -30808,7 +30848,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ?????",
                             NameEn = "??? ?????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000168"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -30818,7 +30858,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ???? ????",
                             NameEn = "??? ???? ????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000168"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -30848,7 +30888,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ???????",
                             NameEn = "????? ???????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000168"),
-                            Type = "Village"
+                            Type = "Manshaat"
                         },
                         new
                         {
@@ -30878,7 +30918,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ??? ??????",
                             NameEn = "????? ??? ??????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000169"),
-                            Type = "Village"
+                            Type = "City"
                         },
                         new
                         {
@@ -30895,8 +30935,8 @@ namespace Tawreed.Infrastructure.Migrations
                             Id = new Guid("00000002-0000-0000-0000-000000002407"),
                             CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             IsActive = true,
-                            NameAr = "?????",
-                            NameEn = "?????",
+                            NameAr = "????? ",
+                            NameEn = "????? ",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000169"),
                             Type = "Village"
                         },
@@ -31068,7 +31108,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ????",
                             NameEn = "??? ????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000169"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -31078,7 +31118,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ??????",
                             NameEn = "??? ??????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000169"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -31088,7 +31128,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ??????",
                             NameEn = "??? ??????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000169"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -31098,7 +31138,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ????????",
                             NameEn = "??? ????????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000169"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -31108,7 +31148,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ?????",
                             NameEn = "??? ?????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000169"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -31118,7 +31158,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ??????",
                             NameEn = "??? ??????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000169"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -31128,7 +31168,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ???????",
                             NameEn = "??? ???????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000169"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -31138,7 +31178,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ????",
                             NameEn = "??? ????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000169"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -31148,7 +31188,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ????",
                             NameEn = "??? ????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000169"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -31158,7 +31198,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ????",
                             NameEn = "??? ????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000169"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -31178,7 +31218,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ?????",
                             NameEn = "??? ?????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000169"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -31198,7 +31238,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ????? ????????",
                             NameEn = "????? ????? ????????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000169"),
-                            Type = "Village"
+                            Type = "Manshaat"
                         },
                         new
                         {
@@ -31208,7 +31248,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ????",
                             NameEn = "??? ????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000169"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -31218,7 +31258,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ??????",
                             NameEn = "????? ??????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000169"),
-                            Type = "Village"
+                            Type = "Manshaat"
                         },
                         new
                         {
@@ -31228,7 +31268,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ??????",
                             NameEn = "????? ??????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000169"),
-                            Type = "Village"
+                            Type = "Manshaat"
                         },
                         new
                         {
@@ -31298,7 +31338,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ????????",
                             NameEn = "??? ????????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000170"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -31518,7 +31558,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ????????",
                             NameEn = "??? ????????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000171"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -31528,7 +31568,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ????? ????",
                             NameEn = "??? ????? ????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000171"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -31538,7 +31578,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ????????",
                             NameEn = "??? ????????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000171"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -31548,7 +31588,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ?????",
                             NameEn = "??? ?????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000171"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -31558,7 +31598,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ?????",
                             NameEn = "??? ?????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000171"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -31568,7 +31608,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ?????",
                             NameEn = "??? ?????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000171"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -31578,7 +31618,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ???? _??? ???????? ?????",
                             NameEn = "????? ???? _??? ???????? ?????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000171"),
-                            Type = "Village"
+                            Type = "Manshaat"
                         },
                         new
                         {
@@ -31598,7 +31638,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ????????",
                             NameEn = "????? ????????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000171"),
-                            Type = "Village"
+                            Type = "Manshaat"
                         },
                         new
                         {
@@ -31608,7 +31648,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ?????",
                             NameEn = "????? ?????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000171"),
-                            Type = "Village"
+                            Type = "Manshaat"
                         },
                         new
                         {
@@ -31618,7 +31658,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ?????",
                             NameEn = "????? ?????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000171"),
-                            Type = "Village"
+                            Type = "Manshaat"
                         },
                         new
                         {
@@ -31678,7 +31718,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ?????",
                             NameEn = "????? ?????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000172"),
-                            Type = "Village"
+                            Type = "City"
                         },
                         new
                         {
@@ -32028,7 +32068,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ??? ????",
                             NameEn = "??? ??? ????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000172"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -32038,7 +32078,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ??? ?????",
                             NameEn = "??? ??? ?????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000172"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -32048,7 +32088,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ?????",
                             NameEn = "??? ?????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000172"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -32058,7 +32098,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ?????",
                             NameEn = "??? ?????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000172"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -32068,7 +32108,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ????????",
                             NameEn = "??? ????????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000172"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -32078,7 +32118,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ??????",
                             NameEn = "??? ??????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000172"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -32088,7 +32128,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ?????????",
                             NameEn = "??? ?????????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000172"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -32098,7 +32138,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ?????",
                             NameEn = "??? ?????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000172"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -32108,7 +32148,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ????",
                             NameEn = "??? ????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000172"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -32118,7 +32158,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ???",
                             NameEn = "??? ???",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000172"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -32128,7 +32168,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ?????",
                             NameEn = "??? ?????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000172"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -32178,7 +32218,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ????",
                             NameEn = "????? ????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000172"),
-                            Type = "Village"
+                            Type = "Manshaat"
                         },
                         new
                         {
@@ -32228,7 +32268,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ???????",
                             NameEn = "????? ???????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000173"),
-                            Type = "Village"
+                            Type = "City"
                         },
                         new
                         {
@@ -32508,7 +32548,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ???????",
                             NameEn = "??? ???????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000173"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -32518,7 +32558,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ??????",
                             NameEn = "??? ??????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000173"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -32528,7 +32568,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ??????",
                             NameEn = "??? ??????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000173"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -32538,7 +32578,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ????????",
                             NameEn = "??? ????????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000173"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -32548,7 +32588,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ????????",
                             NameEn = "??? ????????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000173"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -32558,7 +32598,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ???",
                             NameEn = "??? ???",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000173"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -32568,7 +32608,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ????? ??????",
                             NameEn = "??? ????? ??????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000173"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -32578,17 +32618,17 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ????? ??????",
                             NameEn = "??? ????? ??????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000173"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
                             Id = new Guid("00000002-0000-0000-0000-000000002576"),
                             CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             IsActive = true,
-                            NameAr = "??? ???? ????",
-                            NameEn = "??? ???? ????",
+                            NameAr = "??? ???? ???? ",
+                            NameEn = "??? ???? ???? ",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000173"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -32598,7 +32638,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ?????",
                             NameEn = "??? ?????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000173"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -32608,7 +32648,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ???????",
                             NameEn = "??? ???????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000173"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -32658,7 +32698,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ???",
                             NameEn = "????? ???",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000173"),
-                            Type = "Village"
+                            Type = "Manshaat"
                         },
                         new
                         {
@@ -32668,7 +32708,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ???? ?????",
                             NameEn = "????? ???? ?????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000173"),
-                            Type = "Village"
+                            Type = "Manshaat"
                         },
                         new
                         {
@@ -32708,7 +32748,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ???????",
                             NameEn = "????? ???????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000174"),
-                            Type = "Village"
+                            Type = "City"
                         },
                         new
                         {
@@ -32888,7 +32928,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ????",
                             NameEn = "??? ????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000174"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -32898,7 +32938,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ????????",
                             NameEn = "??? ????????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000174"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -32908,7 +32948,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ???????",
                             NameEn = "??? ???????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000174"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -32918,7 +32958,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ?????????",
                             NameEn = "??? ?????????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000174"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -32928,7 +32968,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ?????",
                             NameEn = "??? ?????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000174"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -32938,7 +32978,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ?????",
                             NameEn = "??? ?????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000174"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -32948,7 +32988,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ??????",
                             NameEn = "??? ??????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000174"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -32958,7 +32998,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ??????",
                             NameEn = "??? ??????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000174"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -32968,7 +33008,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ???????",
                             NameEn = "????? ???????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000174"),
-                            Type = "Village"
+                            Type = "Manshaat"
                         },
                         new
                         {
@@ -32988,7 +33028,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ???? ?????",
                             NameEn = "????? ???? ?????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000175"),
-                            Type = "Village"
+                            Type = "City"
                         },
                         new
                         {
@@ -33098,7 +33138,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ????????",
                             NameEn = "??? ????????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000175"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -33108,7 +33148,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ????? ?????",
                             NameEn = "??? ????? ?????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000175"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -33118,17 +33158,17 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ????",
                             NameEn = "??? ????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000175"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
                             Id = new Guid("00000002-0000-0000-0000-000000002630"),
                             CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             IsActive = true,
-                            NameAr = "??? ????",
-                            NameEn = "??? ????",
+                            NameAr = "??? ???? ",
+                            NameEn = "??? ???? ",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000175"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -33138,7 +33178,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ???? ??????",
                             NameEn = "??? ???? ??????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000175"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -33148,7 +33188,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ?????",
                             NameEn = "??? ?????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000175"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -33158,7 +33198,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ????",
                             NameEn = "??? ????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000175"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -33208,7 +33248,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ???",
                             NameEn = "????? ???",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000176"),
-                            Type = "Village"
+                            Type = "City"
                         },
                         new
                         {
@@ -33245,8 +33285,8 @@ namespace Tawreed.Infrastructure.Migrations
                             Id = new Guid("00000002-0000-0000-0000-000000002642"),
                             CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             IsActive = true,
-                            NameAr = "????",
-                            NameEn = "????",
+                            NameAr = "???? ",
+                            NameEn = "???? ",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000176"),
                             Type = "Village"
                         },
@@ -33388,7 +33428,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ???????",
                             NameEn = "??? ???????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000176"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -33398,7 +33438,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ???????",
                             NameEn = "??? ???????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000176"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -33408,7 +33448,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ?????? ??????",
                             NameEn = "??? ?????? ??????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000176"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -33418,7 +33458,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ????? ?????",
                             NameEn = "??? ????? ?????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000176"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -33428,7 +33468,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ????? ??????",
                             NameEn = "??? ????? ??????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000176"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -33438,7 +33478,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ??????",
                             NameEn = "??? ??????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000176"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -33448,7 +33488,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ??????",
                             NameEn = "??? ??????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000176"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -33458,7 +33498,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ????",
                             NameEn = "??? ????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000176"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -33468,7 +33508,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ?????",
                             NameEn = "??? ?????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000176"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -33478,7 +33518,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ????",
                             NameEn = "??? ????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000176"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -33488,7 +33528,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ?????",
                             NameEn = "??? ?????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000176"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -33498,7 +33538,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ??????",
                             NameEn = "??? ??????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000176"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -33508,7 +33548,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ??????",
                             NameEn = "??? ??????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000176"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -33518,7 +33558,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ??????",
                             NameEn = "??? ??????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000176"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -33528,7 +33568,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ????",
                             NameEn = "??? ????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000176"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -33538,7 +33578,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ?????",
                             NameEn = "??? ?????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000176"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -33548,7 +33588,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ??? ??? ?????",
                             NameEn = "??? ??? ??? ?????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000176"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -33618,7 +33658,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ??????",
                             NameEn = "????? ??????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000176"),
-                            Type = "Village"
+                            Type = "Manshaat"
                         },
                         new
                         {
@@ -33628,7 +33668,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ????",
                             NameEn = "????? ????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000176"),
-                            Type = "Village"
+                            Type = "Manshaat"
                         },
                         new
                         {
@@ -33638,7 +33678,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ????",
                             NameEn = "??? ????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000176"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -33648,7 +33688,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ??????",
                             NameEn = "????? ??????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000177"),
-                            Type = "Village"
+                            Type = "City"
                         },
                         new
                         {
@@ -33838,7 +33878,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ?????",
                             NameEn = "??? ?????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000177"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -33848,7 +33888,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ?????",
                             NameEn = "??? ?????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000177"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -33858,7 +33898,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ??? ?????",
                             NameEn = "??? ??? ?????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000177"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -33868,7 +33908,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ?????",
                             NameEn = "??? ?????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000177"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -33878,7 +33918,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ??????",
                             NameEn = "??? ??????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000177"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -33888,7 +33928,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ????????",
                             NameEn = "??? ????????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000177"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -33898,7 +33938,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ????? ???????",
                             NameEn = "??? ????? ???????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000177"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -33908,7 +33948,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ????? ??????",
                             NameEn = "??? ????? ??????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000177"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -33918,7 +33958,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ?????? ??????",
                             NameEn = "??? ?????? ??????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000177"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -33928,7 +33968,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ?? ?????",
                             NameEn = "??? ?? ?????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000177"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -33938,7 +33978,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ??? ?????",
                             NameEn = "??? ??? ?????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000177"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -33948,7 +33988,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ?? ????",
                             NameEn = "??? ?? ????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000177"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -33958,7 +33998,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ???? ?????? ?????",
                             NameEn = "??? ???? ?????? ?????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000177"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -33968,7 +34008,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ??? ??????",
                             NameEn = "??? ??? ??????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000177"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -33978,7 +34018,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ??? ????",
                             NameEn = "??? ??? ????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000177"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -33988,7 +34028,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ???",
                             NameEn = "??? ???",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000177"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -34018,7 +34058,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ??? ????",
                             NameEn = "????? ??? ????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000177"),
-                            Type = "Village"
+                            Type = "Manshaat"
                         },
                         new
                         {
@@ -34028,7 +34068,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ?? ????",
                             NameEn = "????? ?? ????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000177"),
-                            Type = "Village"
+                            Type = "Manshaat"
                         },
                         new
                         {
@@ -34038,7 +34078,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ?????? ??? ?????? ????",
                             NameEn = "????? ?????? ??? ?????? ????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000177"),
-                            Type = "Village"
+                            Type = "Manshaat"
                         },
                         new
                         {
@@ -34048,7 +34088,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ????",
                             NameEn = "????? ????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000177"),
-                            Type = "Village"
+                            Type = "Manshaat"
                         },
                         new
                         {
@@ -34118,7 +34158,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ?????",
                             NameEn = "????? ?????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000177"),
-                            Type = "Village"
+                            Type = "Manshaat"
                         },
                         new
                         {
@@ -34328,7 +34368,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ???????? ??????",
                             NameEn = "??? ???????? ??????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000178"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -34338,7 +34378,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ???????",
                             NameEn = "??? ???????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000178"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -34348,7 +34388,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ??????",
                             NameEn = "??? ??????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000178"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -34358,7 +34398,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ????",
                             NameEn = "??? ????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000178"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -34368,7 +34408,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ???? ?????",
                             NameEn = "??? ???? ?????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000178"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -34378,7 +34418,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ???? ??????",
                             NameEn = "??? ???? ??????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000178"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -34398,7 +34438,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ?????",
                             NameEn = "????? ?????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000178"),
-                            Type = "Village"
+                            Type = "Manshaat"
                         },
                         new
                         {
@@ -34408,7 +34448,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ?????",
                             NameEn = "????? ?????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000178"),
-                            Type = "Village"
+                            Type = "Manshaat"
                         },
                         new
                         {
@@ -34438,7 +34478,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ??? ???????",
                             NameEn = "????? ??? ???????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000179"),
-                            Type = "Village"
+                            Type = "City"
                         },
                         new
                         {
@@ -34448,7 +34488,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ???????",
                             NameEn = "????? ???????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000180"),
-                            Type = "Village"
+                            Type = "City"
                         },
                         new
                         {
@@ -34498,7 +34538,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "???? ???????",
                             NameEn = "???? ???????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000180"),
-                            Type = "Village"
+                            Type = "Ezba"
                         },
                         new
                         {
@@ -34508,7 +34548,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ????",
                             NameEn = "??? ????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000180"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -34518,7 +34558,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ?????",
                             NameEn = "????? ?????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000180"),
-                            Type = "Village"
+                            Type = "Manshaat"
                         },
                         new
                         {
@@ -34548,7 +34588,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ????",
                             NameEn = "????? ????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000181"),
-                            Type = "Village"
+                            Type = "City"
                         },
                         new
                         {
@@ -34848,7 +34888,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "???? ??????",
                             NameEn = "???? ??????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000183"),
-                            Type = "Village"
+                            Type = "Ezba"
                         },
                         new
                         {
@@ -34898,7 +34938,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "???? ?????????",
                             NameEn = "???? ?????????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000183"),
-                            Type = "Village"
+                            Type = "Ezba"
                         },
                         new
                         {
@@ -34908,7 +34948,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "???? ???????",
                             NameEn = "???? ???????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000183"),
-                            Type = "Village"
+                            Type = "Ezba"
                         },
                         new
                         {
@@ -34918,7 +34958,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "???? ?????",
                             NameEn = "???? ?????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000183"),
-                            Type = "Village"
+                            Type = "Ezba"
                         },
                         new
                         {
@@ -34928,7 +34968,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "???? ?????????",
                             NameEn = "???? ?????????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000183"),
-                            Type = "Village"
+                            Type = "Ezba"
                         },
                         new
                         {
@@ -34938,7 +34978,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "???? ??? ?????",
                             NameEn = "???? ??? ?????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000183"),
-                            Type = "Village"
+                            Type = "Ezba"
                         },
                         new
                         {
@@ -34948,7 +34988,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "???? ?????",
                             NameEn = "???? ?????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000183"),
-                            Type = "Village"
+                            Type = "Ezba"
                         },
                         new
                         {
@@ -34958,7 +34998,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "???? ???? ????",
                             NameEn = "???? ???? ????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000183"),
-                            Type = "Village"
+                            Type = "Ezba"
                         },
                         new
                         {
@@ -34968,7 +35008,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "???? ???? ???????",
                             NameEn = "???? ???? ???????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000183"),
-                            Type = "Village"
+                            Type = "Ezba"
                         },
                         new
                         {
@@ -34978,7 +35018,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "???? ???????",
                             NameEn = "???? ???????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000183"),
-                            Type = "Village"
+                            Type = "Ezba"
                         },
                         new
                         {
@@ -34988,7 +35028,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "???? ???? ???",
                             NameEn = "???? ???? ???",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000183"),
-                            Type = "Village"
+                            Type = "Ezba"
                         },
                         new
                         {
@@ -35018,7 +35058,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ????????",
                             NameEn = "??? ????????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000183"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -35028,7 +35068,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ??? ????",
                             NameEn = "??? ??? ????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000183"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -35038,7 +35078,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ?????",
                             NameEn = "??? ?????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000183"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -35048,7 +35088,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ??????",
                             NameEn = "????? ??????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000183"),
-                            Type = "Village"
+                            Type = "Manshaat"
                         },
                         new
                         {
@@ -35058,7 +35098,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ??????",
                             NameEn = "????? ??????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000183"),
-                            Type = "Village"
+                            Type = "Manshaat"
                         },
                         new
                         {
@@ -35068,7 +35108,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ???????",
                             NameEn = "????? ???????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000183"),
-                            Type = "Village"
+                            Type = "Manshaat"
                         },
                         new
                         {
@@ -35078,7 +35118,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "?????  ????",
                             NameEn = "?????  ????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000183"),
-                            Type = "Village"
+                            Type = "Manshaat"
                         },
                         new
                         {
@@ -35088,7 +35128,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ????",
                             NameEn = "????? ????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000183"),
-                            Type = "Village"
+                            Type = "Manshaat"
                         },
                         new
                         {
@@ -35098,7 +35138,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ???? ?????",
                             NameEn = "????? ???? ?????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000183"),
-                            Type = "Village"
+                            Type = "Manshaat"
                         },
                         new
                         {
@@ -35108,7 +35148,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ?????",
                             NameEn = "????? ?????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000183"),
-                            Type = "Village"
+                            Type = "Manshaat"
                         },
                         new
                         {
@@ -35118,7 +35158,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ???? ??????",
                             NameEn = "????? ???? ??????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000183"),
-                            Type = "Village"
+                            Type = "Manshaat"
                         },
                         new
                         {
@@ -35128,7 +35168,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ????",
                             NameEn = "????? ????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000183"),
-                            Type = "Village"
+                            Type = "Manshaat"
                         },
                         new
                         {
@@ -35138,7 +35178,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ???????",
                             NameEn = "????? ???????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000183"),
-                            Type = "Village"
+                            Type = "Manshaat"
                         },
                         new
                         {
@@ -35178,7 +35218,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ??? ????????",
                             NameEn = "????? ??? ????????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000184"),
-                            Type = "Village"
+                            Type = "City"
                         },
                         new
                         {
@@ -35308,7 +35348,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ????",
                             NameEn = "????? ????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000184"),
-                            Type = "Village"
+                            Type = "Manshaat"
                         },
                         new
                         {
@@ -35318,7 +35358,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ???????",
                             NameEn = "????? ???????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000184"),
-                            Type = "Village"
+                            Type = "Manshaat"
                         },
                         new
                         {
@@ -35628,7 +35668,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ??? ???",
                             NameEn = "????? ??? ???",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000185"),
-                            Type = "Village"
+                            Type = "City"
                         },
                         new
                         {
@@ -35878,7 +35918,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ????",
                             NameEn = "??? ????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000185"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -35888,7 +35928,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ????",
                             NameEn = "??? ????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000185"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -35918,7 +35958,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ??????",
                             NameEn = "????? ??????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000185"),
-                            Type = "Village"
+                            Type = "Manshaat"
                         },
                         new
                         {
@@ -35928,7 +35968,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ??????",
                             NameEn = "????? ??????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000185"),
-                            Type = "Village"
+                            Type = "Manshaat"
                         },
                         new
                         {
@@ -35948,7 +35988,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ????????",
                             NameEn = "????? ????????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000186"),
-                            Type = "Village"
+                            Type = "City"
                         },
                         new
                         {
@@ -36168,7 +36208,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "???? ???????",
                             NameEn = "???? ???????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000186"),
-                            Type = "Village"
+                            Type = "Ezba"
                         },
                         new
                         {
@@ -36178,7 +36218,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "???? ?????? ????? ????? ???? ??????? ????????",
                             NameEn = "???? ?????? ????? ????? ???? ??????? ????????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000186"),
-                            Type = "Village"
+                            Type = "Ezba"
                         },
                         new
                         {
@@ -36188,7 +36228,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "???? ???????? ??????",
                             NameEn = "???? ???????? ??????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000186"),
-                            Type = "Village"
+                            Type = "Ezba"
                         },
                         new
                         {
@@ -36198,7 +36238,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "???? ??? ????",
                             NameEn = "???? ??? ????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000186"),
-                            Type = "Village"
+                            Type = "Ezba"
                         },
                         new
                         {
@@ -36218,7 +36258,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "???? ???? ????",
                             NameEn = "???? ???? ????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000186"),
-                            Type = "Village"
+                            Type = "Ezba"
                         },
                         new
                         {
@@ -36248,7 +36288,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ?????",
                             NameEn = "??? ?????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000186"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -36275,8 +36315,8 @@ namespace Tawreed.Infrastructure.Migrations
                             Id = new Guid("00000002-0000-0000-0000-000000002945"),
                             CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             IsActive = true,
-                            NameAr = "????? ??? ?????",
-                            NameEn = "????? ??? ?????",
+                            NameAr = "????? ??? ????? ",
+                            NameEn = "????? ??? ????? ",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000186"),
                             Type = "Village"
                         },
@@ -36288,7 +36328,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ??? ?????",
                             NameEn = "????? ??? ?????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000186"),
-                            Type = "Village"
+                            Type = "Manshaat"
                         },
                         new
                         {
@@ -36298,7 +36338,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ?????",
                             NameEn = "????? ?????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000186"),
-                            Type = "Village"
+                            Type = "Manshaat"
                         },
                         new
                         {
@@ -36308,7 +36348,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ????",
                             NameEn = "????? ????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000186"),
-                            Type = "Village"
+                            Type = "Manshaat"
                         },
                         new
                         {
@@ -36365,8 +36405,8 @@ namespace Tawreed.Infrastructure.Migrations
                             Id = new Guid("00000002-0000-0000-0000-000000002954"),
                             CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             IsActive = true,
-                            NameAr = "?????? ??????",
-                            NameEn = "?????? ??????",
+                            NameAr = "?????? ?????? ",
+                            NameEn = "?????? ?????? ",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000186"),
                             Type = "Village"
                         },
@@ -36408,7 +36448,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ?????????",
                             NameEn = "????? ?????????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000187"),
-                            Type = "Village"
+                            Type = "City"
                         },
                         new
                         {
@@ -36445,8 +36485,8 @@ namespace Tawreed.Infrastructure.Migrations
                             Id = new Guid("00000002-0000-0000-0000-000000002962"),
                             CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             IsActive = true,
-                            NameAr = "???? ???????",
-                            NameEn = "???? ???????",
+                            NameAr = "???? ??????? ",
+                            NameEn = "???? ??????? ",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000187"),
                             Type = "Village"
                         },
@@ -36528,7 +36568,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ?????????",
                             NameEn = "??? ?????????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000187"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -36538,7 +36578,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ?????",
                             NameEn = "??? ?????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000187"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -36548,7 +36588,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ????",
                             NameEn = "??? ????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000187"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -36568,7 +36608,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ??????",
                             NameEn = "????? ??????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000187"),
-                            Type = "Village"
+                            Type = "Manshaat"
                         },
                         new
                         {
@@ -36618,7 +36658,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ????? ???????",
                             NameEn = "????? ????? ???????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000188"),
-                            Type = "Village"
+                            Type = "City"
                         },
                         new
                         {
@@ -37018,7 +37058,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "???? ????",
                             NameEn = "???? ????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000188"),
-                            Type = "Village"
+                            Type = "Ezba"
                         },
                         new
                         {
@@ -37028,7 +37068,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "???? ??? ????",
                             NameEn = "???? ??? ????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000188"),
-                            Type = "Village"
+                            Type = "Ezba"
                         },
                         new
                         {
@@ -37038,7 +37078,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "???? ????",
                             NameEn = "???? ????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000188"),
-                            Type = "Village"
+                            Type = "Ezba"
                         },
                         new
                         {
@@ -37048,7 +37088,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "???? ???? ???????",
                             NameEn = "???? ???? ???????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000188"),
-                            Type = "Village"
+                            Type = "Ezba"
                         },
                         new
                         {
@@ -37078,7 +37118,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ??? ?????",
                             NameEn = "??? ??? ?????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000188"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -37088,7 +37128,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ??????",
                             NameEn = "??? ??????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000188"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -37098,7 +37138,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ?????",
                             NameEn = "??? ?????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000188"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -37108,7 +37148,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ????? ?????",
                             NameEn = "??? ????? ?????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000188"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -37118,7 +37158,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ??????",
                             NameEn = "??? ??????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000188"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -37128,7 +37168,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ?????",
                             NameEn = "??? ?????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000188"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -37138,7 +37178,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ???? ?????",
                             NameEn = "??? ???? ?????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000188"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -37148,7 +37188,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ???? ???",
                             NameEn = "??? ???? ???",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000188"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -37158,7 +37198,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ?????",
                             NameEn = "??? ?????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000188"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -37168,7 +37208,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ?????",
                             NameEn = "??? ?????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000188"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -37228,7 +37268,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ???????",
                             NameEn = "????? ???????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000188"),
-                            Type = "Village"
+                            Type = "Manshaat"
                         },
                         new
                         {
@@ -37238,7 +37278,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ?????",
                             NameEn = "????? ?????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000188"),
-                            Type = "Village"
+                            Type = "Manshaat"
                         },
                         new
                         {
@@ -37268,7 +37308,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ??? ????",
                             NameEn = "????? ??? ????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000189"),
-                            Type = "Village"
+                            Type = "City"
                         },
                         new
                         {
@@ -37378,7 +37418,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ?????",
                             NameEn = "??? ?????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000189"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -37388,7 +37428,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ????",
                             NameEn = "????? ????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000189"),
-                            Type = "Village"
+                            Type = "Manshaat"
                         },
                         new
                         {
@@ -37398,7 +37438,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ????",
                             NameEn = "????? ????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000190"),
-                            Type = "Village"
+                            Type = "City"
                         },
                         new
                         {
@@ -37558,7 +37598,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ?????",
                             NameEn = "????? ?????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000190"),
-                            Type = "Village"
+                            Type = "Manshaat"
                         },
                         new
                         {
@@ -37568,7 +37608,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ???????",
                             NameEn = "????? ???????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000191"),
-                            Type = "Village"
+                            Type = "City"
                         },
                         new
                         {
@@ -37728,7 +37768,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "???? ??????? ???",
                             NameEn = "???? ??????? ???",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000191"),
-                            Type = "Village"
+                            Type = "Ezba"
                         },
                         new
                         {
@@ -37738,7 +37778,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "???? ???????",
                             NameEn = "???? ???????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000191"),
-                            Type = "Village"
+                            Type = "Ezba"
                         },
                         new
                         {
@@ -37748,7 +37788,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "???? ???? ????",
                             NameEn = "???? ???? ????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000191"),
-                            Type = "Village"
+                            Type = "Ezba"
                         },
                         new
                         {
@@ -37758,7 +37798,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "???? ?????????",
                             NameEn = "???? ?????????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000191"),
-                            Type = "Village"
+                            Type = "Ezba"
                         },
                         new
                         {
@@ -37768,7 +37808,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "???? ???????",
                             NameEn = "???? ???????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000191"),
-                            Type = "Village"
+                            Type = "Ezba"
                         },
                         new
                         {
@@ -37778,7 +37818,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "???? ????? ???",
                             NameEn = "???? ????? ???",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000191"),
-                            Type = "Village"
+                            Type = "Ezba"
                         },
                         new
                         {
@@ -37788,7 +37828,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "???? ???? ?????",
                             NameEn = "???? ???? ?????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000191"),
-                            Type = "Village"
+                            Type = "Ezba"
                         },
                         new
                         {
@@ -37798,7 +37838,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "???? ?????",
                             NameEn = "???? ?????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000191"),
-                            Type = "Village"
+                            Type = "Ezba"
                         },
                         new
                         {
@@ -37808,7 +37848,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "???? ??? ???? ??????",
                             NameEn = "???? ??? ???? ??????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000191"),
-                            Type = "Village"
+                            Type = "Ezba"
                         },
                         new
                         {
@@ -37818,7 +37858,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "???? ?????",
                             NameEn = "???? ?????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000191"),
-                            Type = "Village"
+                            Type = "Ezba"
                         },
                         new
                         {
@@ -37828,7 +37868,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "???? ??? ??????",
                             NameEn = "???? ??? ??????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000191"),
-                            Type = "Village"
+                            Type = "Ezba"
                         },
                         new
                         {
@@ -37838,7 +37878,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "???? ?????",
                             NameEn = "???? ?????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000191"),
-                            Type = "Village"
+                            Type = "Ezba"
                         },
                         new
                         {
@@ -37848,7 +37888,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "???? ???? ????",
                             NameEn = "???? ???? ????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000191"),
-                            Type = "Village"
+                            Type = "Ezba"
                         },
                         new
                         {
@@ -37868,17 +37908,17 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ????????",
                             NameEn = "??? ????????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000191"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
                             Id = new Guid("00000002-0000-0000-0000-000000003105"),
                             CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             IsActive = true,
-                            NameAr = "??? ??????",
-                            NameEn = "??? ??????",
+                            NameAr = "??? ?????? ",
+                            NameEn = "??? ?????? ",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000191"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -37888,7 +37928,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ?????????",
                             NameEn = "??? ?????????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000191"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -37898,7 +37938,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ????",
                             NameEn = "??? ????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000191"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -37908,7 +37948,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ?????",
                             NameEn = "??? ?????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000191"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -37918,7 +37958,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ????",
                             NameEn = "??? ????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000191"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -37928,7 +37968,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ??????",
                             NameEn = "??? ??????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000191"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -37995,8 +38035,8 @@ namespace Tawreed.Infrastructure.Migrations
                             Id = new Guid("00000002-0000-0000-0000-000000003117"),
                             CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             IsActive = true,
-                            NameAr = "???? ???",
-                            NameEn = "???? ???",
+                            NameAr = "???? ??? ",
+                            NameEn = "???? ??? ",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000191"),
                             Type = "Village"
                         },
@@ -38008,7 +38048,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ??? ???",
                             NameEn = "????? ??? ???",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000191"),
-                            Type = "Village"
+                            Type = "Manshaat"
                         },
                         new
                         {
@@ -38018,7 +38058,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ?????",
                             NameEn = "????? ?????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000191"),
-                            Type = "Village"
+                            Type = "Manshaat"
                         },
                         new
                         {
@@ -38028,7 +38068,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ????? ?????",
                             NameEn = "????? ????? ?????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000191"),
-                            Type = "Village"
+                            Type = "Manshaat"
                         },
                         new
                         {
@@ -38038,7 +38078,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ?????",
                             NameEn = "????? ?????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000191"),
-                            Type = "Village"
+                            Type = "Manshaat"
                         },
                         new
                         {
@@ -38048,7 +38088,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ??? ??????",
                             NameEn = "????? ??? ??????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000192"),
-                            Type = "Village"
+                            Type = "City"
                         },
                         new
                         {
@@ -38088,7 +38128,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ????",
                             NameEn = "??? ????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000192"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -38098,7 +38138,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ???????",
                             NameEn = "????? ???????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000192"),
-                            Type = "Village"
+                            Type = "Manshaat"
                         },
                         new
                         {
@@ -38378,7 +38418,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ????????",
                             NameEn = "????? ????????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000193"),
-                            Type = "Village"
+                            Type = "Manshaat"
                         },
                         new
                         {
@@ -38388,7 +38428,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ??????",
                             NameEn = "????? ??????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000193"),
-                            Type = "Village"
+                            Type = "Manshaat"
                         },
                         new
                         {
@@ -38398,7 +38438,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ????",
                             NameEn = "????? ????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000193"),
-                            Type = "Village"
+                            Type = "Manshaat"
                         },
                         new
                         {
@@ -38408,7 +38448,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ?????",
                             NameEn = "????? ?????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000193"),
-                            Type = "Village"
+                            Type = "Manshaat"
                         },
                         new
                         {
@@ -38418,7 +38458,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ????",
                             NameEn = "????? ????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000193"),
-                            Type = "Village"
+                            Type = "Manshaat"
                         },
                         new
                         {
@@ -38428,7 +38468,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ????",
                             NameEn = "????? ????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000193"),
-                            Type = "Village"
+                            Type = "Manshaat"
                         },
                         new
                         {
@@ -38508,7 +38548,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ??? ?????",
                             NameEn = "????? ??? ?????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000194"),
-                            Type = "Village"
+                            Type = "City"
                         },
                         new
                         {
@@ -38848,7 +38888,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "???? ??? ??? ????",
                             NameEn = "???? ??? ??? ????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000194"),
-                            Type = "Village"
+                            Type = "Ezba"
                         },
                         new
                         {
@@ -38868,7 +38908,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ?????",
                             NameEn = "??? ?????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000194"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -38878,7 +38918,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ?????",
                             NameEn = "??? ?????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000194"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -38888,7 +38928,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ??????",
                             NameEn = "??? ??????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000194"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -38898,7 +38938,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ?????",
                             NameEn = "??? ?????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000194"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -38908,7 +38948,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ??????",
                             NameEn = "??? ??????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000194"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -38918,7 +38958,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ????",
                             NameEn = "??? ????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000194"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -38928,7 +38968,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ????",
                             NameEn = "??? ????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000194"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -38938,7 +38978,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ?????",
                             NameEn = "??? ?????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000194"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -38988,7 +39028,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ??? ???",
                             NameEn = "????? ??? ???",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000194"),
-                            Type = "Village"
+                            Type = "Manshaat"
                         },
                         new
                         {
@@ -38998,7 +39038,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ???????? _????????",
                             NameEn = "????? ???????? _????????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000194"),
-                            Type = "Village"
+                            Type = "Manshaat"
                         },
                         new
                         {
@@ -39008,7 +39048,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ???? ???????",
                             NameEn = "????? ???? ???????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000194"),
-                            Type = "Village"
+                            Type = "Manshaat"
                         },
                         new
                         {
@@ -39018,7 +39058,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ????",
                             NameEn = "????? ????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000194"),
-                            Type = "Village"
+                            Type = "Manshaat"
                         },
                         new
                         {
@@ -39028,7 +39068,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ??? ????",
                             NameEn = "????? ??? ????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000194"),
-                            Type = "Village"
+                            Type = "Manshaat"
                         },
                         new
                         {
@@ -39108,7 +39148,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ????",
                             NameEn = "??? ????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000195"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -39128,7 +39168,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ?????????",
                             NameEn = "????? ?????????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000196"),
-                            Type = "Village"
+                            Type = "City"
                         },
                         new
                         {
@@ -39238,7 +39278,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "???? ???????",
                             NameEn = "???? ???????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000196"),
-                            Type = "Village"
+                            Type = "Ezba"
                         },
                         new
                         {
@@ -39248,7 +39288,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "???? ?????",
                             NameEn = "???? ?????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000196"),
-                            Type = "Village"
+                            Type = "Ezba"
                         },
                         new
                         {
@@ -39258,7 +39298,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "???? ???? ????",
                             NameEn = "???? ???? ????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000196"),
-                            Type = "Village"
+                            Type = "Ezba"
                         },
                         new
                         {
@@ -39268,7 +39308,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "???? ??? ??????",
                             NameEn = "???? ??? ??????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000196"),
-                            Type = "Village"
+                            Type = "Ezba"
                         },
                         new
                         {
@@ -39278,7 +39318,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "???? ??? ????",
                             NameEn = "???? ??? ????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000196"),
-                            Type = "Village"
+                            Type = "Ezba"
                         },
                         new
                         {
@@ -39288,7 +39328,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ????? ???",
                             NameEn = "??? ????? ???",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000196"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -39298,7 +39338,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ????",
                             NameEn = "??? ????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000196"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -39308,7 +39348,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ???? ????",
                             NameEn = "??? ???? ????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000196"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -39388,7 +39428,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ????",
                             NameEn = "????? ????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000197"),
-                            Type = "Village"
+                            Type = "City"
                         },
                         new
                         {
@@ -39408,7 +39448,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ?????",
                             NameEn = "????? ?????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000197"),
-                            Type = "Village"
+                            Type = "Manshaat"
                         },
                         new
                         {
@@ -39428,7 +39468,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ????????? ???????",
                             NameEn = "????? ????????? ???????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000198"),
-                            Type = "Village"
+                            Type = "City"
                         },
                         new
                         {
@@ -39558,7 +39598,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ???",
                             NameEn = "????? ???",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000199"),
-                            Type = "Village"
+                            Type = "City"
                         },
                         new
                         {
@@ -39948,7 +39988,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ???????",
                             NameEn = "????? ???????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000201"),
-                            Type = "Village"
+                            Type = "Manshaat"
                         },
                         new
                         {
@@ -40178,7 +40218,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ??????? ???",
                             NameEn = "????? ??????? ???",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000205"),
-                            Type = "Village"
+                            Type = "City"
                         },
                         new
                         {
@@ -40258,7 +40298,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ????",
                             NameEn = "????? ????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000206"),
-                            Type = "Village"
+                            Type = "City"
                         },
                         new
                         {
@@ -40298,7 +40338,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ??????? ???",
                             NameEn = "????? ??????? ???",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000207"),
-                            Type = "Village"
+                            Type = "City"
                         },
                         new
                         {
@@ -40498,7 +40538,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ??????",
                             NameEn = "??? ??????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000208"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -40508,7 +40548,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ????? ???????",
                             NameEn = "??? ????? ???????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000208"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -40518,7 +40558,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ???????",
                             NameEn = "????? ???????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000208"),
-                            Type = "Village"
+                            Type = "City"
                         },
                         new
                         {
@@ -40528,7 +40568,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ??????",
                             NameEn = "????? ??????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000208"),
-                            Type = "Village"
+                            Type = "City"
                         },
                         new
                         {
@@ -40558,7 +40598,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? 6 ??????",
                             NameEn = "????? 6 ??????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000208"),
-                            Type = "Village"
+                            Type = "Shiyakha"
                         },
                         new
                         {
@@ -40608,7 +40648,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ??????? - ???????",
                             NameEn = "????? ??????? - ???????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000209"),
-                            Type = "Village"
+                            Type = "City"
                         },
                         new
                         {
@@ -40728,7 +40768,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ?????",
                             NameEn = "??? ?????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000212"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -40738,7 +40778,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ?????",
                             NameEn = "????? ?????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000212"),
-                            Type = "Village"
+                            Type = "Manshaat"
                         },
                         new
                         {
@@ -40768,7 +40808,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ???????",
                             NameEn = "????? ???????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000213"),
-                            Type = "Village"
+                            Type = "Manshaat"
                         },
                         new
                         {
@@ -40828,7 +40868,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??????? ??????",
                             NameEn = "??????? ??????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000214"),
-                            Type = "Village"
+                            Type = "Shiyakha"
                         },
                         new
                         {
@@ -40838,7 +40878,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??????? ???????",
                             NameEn = "??????? ???????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000214"),
-                            Type = "Village"
+                            Type = "Shiyakha"
                         },
                         new
                         {
@@ -40848,7 +40888,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??????? ???????",
                             NameEn = "??????? ???????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000214"),
-                            Type = "Village"
+                            Type = "Shiyakha"
                         },
                         new
                         {
@@ -40858,7 +40898,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??????? ???????",
                             NameEn = "??????? ???????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000214"),
-                            Type = "Village"
+                            Type = "Shiyakha"
                         },
                         new
                         {
@@ -40868,7 +40908,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??????? ???????",
                             NameEn = "??????? ???????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000214"),
-                            Type = "Village"
+                            Type = "Shiyakha"
                         },
                         new
                         {
@@ -40878,7 +40918,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??????? ???????",
                             NameEn = "??????? ???????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000214"),
-                            Type = "Village"
+                            Type = "Shiyakha"
                         },
                         new
                         {
@@ -40898,7 +40938,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ?????????",
                             NameEn = "????? ?????????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000215"),
-                            Type = "Village"
+                            Type = "City"
                         },
                         new
                         {
@@ -40928,7 +40968,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ??? ??????",
                             NameEn = "????? ??? ??????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000216"),
-                            Type = "Village"
+                            Type = "City"
                         },
                         new
                         {
@@ -41048,7 +41088,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ????????",
                             NameEn = "????? ????????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000217"),
-                            Type = "Village"
+                            Type = "City"
                         },
                         new
                         {
@@ -41198,7 +41238,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ?????",
                             NameEn = "????? ?????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000217"),
-                            Type = "Village"
+                            Type = "Manshaat"
                         },
                         new
                         {
@@ -41208,7 +41248,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ????",
                             NameEn = "????? ????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000217"),
-                            Type = "Village"
+                            Type = "Manshaat"
                         },
                         new
                         {
@@ -41238,7 +41278,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ????",
                             NameEn = "????? ????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000218"),
-                            Type = "Village"
+                            Type = "City"
                         },
                         new
                         {
@@ -41398,7 +41438,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ?????",
                             NameEn = "??? ?????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000218"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -41438,7 +41478,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ??????",
                             NameEn = "????? ??????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000219"),
-                            Type = "Village"
+                            Type = "City"
                         },
                         new
                         {
@@ -41615,8 +41655,8 @@ namespace Tawreed.Infrastructure.Migrations
                             Id = new Guid("00000002-0000-0000-0000-000000003479"),
                             CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             IsActive = true,
-                            NameAr = "????",
-                            NameEn = "????",
+                            NameAr = "???? ",
+                            NameEn = "???? ",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000219"),
                             Type = "Village"
                         },
@@ -41698,7 +41738,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ???????",
                             NameEn = "??? ???????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000219"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -41708,7 +41748,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ??????",
                             NameEn = "??? ??????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000219"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -41718,7 +41758,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ?????",
                             NameEn = "??? ?????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000219"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -41728,7 +41768,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ???? ???? ?????",
                             NameEn = "??? ???? ???? ?????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000219"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -41738,7 +41778,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ????",
                             NameEn = "??? ????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000219"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -41748,7 +41788,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ????",
                             NameEn = "??? ????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000219"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -41758,7 +41798,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ?????",
                             NameEn = "??? ?????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000219"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -41768,7 +41808,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ????",
                             NameEn = "??? ????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000219"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -41778,7 +41818,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ????",
                             NameEn = "??? ????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000219"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -41788,7 +41828,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ??? ??????",
                             NameEn = "????? ??? ??????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000219"),
-                            Type = "Village"
+                            Type = "Manshaat"
                         },
                         new
                         {
@@ -41798,7 +41838,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ??? ?????",
                             NameEn = "????? ??? ?????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000219"),
-                            Type = "Village"
+                            Type = "Manshaat"
                         },
                         new
                         {
@@ -41808,7 +41848,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ????",
                             NameEn = "????? ????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000219"),
-                            Type = "Village"
+                            Type = "Manshaat"
                         },
                         new
                         {
@@ -41838,7 +41878,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ????? ???????",
                             NameEn = "????? ????? ???????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000220"),
-                            Type = "Village"
+                            Type = "City"
                         },
                         new
                         {
@@ -42018,7 +42058,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ?????",
                             NameEn = "??? ?????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000220"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -42028,7 +42068,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ??? ??????",
                             NameEn = "??? ??? ??????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000220"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -42038,7 +42078,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ?????",
                             NameEn = "????? ?????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000220"),
-                            Type = "Village"
+                            Type = "Manshaat"
                         },
                         new
                         {
@@ -42078,7 +42118,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ????????",
                             NameEn = "????? ????????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000221"),
-                            Type = "Village"
+                            Type = "City"
                         },
                         new
                         {
@@ -42168,7 +42208,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "???? ???????",
                             NameEn = "???? ???????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000221"),
-                            Type = "Village"
+                            Type = "Ezba"
                         },
                         new
                         {
@@ -42178,7 +42218,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "???? ??? ??????",
                             NameEn = "???? ??? ??????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000221"),
-                            Type = "Village"
+                            Type = "Ezba"
                         },
                         new
                         {
@@ -42188,7 +42228,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "???? ?????",
                             NameEn = "???? ?????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000221"),
-                            Type = "Village"
+                            Type = "Ezba"
                         },
                         new
                         {
@@ -42238,7 +42278,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ?????",
                             NameEn = "????? ?????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000222"),
-                            Type = "Village"
+                            Type = "City"
                         },
                         new
                         {
@@ -42388,7 +42428,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ????????",
                             NameEn = "??? ????????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000222"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -42398,7 +42438,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ?????",
                             NameEn = "??? ?????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000222"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -42408,7 +42448,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ?????",
                             NameEn = "??? ?????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000222"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -42428,7 +42468,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ??????",
                             NameEn = "????? ??????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000222"),
-                            Type = "Village"
+                            Type = "Manshaat"
                         },
                         new
                         {
@@ -42468,7 +42508,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ?????",
                             NameEn = "????? ?????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000223"),
-                            Type = "Village"
+                            Type = "City"
                         },
                         new
                         {
@@ -42568,7 +42608,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ?????? ? ???? ???? ????? ? ???? ????? ?????*",
                             NameEn = "????? ?????? ? ???? ???? ????? ? ???? ????? ?????*",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000224"),
-                            Type = "Village"
+                            Type = "City"
                         },
                         new
                         {
@@ -42668,7 +42708,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ????? ????",
                             NameEn = "????? ????? ????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000226"),
-                            Type = "Village"
+                            Type = "City"
                         },
                         new
                         {
@@ -42758,7 +42798,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ????",
                             NameEn = "??? ????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000227"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -42778,7 +42818,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??????? ???????",
                             NameEn = "??????? ???????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000228"),
-                            Type = "Village"
+                            Type = "Shiyakha"
                         },
                         new
                         {
@@ -42788,7 +42828,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??????? ???????",
                             NameEn = "??????? ???????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000228"),
-                            Type = "Village"
+                            Type = "Shiyakha"
                         },
                         new
                         {
@@ -42798,7 +42838,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??????? ???????",
                             NameEn = "??????? ???????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000228"),
-                            Type = "Village"
+                            Type = "Shiyakha"
                         },
                         new
                         {
@@ -42808,7 +42848,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??????? ???????",
                             NameEn = "??????? ???????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000228"),
-                            Type = "Village"
+                            Type = "Shiyakha"
                         },
                         new
                         {
@@ -42818,7 +42858,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??????? ??????? ???",
                             NameEn = "??????? ??????? ???",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000228"),
-                            Type = "Village"
+                            Type = "Shiyakha"
                         },
                         new
                         {
@@ -42828,7 +42868,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??????? ??????? ???",
                             NameEn = "??????? ??????? ???",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000228"),
-                            Type = "Village"
+                            Type = "Shiyakha"
                         },
                         new
                         {
@@ -43198,7 +43238,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ???? ???",
                             NameEn = "????? ???? ???",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000230"),
-                            Type = "Village"
+                            Type = "Manshaat"
                         },
                         new
                         {
@@ -43208,7 +43248,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ????",
                             NameEn = "????? ????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000230"),
-                            Type = "Village"
+                            Type = "Manshaat"
                         },
                         new
                         {
@@ -43288,7 +43328,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ??? ???? ???????",
                             NameEn = "????? ??? ???? ???????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000231"),
-                            Type = "Village"
+                            Type = "City"
                         },
                         new
                         {
@@ -43298,7 +43338,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ?????",
                             NameEn = "????? ?????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000232"),
-                            Type = "Village"
+                            Type = "City"
                         },
                         new
                         {
@@ -43558,7 +43598,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "???? ???",
                             NameEn = "???? ???",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000232"),
-                            Type = "Village"
+                            Type = "Ezba"
                         },
                         new
                         {
@@ -43568,7 +43608,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ?????",
                             NameEn = "??? ?????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000232"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -43578,7 +43618,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ??????",
                             NameEn = "??? ??????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000232"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -43588,7 +43628,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ????",
                             NameEn = "????? ????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000232"),
-                            Type = "Village"
+                            Type = "Manshaat"
                         },
                         new
                         {
@@ -43598,7 +43638,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ???????",
                             NameEn = "????? ???????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000232"),
-                            Type = "Village"
+                            Type = "Manshaat"
                         },
                         new
                         {
@@ -43638,7 +43678,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ???????",
                             NameEn = "????? ???????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000233"),
-                            Type = "Village"
+                            Type = "City"
                         },
                         new
                         {
@@ -43878,7 +43918,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ?????",
                             NameEn = "??? ?????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000233"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -43888,7 +43928,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ??? ?????",
                             NameEn = "??? ??? ?????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000233"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -43915,8 +43955,8 @@ namespace Tawreed.Infrastructure.Migrations
                             Id = new Guid("00000002-0000-0000-0000-000000003709"),
                             CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             IsActive = true,
-                            NameAr = "????? ??? ???",
-                            NameEn = "????? ??? ???",
+                            NameAr = "????? ??? ??? ",
+                            NameEn = "????? ??? ??? ",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000233"),
                             Type = "Village"
                         },
@@ -43925,10 +43965,10 @@ namespace Tawreed.Infrastructure.Migrations
                             Id = new Guid("00000002-0000-0000-0000-000000003710"),
                             CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             IsActive = true,
-                            NameAr = "????? ??? ???",
-                            NameEn = "????? ??? ???",
+                            NameAr = "????? ??? ??? ",
+                            NameEn = "????? ??? ??? ",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000233"),
-                            Type = "Village"
+                            Type = "Manshaat"
                         },
                         new
                         {
@@ -43968,7 +44008,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ???????",
                             NameEn = "????? ???????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000234"),
-                            Type = "Village"
+                            Type = "City"
                         },
                         new
                         {
@@ -44138,7 +44178,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ??? ????",
                             NameEn = "??? ??? ????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000234"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -44168,7 +44208,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ???????",
                             NameEn = "????? ???????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000234"),
-                            Type = "Village"
+                            Type = "Manshaat"
                         },
                         new
                         {
@@ -44178,7 +44218,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ???????",
                             NameEn = "????? ???????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000234"),
-                            Type = "Village"
+                            Type = "Manshaat"
                         },
                         new
                         {
@@ -44188,7 +44228,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ?????",
                             NameEn = "????? ?????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000234"),
-                            Type = "Village"
+                            Type = "Manshaat"
                         },
                         new
                         {
@@ -44198,7 +44238,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ????",
                             NameEn = "????? ????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000234"),
-                            Type = "Village"
+                            Type = "Manshaat"
                         },
                         new
                         {
@@ -44208,7 +44248,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ??? ?????",
                             NameEn = "????? ??? ?????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000234"),
-                            Type = "Village"
+                            Type = "Manshaat"
                         },
                         new
                         {
@@ -44218,7 +44258,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ????",
                             NameEn = "????? ????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000234"),
-                            Type = "Village"
+                            Type = "Manshaat"
                         },
                         new
                         {
@@ -44338,7 +44378,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ???",
                             NameEn = "????? ???",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000235"),
-                            Type = "Village"
+                            Type = "City"
                         },
                         new
                         {
@@ -44698,7 +44738,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ????",
                             NameEn = "??? ????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000235"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -44708,7 +44748,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ?????",
                             NameEn = "??? ?????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000235"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -44718,7 +44758,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ????",
                             NameEn = "??? ????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000235"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -44728,7 +44768,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ??? ????",
                             NameEn = "????? ??? ????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000235"),
-                            Type = "Village"
+                            Type = "Manshaat"
                         },
                         new
                         {
@@ -44808,7 +44848,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ?????",
                             NameEn = "????? ?????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000236"),
-                            Type = "Village"
+                            Type = "City"
                         },
                         new
                         {
@@ -44918,7 +44958,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "???? ???????",
                             NameEn = "???? ???????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000236"),
-                            Type = "Village"
+                            Type = "Ezba"
                         },
                         new
                         {
@@ -44928,7 +44968,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "???? ?????",
                             NameEn = "???? ?????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000236"),
-                            Type = "Village"
+                            Type = "Ezba"
                         },
                         new
                         {
@@ -44938,7 +44978,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ????? ????",
                             NameEn = "??? ????? ????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000236"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -44948,7 +44988,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ??? ???",
                             NameEn = "??? ??? ???",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000236"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -44988,7 +45028,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ??? ????",
                             NameEn = "????? ??? ????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000236"),
-                            Type = "Village"
+                            Type = "Manshaat"
                         },
                         new
                         {
@@ -44998,7 +45038,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ??????",
                             NameEn = "????? ??????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000236"),
-                            Type = "Village"
+                            Type = "Manshaat"
                         },
                         new
                         {
@@ -45028,7 +45068,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ????",
                             NameEn = "????? ????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000237"),
-                            Type = "Village"
+                            Type = "City"
                         },
                         new
                         {
@@ -45198,7 +45238,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ???????",
                             NameEn = "??? ???????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000237"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -45218,7 +45258,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ??????",
                             NameEn = "????? ??????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000237"),
-                            Type = "Village"
+                            Type = "Manshaat"
                         },
                         new
                         {
@@ -45228,7 +45268,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ????",
                             NameEn = "????? ????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000237"),
-                            Type = "Village"
+                            Type = "Manshaat"
                         },
                         new
                         {
@@ -45248,7 +45288,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ???",
                             NameEn = "??? ???",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000238"),
-                            Type = "Village"
+                            Type = "QismSection"
                         },
                         new
                         {
@@ -45258,7 +45298,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ????",
                             NameEn = "??? ????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000238"),
-                            Type = "Village"
+                            Type = "QismSection"
                         },
                         new
                         {
@@ -45268,7 +45308,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ????",
                             NameEn = "??? ????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000238"),
-                            Type = "Village"
+                            Type = "QismSection"
                         },
                         new
                         {
@@ -45278,7 +45318,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ????",
                             NameEn = "??? ????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000238"),
-                            Type = "Village"
+                            Type = "QismSection"
                         },
                         new
                         {
@@ -45568,7 +45608,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ???????",
                             NameEn = "????? ???????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000239"),
-                            Type = "Village"
+                            Type = "Manshaat"
                         },
                         new
                         {
@@ -45578,7 +45618,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ??????",
                             NameEn = "????? ??????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000239"),
-                            Type = "Village"
+                            Type = "Manshaat"
                         },
                         new
                         {
@@ -45588,7 +45628,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ??????",
                             NameEn = "????? ??????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000239"),
-                            Type = "Village"
+                            Type = "Manshaat"
                         },
                         new
                         {
@@ -45598,7 +45638,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ???",
                             NameEn = "????? ???",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000239"),
-                            Type = "Village"
+                            Type = "Manshaat"
                         },
                         new
                         {
@@ -45608,7 +45648,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ??? ????",
                             NameEn = "????? ??? ????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000239"),
-                            Type = "Village"
+                            Type = "Manshaat"
                         },
                         new
                         {
@@ -45618,7 +45658,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ????",
                             NameEn = "????? ????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000239"),
-                            Type = "Village"
+                            Type = "Manshaat"
                         },
                         new
                         {
@@ -45628,7 +45668,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ????",
                             NameEn = "????? ????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000239"),
-                            Type = "Village"
+                            Type = "Manshaat"
                         },
                         new
                         {
@@ -45638,7 +45678,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ?????",
                             NameEn = "????? ?????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000239"),
-                            Type = "Village"
+                            Type = "Manshaat"
                         },
                         new
                         {
@@ -45688,7 +45728,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ??????",
                             NameEn = "????? ??????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000240"),
-                            Type = "Village"
+                            Type = "City"
                         },
                         new
                         {
@@ -45838,7 +45878,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ????",
                             NameEn = "??? ????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000240"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -45848,7 +45888,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ?????",
                             NameEn = "????? ?????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000240"),
-                            Type = "Village"
+                            Type = "Manshaat"
                         },
                         new
                         {
@@ -45858,7 +45898,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ????",
                             NameEn = "????? ????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000241"),
-                            Type = "Village"
+                            Type = "City"
                         },
                         new
                         {
@@ -46098,7 +46138,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "???? ??????",
                             NameEn = "???? ??????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000241"),
-                            Type = "Village"
+                            Type = "Ezba"
                         },
                         new
                         {
@@ -46148,7 +46188,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "???  ?????????",
                             NameEn = "???  ?????????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000241"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -46198,7 +46238,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ??????",
                             NameEn = "????? ??????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000241"),
-                            Type = "Village"
+                            Type = "Manshaat"
                         },
                         new
                         {
@@ -46208,7 +46248,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ????",
                             NameEn = "????? ????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000241"),
-                            Type = "Village"
+                            Type = "Manshaat"
                         },
                         new
                         {
@@ -46218,7 +46258,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ????",
                             NameEn = "????? ????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000241"),
-                            Type = "Village"
+                            Type = "Manshaat"
                         },
                         new
                         {
@@ -46228,7 +46268,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ????",
                             NameEn = "????? ????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000241"),
-                            Type = "Village"
+                            Type = "Manshaat"
                         },
                         new
                         {
@@ -46238,7 +46278,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ????",
                             NameEn = "????? ????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000241"),
-                            Type = "Village"
+                            Type = "Manshaat"
                         },
                         new
                         {
@@ -46248,7 +46288,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ??? ?????",
                             NameEn = "????? ??? ?????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000241"),
-                            Type = "Village"
+                            Type = "Manshaat"
                         },
                         new
                         {
@@ -46258,7 +46298,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ????",
                             NameEn = "????? ????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000241"),
-                            Type = "Village"
+                            Type = "Manshaat"
                         },
                         new
                         {
@@ -46268,7 +46308,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ????",
                             NameEn = "????? ????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000241"),
-                            Type = "Village"
+                            Type = "Manshaat"
                         },
                         new
                         {
@@ -46278,7 +46318,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ??? ??????",
                             NameEn = "????? ??? ??????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000241"),
-                            Type = "Village"
+                            Type = "Manshaat"
                         },
                         new
                         {
@@ -46288,7 +46328,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ????",
                             NameEn = "????? ????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000241"),
-                            Type = "Village"
+                            Type = "Manshaat"
                         },
                         new
                         {
@@ -46298,7 +46338,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ????",
                             NameEn = "????? ????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000241"),
-                            Type = "Village"
+                            Type = "Manshaat"
                         },
                         new
                         {
@@ -46328,7 +46368,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ?????",
                             NameEn = "????? ?????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000242"),
-                            Type = "Village"
+                            Type = "City"
                         },
                         new
                         {
@@ -46498,7 +46538,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ?????",
                             NameEn = "??? ?????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000242"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -46518,7 +46558,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ?????",
                             NameEn = "????? ?????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000242"),
-                            Type = "Village"
+                            Type = "Manshaat"
                         },
                         new
                         {
@@ -46528,7 +46568,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ???????",
                             NameEn = "????? ???????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000242"),
-                            Type = "Village"
+                            Type = "Manshaat"
                         },
                         new
                         {
@@ -46538,7 +46578,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ??? ?????",
                             NameEn = "????? ??? ?????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000242"),
-                            Type = "Village"
+                            Type = "Manshaat"
                         },
                         new
                         {
@@ -46548,7 +46588,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ?????",
                             NameEn = "????? ?????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000242"),
-                            Type = "Village"
+                            Type = "Manshaat"
                         },
                         new
                         {
@@ -46558,7 +46598,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ??????",
                             NameEn = "????? ??????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000242"),
-                            Type = "Village"
+                            Type = "Manshaat"
                         },
                         new
                         {
@@ -46568,7 +46608,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ?????",
                             NameEn = "????? ?????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000242"),
-                            Type = "Village"
+                            Type = "Manshaat"
                         },
                         new
                         {
@@ -46578,7 +46618,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ?????",
                             NameEn = "????? ?????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000243"),
-                            Type = "Village"
+                            Type = "City"
                         },
                         new
                         {
@@ -46738,7 +46778,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ?????",
                             NameEn = "??? ?????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000243"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -46748,7 +46788,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ?????",
                             NameEn = "??? ?????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000243"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -46768,7 +46808,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ??????? ??????",
                             NameEn = "????? ??????? ??????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000243"),
-                            Type = "Village"
+                            Type = "Manshaat"
                         },
                         new
                         {
@@ -46788,7 +46828,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ???? ??????",
                             NameEn = "????? ???? ??????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000244"),
-                            Type = "Village"
+                            Type = "City"
                         },
                         new
                         {
@@ -46978,7 +47018,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ?????? ???????",
                             NameEn = "????? ?????? ???????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000245"),
-                            Type = "Village"
+                            Type = "City"
                         },
                         new
                         {
@@ -46998,7 +47038,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ???",
                             NameEn = "??? ???",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000246"),
-                            Type = "Village"
+                            Type = "QismSection"
                         },
                         new
                         {
@@ -47008,7 +47048,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ???",
                             NameEn = "??? ???",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000246"),
-                            Type = "Village"
+                            Type = "QismSection"
                         },
                         new
                         {
@@ -47018,7 +47058,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ????",
                             NameEn = "??? ????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000246"),
-                            Type = "Village"
+                            Type = "QismSection"
                         },
                         new
                         {
@@ -47028,7 +47068,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ????",
                             NameEn = "??? ????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000246"),
-                            Type = "Village"
+                            Type = "QismSection"
                         },
                         new
                         {
@@ -47038,7 +47078,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ????",
                             NameEn = "??? ????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000246"),
-                            Type = "Village"
+                            Type = "QismSection"
                         },
                         new
                         {
@@ -47048,7 +47088,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ???????? ??????",
                             NameEn = "??? ???????? ??????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000246"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -47378,7 +47418,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ?????????",
                             NameEn = "????? ?????????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000247"),
-                            Type = "Village"
+                            Type = "Manshaat"
                         },
                         new
                         {
@@ -47388,7 +47428,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ????? ???????",
                             NameEn = "????? ????? ???????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000247"),
-                            Type = "Village"
+                            Type = "Manshaat"
                         },
                         new
                         {
@@ -47398,7 +47438,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ????? ???????",
                             NameEn = "????? ????? ???????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000247"),
-                            Type = "Village"
+                            Type = "Manshaat"
                         },
                         new
                         {
@@ -47488,7 +47528,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ?????? ???????",
                             NameEn = "????? ?????? ???????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000248"),
-                            Type = "Village"
+                            Type = "City"
                         },
                         new
                         {
@@ -47498,7 +47538,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ???????",
                             NameEn = "????? ???????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000249"),
-                            Type = "Village"
+                            Type = "City"
                         },
                         new
                         {
@@ -47818,7 +47858,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ??????",
                             NameEn = "??? ??????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000249"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -47828,7 +47868,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ???",
                             NameEn = "??? ???",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000249"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -47888,7 +47928,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ????",
                             NameEn = "????? ????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000249"),
-                            Type = "Village"
+                            Type = "Manshaat"
                         },
                         new
                         {
@@ -47898,7 +47938,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ???????",
                             NameEn = "????? ???????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000249"),
-                            Type = "Village"
+                            Type = "Manshaat"
                         },
                         new
                         {
@@ -47978,7 +48018,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ??????",
                             NameEn = "????? ??????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000250"),
-                            Type = "Village"
+                            Type = "City"
                         },
                         new
                         {
@@ -48128,7 +48168,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ???????",
                             NameEn = "??? ???????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000250"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -48138,7 +48178,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ??? ??????",
                             NameEn = "??? ??? ??????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000250"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -48148,7 +48188,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ????",
                             NameEn = "??? ????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000250"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -48168,7 +48208,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ???????",
                             NameEn = "????? ???????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000250"),
-                            Type = "Village"
+                            Type = "Manshaat"
                         },
                         new
                         {
@@ -48178,7 +48218,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ??????",
                             NameEn = "????? ??????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000250"),
-                            Type = "Village"
+                            Type = "Manshaat"
                         },
                         new
                         {
@@ -48188,7 +48228,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ????",
                             NameEn = "????? ????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000250"),
-                            Type = "Village"
+                            Type = "Manshaat"
                         },
                         new
                         {
@@ -48198,7 +48238,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ??? ???? ?????",
                             NameEn = "????? ??? ???? ?????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000250"),
-                            Type = "Village"
+                            Type = "Manshaat"
                         },
                         new
                         {
@@ -48215,8 +48255,8 @@ namespace Tawreed.Infrastructure.Migrations
                             Id = new Guid("00000002-0000-0000-0000-000000004139"),
                             CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             IsActive = true,
-                            NameAr = "?????? 4",
-                            NameEn = "?????? 4",
+                            NameAr = " ?????? 4",
+                            NameEn = " ?????? 4",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000250"),
                             Type = "Village"
                         },
@@ -48248,7 +48288,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ??? ????",
                             NameEn = "????? ??? ????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000251"),
-                            Type = "Village"
+                            Type = "City"
                         },
                         new
                         {
@@ -48568,7 +48608,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ??? ???????",
                             NameEn = "??? ??? ???????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000251"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -48578,7 +48618,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ????? ???????",
                             NameEn = "??? ????? ???????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000251"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -48598,7 +48638,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ??? ????",
                             NameEn = "????? ??? ????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000251"),
-                            Type = "Village"
+                            Type = "Manshaat"
                         },
                         new
                         {
@@ -48608,7 +48648,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ????? ???",
                             NameEn = "????? ????? ???",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000251"),
-                            Type = "Village"
+                            Type = "Manshaat"
                         },
                         new
                         {
@@ -48618,7 +48658,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ??????",
                             NameEn = "????? ??????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000251"),
-                            Type = "Village"
+                            Type = "Manshaat"
                         },
                         new
                         {
@@ -48628,7 +48668,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ???????",
                             NameEn = "????? ???????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000251"),
-                            Type = "Village"
+                            Type = "Manshaat"
                         },
                         new
                         {
@@ -48638,7 +48678,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ????",
                             NameEn = "????? ????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000251"),
-                            Type = "Village"
+                            Type = "Manshaat"
                         },
                         new
                         {
@@ -48648,7 +48688,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ????",
                             NameEn = "????? ????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000251"),
-                            Type = "Village"
+                            Type = "Manshaat"
                         },
                         new
                         {
@@ -48688,7 +48728,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "???? ?????? ???????",
                             NameEn = "???? ?????? ???????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000251"),
-                            Type = "Village"
+                            Type = "Ezba"
                         },
                         new
                         {
@@ -48698,7 +48738,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ??? ????",
                             NameEn = "????? ??? ????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000252"),
-                            Type = "Village"
+                            Type = "City"
                         },
                         new
                         {
@@ -48898,7 +48938,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ????",
                             NameEn = "??? ????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000252"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -48908,7 +48948,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ???? ???????",
                             NameEn = "????? ???? ???????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000252"),
-                            Type = "Village"
+                            Type = "Manshaat"
                         },
                         new
                         {
@@ -48918,7 +48958,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ?????",
                             NameEn = "????? ?????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000252"),
-                            Type = "Village"
+                            Type = "Manshaat"
                         },
                         new
                         {
@@ -48998,7 +49038,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ??????",
                             NameEn = "????? ??????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000253"),
-                            Type = "Village"
+                            Type = "City"
                         },
                         new
                         {
@@ -49388,7 +49428,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "???? ????????",
                             NameEn = "???? ????????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000253"),
-                            Type = "Village"
+                            Type = "Ezba"
                         },
                         new
                         {
@@ -49428,7 +49468,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ?????",
                             NameEn = "????? ?????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000253"),
-                            Type = "Village"
+                            Type = "Manshaat"
                         },
                         new
                         {
@@ -49438,7 +49478,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ??????",
                             NameEn = "????? ??????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000253"),
-                            Type = "Village"
+                            Type = "Manshaat"
                         },
                         new
                         {
@@ -49448,7 +49488,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ???????",
                             NameEn = "????? ???????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000253"),
-                            Type = "Village"
+                            Type = "Manshaat"
                         },
                         new
                         {
@@ -49548,7 +49588,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ????",
                             NameEn = "????? ????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000254"),
-                            Type = "Village"
+                            Type = "City"
                         },
                         new
                         {
@@ -49708,7 +49748,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "???? ?????",
                             NameEn = "???? ?????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000254"),
-                            Type = "Village"
+                            Type = "Ezba"
                         },
                         new
                         {
@@ -49718,7 +49758,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ???????",
                             NameEn = "??? ???????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000254"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -49778,7 +49818,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ??? ????",
                             NameEn = "????? ??? ????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000254"),
-                            Type = "Village"
+                            Type = "Manshaat"
                         },
                         new
                         {
@@ -49788,7 +49828,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ?????",
                             NameEn = "????? ?????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000254"),
-                            Type = "Village"
+                            Type = "Manshaat"
                         },
                         new
                         {
@@ -49818,7 +49858,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ?????",
                             NameEn = "????? ?????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000255"),
-                            Type = "Village"
+                            Type = "City"
                         },
                         new
                         {
@@ -50098,7 +50138,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ???????? ??????",
                             NameEn = "??? ???????? ??????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000255"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -50108,7 +50148,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ???????",
                             NameEn = "??? ???????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000255"),
-                            Type = "Village"
+                            Type = "Kafr"
                         },
                         new
                         {
@@ -50138,7 +50178,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ?????",
                             NameEn = "????? ?????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000255"),
-                            Type = "Village"
+                            Type = "Manshaat"
                         },
                         new
                         {
@@ -50148,7 +50188,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ?????",
                             NameEn = "????? ?????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000255"),
-                            Type = "Village"
+                            Type = "Manshaat"
                         },
                         new
                         {
@@ -50238,7 +50278,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ???",
                             NameEn = "??? ???",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000256"),
-                            Type = "Village"
+                            Type = "QismSection"
                         },
                         new
                         {
@@ -50248,7 +50288,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ???",
                             NameEn = "??? ???",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000256"),
-                            Type = "Village"
+                            Type = "QismSection"
                         },
                         new
                         {
@@ -50258,7 +50298,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ????",
                             NameEn = "??? ????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000256"),
-                            Type = "Village"
+                            Type = "QismSection"
                         },
                         new
                         {
@@ -50268,7 +50308,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ????",
                             NameEn = "??? ????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000256"),
-                            Type = "Village"
+                            Type = "QismSection"
                         },
                         new
                         {
@@ -50608,7 +50648,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "???? ????",
                             NameEn = "???? ????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000257"),
-                            Type = "Village"
+                            Type = "Ezba"
                         },
                         new
                         {
@@ -50618,7 +50658,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "???? ????? ????",
                             NameEn = "???? ????? ????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000257"),
-                            Type = "Village"
+                            Type = "Ezba"
                         },
                         new
                         {
@@ -50658,7 +50698,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ????????",
                             NameEn = "????? ????????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000257"),
-                            Type = "Village"
+                            Type = "Manshaat"
                         },
                         new
                         {
@@ -50668,7 +50708,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ??? ????? ???????",
                             NameEn = "????? ??? ????? ???????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000257"),
-                            Type = "Village"
+                            Type = "Manshaat"
                         },
                         new
                         {
@@ -50678,7 +50718,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ??? ????? ????",
                             NameEn = "????? ??? ????? ????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000257"),
-                            Type = "Village"
+                            Type = "Manshaat"
                         },
                         new
                         {
@@ -50768,7 +50808,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ??????",
                             NameEn = "????? ??????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000258"),
-                            Type = "Village"
+                            Type = "Shiyakha"
                         },
                         new
                         {
@@ -50778,7 +50818,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ?????",
                             NameEn = "????? ?????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000258"),
-                            Type = "Village"
+                            Type = "Shiyakha"
                         },
                         new
                         {
@@ -50788,7 +50828,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ???????",
                             NameEn = "????? ???????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000258"),
-                            Type = "Village"
+                            Type = "Shiyakha"
                         },
                         new
                         {
@@ -50798,7 +50838,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ???????",
                             NameEn = "????? ???????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000258"),
-                            Type = "Village"
+                            Type = "Shiyakha"
                         },
                         new
                         {
@@ -50808,7 +50848,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ???????",
                             NameEn = "????? ???????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000258"),
-                            Type = "Village"
+                            Type = "Shiyakha"
                         },
                         new
                         {
@@ -50818,7 +50858,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ???????",
                             NameEn = "????? ???????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000258"),
-                            Type = "Village"
+                            Type = "Shiyakha"
                         },
                         new
                         {
@@ -50828,7 +50868,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ???????",
                             NameEn = "????? ???????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000258"),
-                            Type = "Village"
+                            Type = "Shiyakha"
                         },
                         new
                         {
@@ -50838,7 +50878,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ??????? ?????? ????????",
                             NameEn = "????? ??????? ?????? ????????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000258"),
-                            Type = "Village"
+                            Type = "Shiyakha"
                         },
                         new
                         {
@@ -50848,7 +50888,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ???????",
                             NameEn = "????? ???????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000258"),
-                            Type = "Village"
+                            Type = "Shiyakha"
                         },
                         new
                         {
@@ -50858,7 +50898,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ??????? ??????",
                             NameEn = "????? ??????? ??????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000259"),
-                            Type = "Village"
+                            Type = "Shiyakha"
                         },
                         new
                         {
@@ -50868,7 +50908,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ??????? ???????",
                             NameEn = "????? ??????? ???????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000259"),
-                            Type = "Village"
+                            Type = "Shiyakha"
                         },
                         new
                         {
@@ -50878,7 +50918,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ???????? ???????",
                             NameEn = "????? ???????? ???????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000259"),
-                            Type = "Village"
+                            Type = "Shiyakha"
                         },
                         new
                         {
@@ -50888,7 +50928,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ???????? ?????????",
                             NameEn = "????? ???????? ?????????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000259"),
-                            Type = "Village"
+                            Type = "Shiyakha"
                         },
                         new
                         {
@@ -50898,7 +50938,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ???????? ???????",
                             NameEn = "????? ???????? ???????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000259"),
-                            Type = "Village"
+                            Type = "Shiyakha"
                         },
                         new
                         {
@@ -50908,7 +50948,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ???????",
                             NameEn = "????? ???????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000259"),
-                            Type = "Village"
+                            Type = "Shiyakha"
                         },
                         new
                         {
@@ -51208,7 +51248,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ?????",
                             NameEn = "????? ?????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000261"),
-                            Type = "Village"
+                            Type = "City"
                         },
                         new
                         {
@@ -51388,7 +51428,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ??? ???",
                             NameEn = "????? ??? ???",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000262"),
-                            Type = "Village"
+                            Type = "City"
                         },
                         new
                         {
@@ -51518,7 +51558,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ???????",
                             NameEn = "????? ???????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000263"),
-                            Type = "Village"
+                            Type = "City"
                         },
                         new
                         {
@@ -51638,7 +51678,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "???? ???????",
                             NameEn = "???? ???????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000263"),
-                            Type = "Village"
+                            Type = "Ezba"
                         },
                         new
                         {
@@ -51658,7 +51698,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ???????",
                             NameEn = "????? ???????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000263"),
-                            Type = "Village"
+                            Type = "Manshaat"
                         },
                         new
                         {
@@ -51668,7 +51708,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ??????",
                             NameEn = "????? ??????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000263"),
-                            Type = "Village"
+                            Type = "Manshaat"
                         },
                         new
                         {
@@ -51678,7 +51718,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ????",
                             NameEn = "????? ????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000263"),
-                            Type = "Village"
+                            Type = "Manshaat"
                         },
                         new
                         {
@@ -51718,7 +51758,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ???? ????",
                             NameEn = "????? ???? ????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000264"),
-                            Type = "Village"
+                            Type = "City"
                         },
                         new
                         {
@@ -51888,7 +51928,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ???????",
                             NameEn = "????? ???????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000265"),
-                            Type = "Village"
+                            Type = "City"
                         },
                         new
                         {
@@ -51968,7 +52008,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ???????",
                             NameEn = "????? ???????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000266"),
-                            Type = "Village"
+                            Type = "City"
                         },
                         new
                         {
@@ -52258,7 +52298,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ????",
                             NameEn = "????? ????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000266"),
-                            Type = "Village"
+                            Type = "Manshaat"
                         },
                         new
                         {
@@ -52288,7 +52328,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ?????",
                             NameEn = "????? ?????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000267"),
-                            Type = "Village"
+                            Type = "City"
                         },
                         new
                         {
@@ -52708,7 +52748,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ????",
                             NameEn = "????? ????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000268"),
-                            Type = "Village"
+                            Type = "City"
                         },
                         new
                         {
@@ -52888,7 +52928,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ??????",
                             NameEn = "????? ??????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000269"),
-                            Type = "Village"
+                            Type = "City"
                         },
                         new
                         {
@@ -53138,7 +53178,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ????? ????? ????????",
                             NameEn = "????? ????? ????? ????????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000270"),
-                            Type = "Village"
+                            Type = "City"
                         },
                         new
                         {
@@ -53348,7 +53388,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ???????",
                             NameEn = "????? ???????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000270"),
-                            Type = "Village"
+                            Type = "Manshaat"
                         },
                         new
                         {
@@ -53368,7 +53408,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ????? ???????",
                             NameEn = "????? ????? ???????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000271"),
-                            Type = "Village"
+                            Type = "City"
                         },
                         new
                         {
@@ -53768,7 +53808,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ?????",
                             NameEn = "????? ?????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000275"),
-                            Type = "Village"
+                            Type = "City"
                         },
                         new
                         {
@@ -53918,7 +53958,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ???????",
                             NameEn = "????? ???????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000276"),
-                            Type = "Village"
+                            Type = "City"
                         },
                         new
                         {
@@ -54178,7 +54218,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ?????",
                             NameEn = "????? ?????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000276"),
-                            Type = "Village"
+                            Type = "Manshaat"
                         },
                         new
                         {
@@ -54218,7 +54258,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ???????",
                             NameEn = "????? ???????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000277"),
-                            Type = "Village"
+                            Type = "City"
                         },
                         new
                         {
@@ -54458,7 +54498,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ???????",
                             NameEn = "????? ???????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000278"),
-                            Type = "Village"
+                            Type = "City"
                         },
                         new
                         {
@@ -54718,7 +54758,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ??? ??????",
                             NameEn = "????? ??? ??????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000279"),
-                            Type = "Village"
+                            Type = "City"
                         },
                         new
                         {
@@ -54918,7 +54958,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ????",
                             NameEn = "????? ????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000280"),
-                            Type = "Village"
+                            Type = "City"
                         },
                         new
                         {
@@ -55198,7 +55238,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ?????",
                             NameEn = "????? ?????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000282"),
-                            Type = "Village"
+                            Type = "City"
                         },
                         new
                         {
@@ -55348,7 +55388,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ??????",
                             NameEn = "????? ??????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000283"),
-                            Type = "Village"
+                            Type = "City"
                         },
                         new
                         {
@@ -55498,7 +55538,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ???",
                             NameEn = "????? ???",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000284"),
-                            Type = "Village"
+                            Type = "City"
                         },
                         new
                         {
@@ -55768,7 +55808,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "???? ???????",
                             NameEn = "???? ???????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000284"),
-                            Type = "Village"
+                            Type = "Ezba"
                         },
                         new
                         {
@@ -56015,8 +56055,8 @@ namespace Tawreed.Infrastructure.Migrations
                             Id = new Guid("00000002-0000-0000-0000-000000004919"),
                             CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             IsActive = true,
-                            NameAr = "??? ????",
-                            NameEn = "??? ????",
+                            NameAr = "??? ???? ",
+                            NameEn = "??? ???? ",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000285"),
                             Type = "Village"
                         },
@@ -56128,7 +56168,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ????",
                             NameEn = "????? ????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000286"),
-                            Type = "Village"
+                            Type = "City"
                         },
                         new
                         {
@@ -56258,7 +56298,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ????? ???????",
                             NameEn = "????? ????? ???????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000289"),
-                            Type = "Village"
+                            Type = "City"
                         },
                         new
                         {
@@ -56268,7 +56308,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ????? ???????",
                             NameEn = "????? ????? ???????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000290"),
-                            Type = "Village"
+                            Type = "City"
                         },
                         new
                         {
@@ -56288,7 +56328,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ???",
                             NameEn = "??? ???",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000291"),
-                            Type = "Village"
+                            Type = "QismSection"
                         },
                         new
                         {
@@ -56298,7 +56338,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ???",
                             NameEn = "??? ???",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000291"),
-                            Type = "Village"
+                            Type = "QismSection"
                         },
                         new
                         {
@@ -56308,7 +56348,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ????",
                             NameEn = "??? ????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000291"),
-                            Type = "Village"
+                            Type = "QismSection"
                         },
                         new
                         {
@@ -56405,8 +56445,8 @@ namespace Tawreed.Infrastructure.Migrations
                             Id = new Guid("00000002-0000-0000-0000-000000004958"),
                             CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             IsActive = true,
-                            NameAr = "?????",
-                            NameEn = "?????",
+                            NameAr = "????? ",
+                            NameEn = "????? ",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000292"),
                             Type = "Village"
                         },
@@ -56568,7 +56608,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ??? ???",
                             NameEn = "????? ??? ???",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000293"),
-                            Type = "Village"
+                            Type = "City"
                         },
                         new
                         {
@@ -56868,7 +56908,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "???? ??????",
                             NameEn = "???? ??????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000293"),
-                            Type = "Village"
+                            Type = "Ezba"
                         },
                         new
                         {
@@ -56908,7 +56948,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ?????",
                             NameEn = "????? ?????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000294"),
-                            Type = "Village"
+                            Type = "City"
                         },
                         new
                         {
@@ -56988,7 +57028,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ????",
                             NameEn = "????? ????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000295"),
-                            Type = "Village"
+                            Type = "City"
                         },
                         new
                         {
@@ -57268,7 +57308,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ????",
                             NameEn = "????? ????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000296"),
-                            Type = "Village"
+                            Type = "City"
                         },
                         new
                         {
@@ -57448,7 +57488,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ???",
                             NameEn = "????? ???",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000297"),
-                            Type = "Village"
+                            Type = "City"
                         },
                         new
                         {
@@ -57698,7 +57738,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ??? ?????",
                             NameEn = "????? ??? ?????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000298"),
-                            Type = "Village"
+                            Type = "City"
                         },
                         new
                         {
@@ -57968,7 +58008,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "???? ??????",
                             NameEn = "???? ??????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000298"),
-                            Type = "Village"
+                            Type = "Ezba"
                         },
                         new
                         {
@@ -57998,7 +58038,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ?????",
                             NameEn = "????? ?????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000299"),
-                            Type = "Village"
+                            Type = "City"
                         },
                         new
                         {
@@ -58068,7 +58108,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ?????",
                             NameEn = "????? ?????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000300"),
-                            Type = "Village"
+                            Type = "City"
                         },
                         new
                         {
@@ -58168,7 +58208,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ???",
                             NameEn = "????? ???",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000301"),
-                            Type = "Village"
+                            Type = "City"
                         },
                         new
                         {
@@ -58258,7 +58298,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ?????",
                             NameEn = "????? ?????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000302"),
-                            Type = "Village"
+                            Type = "City"
                         },
                         new
                         {
@@ -58298,7 +58338,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ??? ???????",
                             NameEn = "????? ??? ???????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000303"),
-                            Type = "Village"
+                            Type = "City"
                         },
                         new
                         {
@@ -58518,7 +58558,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ????",
                             NameEn = "????? ????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000306"),
-                            Type = "Village"
+                            Type = "City"
                         },
                         new
                         {
@@ -58528,7 +58568,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ???????? ???",
                             NameEn = "????? ???????? ???",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000306"),
-                            Type = "Village"
+                            Type = "City"
                         },
                         new
                         {
@@ -58538,7 +58578,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ??????? ????",
                             NameEn = "????? ??????? ????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000306"),
-                            Type = "Village"
+                            Type = "City"
                         },
                         new
                         {
@@ -58548,7 +58588,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ???????? ????",
                             NameEn = "????? ???????? ????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000306"),
-                            Type = "Village"
+                            Type = "City"
                         },
                         new
                         {
@@ -58848,7 +58888,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ??? ????",
                             NameEn = "????? ??? ????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000307"),
-                            Type = "Village"
+                            Type = "City"
                         },
                         new
                         {
@@ -58978,7 +59018,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ???????",
                             NameEn = "????? ???????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000307"),
-                            Type = "Village"
+                            Type = "Manshaat"
                         },
                         new
                         {
@@ -59008,7 +59048,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ??? ??????",
                             NameEn = "????? ??? ??????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000308"),
-                            Type = "Village"
+                            Type = "City"
                         },
                         new
                         {
@@ -59018,7 +59058,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ??????",
                             NameEn = "????? ??????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000308"),
-                            Type = "Village"
+                            Type = "City"
                         },
                         new
                         {
@@ -59388,7 +59428,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ????",
                             NameEn = "????? ????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000309"),
-                            Type = "Village"
+                            Type = "City"
                         },
                         new
                         {
@@ -59478,7 +59518,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ??? ???? ????????",
                             NameEn = "????? ??? ???? ????????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000310"),
-                            Type = "Village"
+                            Type = "City"
                         },
                         new
                         {
@@ -59508,7 +59548,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ????? ???????",
                             NameEn = "????? ????? ???????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000311"),
-                            Type = "Village"
+                            Type = "City"
                         },
                         new
                         {
@@ -59518,7 +59558,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ????? ???????",
                             NameEn = "????? ????? ???????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000312"),
-                            Type = "Village"
+                            Type = "City"
                         },
                         new
                         {
@@ -59528,7 +59568,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ??????",
                             NameEn = "????? ??????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000313"),
-                            Type = "Village"
+                            Type = "City"
                         },
                         new
                         {
@@ -59578,7 +59618,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ???????",
                             NameEn = "????? ???????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000313"),
-                            Type = "Village"
+                            Type = "Manshaat"
                         },
                         new
                         {
@@ -59588,7 +59628,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ????????",
                             NameEn = "????? ????????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000314"),
-                            Type = "Village"
+                            Type = "City"
                         },
                         new
                         {
@@ -59698,7 +59738,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ???? ???????",
                             NameEn = "????? ???? ???????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000315"),
-                            Type = "Village"
+                            Type = "City"
                         },
                         new
                         {
@@ -59808,7 +59848,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ??????",
                             NameEn = "????? ??????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000317"),
-                            Type = "Village"
+                            Type = "City"
                         },
                         new
                         {
@@ -59948,7 +59988,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ?????",
                             NameEn = "????? ?????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000318"),
-                            Type = "Village"
+                            Type = "City"
                         },
                         new
                         {
@@ -59988,7 +60028,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ???? ???",
                             NameEn = "????? ???? ???",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000319"),
-                            Type = "Village"
+                            Type = "City"
                         },
                         new
                         {
@@ -60038,7 +60078,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ??? ????",
                             NameEn = "????? ??? ????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000320"),
-                            Type = "Village"
+                            Type = "City"
                         },
                         new
                         {
@@ -60058,7 +60098,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ????????",
                             NameEn = "????? ????????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000321"),
-                            Type = "Village"
+                            Type = "City"
                         },
                         new
                         {
@@ -60168,7 +60208,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ???????",
                             NameEn = "????? ???????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000324"),
-                            Type = "Village"
+                            Type = "City"
                         },
                         new
                         {
@@ -60328,7 +60368,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ???",
                             NameEn = "????? ???",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000325"),
-                            Type = "Village"
+                            Type = "City"
                         },
                         new
                         {
@@ -60578,7 +60618,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "???? ?????",
                             NameEn = "???? ?????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000325"),
-                            Type = "Village"
+                            Type = "Ezba"
                         },
                         new
                         {
@@ -60668,7 +60708,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ????????",
                             NameEn = "????? ????????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000326"),
-                            Type = "Village"
+                            Type = "City"
                         },
                         new
                         {
@@ -60848,7 +60888,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ?????",
                             NameEn = "????? ?????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000327"),
-                            Type = "Village"
+                            Type = "City"
                         },
                         new
                         {
@@ -60918,7 +60958,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ???? ?????",
                             NameEn = "????? ???? ?????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000328"),
-                            Type = "Village"
+                            Type = "City"
                         },
                         new
                         {
@@ -60928,7 +60968,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ???????",
                             NameEn = "????? ???????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000328"),
-                            Type = "Village"
+                            Type = "City"
                         },
                         new
                         {
@@ -61158,7 +61198,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ?????? ????????",
                             NameEn = "????? ?????? ????????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000329"),
-                            Type = "Village"
+                            Type = "City"
                         },
                         new
                         {
@@ -61168,7 +61208,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ???????",
                             NameEn = "????? ???????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000329"),
-                            Type = "Village"
+                            Type = "City"
                         },
                         new
                         {
@@ -61318,7 +61358,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ??????",
                             NameEn = "????? ??????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000330"),
-                            Type = "Village"
+                            Type = "City"
                         },
                         new
                         {
@@ -61528,7 +61568,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ??????",
                             NameEn = "????? ??????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000331"),
-                            Type = "Village"
+                            Type = "City"
                         },
                         new
                         {
@@ -61698,7 +61738,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ???? ?????",
                             NameEn = "????? ???? ?????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000332"),
-                            Type = "Village"
+                            Type = "City"
                         },
                         new
                         {
@@ -61918,7 +61958,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ????",
                             NameEn = "????? ????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000333"),
-                            Type = "Village"
+                            Type = "City"
                         },
                         new
                         {
@@ -62035,8 +62075,8 @@ namespace Tawreed.Infrastructure.Migrations
                             Id = new Guid("00000002-0000-0000-0000-000000005521"),
                             CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             IsActive = true,
-                            NameAr = "????? ?????? ???????",
-                            NameEn = "????? ?????? ???????",
+                            NameAr = " ????? ?????? ???????",
+                            NameEn = " ????? ?????? ???????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000335"),
                             Type = "Village"
                         },
@@ -62048,7 +62088,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ??? ??????",
                             NameEn = "??? ??? ??????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000336"),
-                            Type = "Village"
+                            Type = "QismSection"
                         },
                         new
                         {
@@ -62078,7 +62118,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "??? ??? ??????",
                             NameEn = "??? ??? ??????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000337"),
-                            Type = "Village"
+                            Type = "QismSection"
                         },
                         new
                         {
@@ -62178,7 +62218,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ??? ?????",
                             NameEn = "????? ??? ?????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000340"),
-                            Type = "Village"
+                            Type = "City"
                         },
                         new
                         {
@@ -62258,7 +62298,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ??????",
                             NameEn = "????? ??????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000341"),
-                            Type = "Village"
+                            Type = "City"
                         },
                         new
                         {
@@ -62388,7 +62428,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ???",
                             NameEn = "????? ???",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000342"),
-                            Type = "Village"
+                            Type = "City"
                         },
                         new
                         {
@@ -62498,7 +62538,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ????? ????",
                             NameEn = "????? ????? ????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000343"),
-                            Type = "Village"
+                            Type = "City"
                         },
                         new
                         {
@@ -62648,7 +62688,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ???",
                             NameEn = "????? ???",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000344"),
-                            Type = "Village"
+                            Type = "City"
                         },
                         new
                         {
@@ -63008,15 +63048,15 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ??? ?????",
                             NameEn = "????? ??? ?????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000347"),
-                            Type = "Village"
+                            Type = "City"
                         },
                         new
                         {
                             Id = new Guid("00000002-0000-0000-0000-000000005619"),
                             CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             IsActive = true,
-                            NameAr = "???? ??????",
-                            NameEn = "???? ??????",
+                            NameAr = "???? ?????? ",
+                            NameEn = "???? ?????? ",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000347"),
                             Type = "Village"
                         },
@@ -63065,8 +63105,8 @@ namespace Tawreed.Infrastructure.Migrations
                             Id = new Guid("00000002-0000-0000-0000-000000005624"),
                             CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             IsActive = true,
-                            NameAr = "?????",
-                            NameEn = "?????",
+                            NameAr = " ?????",
+                            NameEn = " ?????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000347"),
                             Type = "Village"
                         },
@@ -63105,8 +63145,8 @@ namespace Tawreed.Infrastructure.Migrations
                             Id = new Guid("00000002-0000-0000-0000-000000005628"),
                             CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             IsActive = true,
-                            NameAr = "????",
-                            NameEn = "????",
+                            NameAr = " ????",
+                            NameEn = " ????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000347"),
                             Type = "Village"
                         },
@@ -63128,7 +63168,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ??? ???",
                             NameEn = "????? ??? ???",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000348"),
-                            Type = "Village"
+                            Type = "City"
                         },
                         new
                         {
@@ -63238,7 +63278,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ??? ????",
                             NameEn = "????? ??? ????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000349"),
-                            Type = "Village"
+                            Type = "City"
                         },
                         new
                         {
@@ -63248,7 +63288,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ??? ?????",
                             NameEn = "????? ??? ?????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000349"),
-                            Type = "Village"
+                            Type = "City"
                         },
                         new
                         {
@@ -63498,7 +63538,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ???? ??????",
                             NameEn = "????? ???? ??????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000350"),
-                            Type = "Village"
+                            Type = "City"
                         },
                         new
                         {
@@ -63678,15 +63718,15 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ??? ????? ????? ????? ???",
                             NameEn = "????? ??? ????? ????? ????? ???",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000351"),
-                            Type = "Village"
+                            Type = "City"
                         },
                         new
                         {
                             Id = new Guid("00000002-0000-0000-0000-000000005686"),
                             CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             IsActive = true,
-                            NameAr = "??? ????",
-                            NameEn = "??? ????",
+                            NameAr = " ??? ????",
+                            NameEn = " ??? ????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000351"),
                             Type = "Village"
                         },
@@ -63818,7 +63858,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ???",
                             NameEn = "????? ???",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000352"),
-                            Type = "Village"
+                            Type = "City"
                         },
                         new
                         {
@@ -63888,7 +63928,7 @@ namespace Tawreed.Infrastructure.Migrations
                             NameAr = "????? ?????",
                             NameEn = "????? ?????",
                             ParentId = new Guid("00000001-0000-0000-0000-000000000353"),
-                            Type = "Village"
+                            Type = "City"
                         },
                         new
                         {

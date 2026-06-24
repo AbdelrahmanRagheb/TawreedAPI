@@ -20,6 +20,9 @@ public class BuyerOrderService : IBuyerOrderService
     private readonly IAppSettingRepository _appSettingRepository;
     private readonly IProductRepository _productRepository;
     private readonly INotificationRepository _notificationRepository;
+    private readonly ISupplierRepository _supplierRepository;
+    private readonly IInvoiceRepository _invoiceRepository;
+    private readonly IDeliveryRepository _deliveryRepository;
     private readonly IUnitOfWork _unitOfWork;
 
     public BuyerOrderService(
@@ -34,6 +37,9 @@ public class BuyerOrderService : IBuyerOrderService
         IAppSettingRepository appSettingRepository,
         IProductRepository productRepository,
         INotificationRepository notificationRepository,
+        ISupplierRepository supplierRepository,
+        IInvoiceRepository invoiceRepository,
+        IDeliveryRepository deliveryRepository,
         IUnitOfWork unitOfWork)
     {
         _groupOrderRepository = groupOrderRepository;
@@ -47,6 +53,9 @@ public class BuyerOrderService : IBuyerOrderService
         _appSettingRepository = appSettingRepository;
         _productRepository = productRepository;
         _notificationRepository = notificationRepository;
+        _supplierRepository = supplierRepository;
+        _invoiceRepository = invoiceRepository;
+        _deliveryRepository = deliveryRepository;
         _unitOfWork = unitOfWork;
     }
 
@@ -202,7 +211,7 @@ public class BuyerOrderService : IBuyerOrderService
                     CurrentQuantity = currentQty,
                     TargetQuantity = i.TargetQty,
                     Unit = i.Product?.Unit?.Symbol ?? "",
-                    UnitPrice = i.UnitPrice,
+                    UnitPrice = i.UnitPrice ?? i.SupplierProduct?.Price,
                     SupplierProductId = i.SupplierProductId
                 };
             }).ToList() ?? [],
@@ -305,6 +314,36 @@ public class BuyerOrderService : IBuyerOrderService
                 }
             }
         }
+        else if (order.SupplierId != null && order.Items != null && order.Items.Any())
+        {
+            // Recalculate prices using the assigned supplier's pricing tiers.
+            // This ensures correct pricing even if the assignment happened before
+            // the tier-calculation fix in AssignSupplierAsync.
+            var assignedSp = await _supplierProductRepository.GetBySupplierWithTiersAsync(order.SupplierId.Value, cancellationToken);
+            
+            foreach (var productDto in dto.Products)
+            {
+                var item = order.Items.FirstOrDefault(i => i.ProductId == productDto.ProductId);
+                var sp = assignedSp.FirstOrDefault(p => p.ProductId == productDto.ProductId);
+                if (sp != null && item != null)
+                {
+                    decimal unitPrice = sp.Price;
+                    if (sp.PricingTiers != null && sp.PricingTiers.Any())
+                    {
+                        var applicableTier = sp.PricingTiers
+                            .Where(t => item.TargetQty >= t.MinQty && (t.MaxQty == null || item.TargetQty <= t.MaxQty))
+                            .OrderByDescending(t => t.MinQty)
+                            .FirstOrDefault();
+                        if (applicableTier != null)
+                            unitPrice = applicableTier.UnitPrice;
+                    }
+                    productDto.UnitPrice = unitPrice;
+                    productDto.SupplierProductId = sp.Id;
+                }
+            }
+            
+            dto.TotalOrderValue = dto.Products.Sum(p => (p.UnitPrice ?? 0) * p.TargetQuantity);
+        }
 
         return dto;
     }
@@ -349,7 +388,7 @@ public class BuyerOrderService : IBuyerOrderService
             GroupOrderId = order.Id,
             EventType = "Created",
             NotesEn = $"{buyer.BusinessName ?? "A buyer"} created the order",
-            NotesAr = $"أنشأ {buyer.BusinessName ?? "مشترٍ"} الطلب",
+            NotesAr = $"???? {buyer.BusinessName ?? "?????"} ?????",
             CreatedBy = userId
         });
 
@@ -365,9 +404,9 @@ public class BuyerOrderService : IBuyerOrderService
                 Id = Guid.NewGuid(),
                 UserId = regionBuyer.UserId,
                 Type = "NewGroupOrder",
-                TitleAr = "طلب جماعي جديد في منطقتك",
+                TitleAr = "??? ????? ???? ?? ??????",
                 TitleEn = "New Group Order in Your Area",
-                BodyAr = $"تم إنشاء طلب جماعي جديد بعنوان '{order.Title}'. انضم الآن!",
+                BodyAr = $"?? ????? ??? ????? ???? ?????? '{order.Title}'. ???? ????!",
                 BodyEn = $"A new group order '{order.Title}' has been created in your area. Join now!",
                 Channel = "InApp",
                 RelatedOrderId = order.Id
@@ -400,12 +439,15 @@ public class BuyerOrderService : IBuyerOrderService
 
         foreach (var item in request.Items)
         {
+            var sp = await _supplierProductRepository.FindCheapestForProductAsync(item.ProductId, cancellationToken);
             _groupOrderItemRepository.Add(new GroupOrderItem
             {
                 Id = Guid.NewGuid(),
                 GroupOrderId = order.Id,
                 ProductId = item.ProductId,
-                TargetQty = item.TargetQuantity
+                TargetQty = item.TargetQuantity,
+                SupplierProductId = sp?.Id,
+                UnitPrice = sp?.Price
             });
         }
 
@@ -415,7 +457,7 @@ public class BuyerOrderService : IBuyerOrderService
             GroupOrderId = order.Id,
             EventType = "DraftCreated",
             NotesEn = $"{buyer.BusinessName ?? "A buyer"} saved a draft",
-            NotesAr = $"حفظ {buyer.BusinessName ?? "مشترٍ"} مسودة",
+            NotesAr = $"??? {buyer.BusinessName ?? "?????"} ?????",
             CreatedBy = userId
         });
 
@@ -476,7 +518,7 @@ public class BuyerOrderService : IBuyerOrderService
                 GroupOrderId = order.Id,
                 EventType = "BuyerJoined",
                 NotesEn = $"{buyer.User?.FullName ?? "A buyer"} joined the order",
-                NotesAr = $"انضم {buyer.User?.FullName ?? "مشترٍ"} إلى الطلب",
+                NotesAr = $"???? {buyer.User?.FullName ?? "?????"} ??? ?????",
                 CreatedBy = userId
             });
         }
@@ -493,7 +535,7 @@ public class BuyerOrderService : IBuyerOrderService
                 GroupOrderId = order.Id,
                 EventType = "BuyerJoined",
                 NotesEn = $"{buyer.User?.FullName ?? "A buyer"} rejoined the order",
-                NotesAr = $"انضم {buyer.User?.FullName ?? "مشترٍ"} إلى الطلب مرة أخرى",
+                NotesAr = $"???? {buyer.User?.FullName ?? "?????"} ??? ????? ??? ????",
                 CreatedBy = userId
             });
         }
@@ -608,21 +650,21 @@ public class BuyerOrderService : IBuyerOrderService
 
                 if (oldQty == null)
                 {
-                    enChanges.Add($"{productName} increased by ×{item.Quantity}");
-                    arChanges.Add(ToArabicNumerals($"{productName} بزيادة ×{item.Quantity}"));
+                    enChanges.Add($"{productName} increased by �{item.Quantity}");
+                    arChanges.Add(ToArabicNumerals($"{productName} ?????? �{item.Quantity}"));
                 }
                 else if (oldQty.Value != item.Quantity)
                 {
                     int diff = item.Quantity - oldQty.Value;
                     if (diff > 0)
                     {
-                        enChanges.Add($"{productName} increased by ×{diff}");
-                        arChanges.Add(ToArabicNumerals($"{productName} بزيادة ×{diff}"));
+                        enChanges.Add($"{productName} increased by �{diff}");
+                        arChanges.Add(ToArabicNumerals($"{productName} ?????? �{diff}"));
                     }
                     else
                     {
-                        enChanges.Add($"{productName} decreased by ×{-diff}");
-                        arChanges.Add(ToArabicNumerals($"{productName} بنقص ×{-diff}"));
+                        enChanges.Add($"{productName} decreased by �{-diff}");
+                        arChanges.Add(ToArabicNumerals($"{productName} ???? �{-diff}"));
                     }
                 }
             }
@@ -633,7 +675,7 @@ public class BuyerOrderService : IBuyerOrderService
                 if (goi == null || requestedProductIds.Contains(goi.ProductId)) continue;
                 var productName = goi.Product?.Name ?? "Unknown";
                 enChanges.Add($"removed {productName}");
-                arChanges.Add($"إزالة {productName}");
+                arChanges.Add($"????? {productName}");
             }
 
             if (enChanges.Count > 0)
@@ -644,7 +686,7 @@ public class BuyerOrderService : IBuyerOrderService
                     GroupOrderId = order.Id,
                     EventType = "ItemsUpdated",
                     NotesEn = $"{buyer.User?.FullName ?? "A buyer"} updated items: {string.Join(", ", enChanges)}",
-                    NotesAr = $"قام {buyer.User?.FullName ?? "مشترٍ"} بتحديث المنتجات: {string.Join(", ", arChanges)}",
+                    NotesAr = $"??? {buyer.User?.FullName ?? "?????"} ?????? ????????: {string.Join(", ", arChanges)}",
                     CreatedBy = userId
                 });
             }
@@ -664,9 +706,9 @@ public class BuyerOrderService : IBuyerOrderService
                 Id = Guid.NewGuid(),
                 UserId = creatorUserId.Value,
                 Type = "BuyerJoinedOrder",
-                TitleAr = "انضم مشترٍ جديد لطلبك",
+                TitleAr = "???? ????? ???? ?????",
                 TitleEn = "A Buyer Joined Your Order",
-                BodyAr = $"انضم '{buyer.User?.FullName ?? "مشترٍ"}' إلى طلبك الجماعي '{order.Title}'.",
+                BodyAr = $"???? '{buyer.User?.FullName ?? "?????"}' ??? ???? ??????? '{order.Title}'.",
                 BodyEn = $"'{buyer.User?.FullName ?? "A buyer"}' has joined your group order '{order.Title}'.",
                 Channel = "InApp",
                 RelatedOrderId = orderId
@@ -691,9 +733,9 @@ public class BuyerOrderService : IBuyerOrderService
                     Id = Guid.NewGuid(),
                     UserId = participantUserId,
                     Type = "OrderQuantityUpdated",
-                    TitleAr = "تحديث كميات الطلب الجماعي",
+                    TitleAr = "????? ????? ????? ???????",
                     TitleEn = "Group Order Quantities Updated",
-                    BodyAr = $"تم تحديث كميات الطلب الجماعي '{order.Title}'. تحقق من الأسعار الجديدة!",
+                    BodyAr = $"?? ????? ????? ????? ??????? '{order.Title}'. ???? ?? ??????? ???????!",
                     BodyEn = $"Quantities in group order '{order.Title}' have been updated. Check for new pricing!",
                     Channel = "InApp",
                     RelatedOrderId = orderId
@@ -786,9 +828,9 @@ public class BuyerOrderService : IBuyerOrderService
                     Id = Guid.NewGuid(),
                     UserId = creatorUserId.Value,
                     Type = "BuyerLeftOrder",
-                    TitleAr = "مشترٍ غادر طلبك الجماعي",
+                    TitleAr = "????? ???? ???? ???????",
                     TitleEn = "A Buyer Left Your Order",
-                    BodyAr = $"غادر '{buyer.User?.FullName ?? "مشترٍ"}' طلبك الجماعي '{order.Title}'.",
+                    BodyAr = $"???? '{buyer.User?.FullName ?? "?????"}' ???? ??????? '{order.Title}'.",
                     BodyEn = $"'{buyer.User?.FullName ?? "A buyer"}' has left your group order '{order.Title}'.",
                     Channel = "InApp",
                     RelatedOrderId = orderId
@@ -952,6 +994,9 @@ public class BuyerOrderService : IBuyerOrderService
         if (order.Status != OrderStatus.Open && order.Status != OrderStatus.Draft)
             throw new InvalidOperationException("Cannot modify items on a closed/completed/cancelled order.");
 
+        if (DateTimeOffset.UtcNow > order.DeadlineAt)
+            throw new InvalidOperationException("Order deadline has passed. Cannot modify items.");
+
         var requestProductIds = items.Select(i => i.ProductId).ToHashSet();
         var currentItems = order.Items?.ToList() ?? [];
         var currentProductIds = currentItems.Select(i => i.ProductId).ToHashSet();
@@ -977,7 +1022,7 @@ public class BuyerOrderService : IBuyerOrderService
             {
                 int committedQty = existing.ParticipantItems?.Sum(pi => pi.Quantity) ?? 0;
                 if (req.TargetQuantity < committedQty)
-                    throw new InvalidOperationException($"Cannot set target quantity below {committedQty} — participants have already committed that amount.");
+                    throw new InvalidOperationException($"Cannot set target quantity below {committedQty} � participants have already committed that amount.");
                 existing.TargetQty = req.TargetQuantity;
                 _groupOrderItemRepository.Update(existing);
             }
@@ -1000,10 +1045,126 @@ public class BuyerOrderService : IBuyerOrderService
         return new { message = "Order items updated successfully" };
     }
 
+    public async Task<object> AssignSupplierAsync(Guid orderId, Guid supplierId, Guid userId, CancellationToken cancellationToken = default)
+    {
+        var order = await _groupOrderRepository.GetWithDetailsAsync(orderId, cancellationToken)
+            ?? throw new KeyNotFoundException("Order not found.");
+
+        var buyer = await _buyerRepository.GetByUserIdAsync(userId, cancellationToken)
+            ?? throw new KeyNotFoundException("Buyer profile not found.");
+
+        if (order.CreatorId != buyer.Id)
+            throw new UnauthorizedAccessException("Only the order creator can assign a supplier.");
+
+        if (order.Status != OrderStatus.Open)
+            throw new InvalidOperationException("Order must be open to assign a supplier.");
+
+        if (order.SupplierId.HasValue)
+            throw new InvalidOperationException("A supplier is already assigned to this order.");
+
+        if (DateTimeOffset.UtcNow <= order.DeadlineAt)
+            throw new InvalidOperationException("Cannot assign a supplier before the order deadline passes.");
+
+        order.SupplierId = supplierId;
+        order.Status = OrderStatus.PendingApproval;
+
+        // Ensure the supplier offers all products in the order
+        var supplierProducts = await _supplierProductRepository.GetBySupplierWithTiersAsync(supplierId, cancellationToken);
+        foreach (var item in order.Items ?? [])
+        {
+            var sp = supplierProducts.FirstOrDefault(p => p.ProductId == item.ProductId);
+            if (sp == null)
+                throw new InvalidOperationException($"The supplier does not offer the product '{item.Product?.Name}' (ID: {item.ProductId}). Please choose a supplier that covers all order items.");
+
+            // Calculate applicable pricing tier based on target quantity
+            decimal unitPrice = sp.Price;
+            if (sp.PricingTiers != null && sp.PricingTiers.Any())
+            {
+                var applicableTier = sp.PricingTiers
+                    .Where(t => item.TargetQty >= t.MinQty && (t.MaxQty == null || item.TargetQty <= t.MaxQty))
+                    .OrderByDescending(t => t.MinQty)
+                    .FirstOrDefault();
+                if (applicableTier != null)
+                    unitPrice = applicableTier.UnitPrice;
+            }
+            item.UnitPrice = unitPrice;
+            item.SupplierProductId = sp.Id;
+        }
+
+        _eventRepository.Add(new GroupOrderEvent
+        {
+            Id = Guid.NewGuid(),
+            GroupOrderId = order.Id,
+            EventType = "SupplierAssigned",
+            NotesEn = "A supplier has been assigned to this order",
+            NotesAr = "?? ????? ???? ???? ?????",
+            CreatedBy = userId
+        });
+
+        var supplier = await _supplierRepository.GetByIdAsync(supplierId, cancellationToken);
+        if (supplier?.UserId is Guid supplierUserId)
+        {
+            _notificationRepository.Add(new Notification
+            {
+                Id = Guid.NewGuid(),
+                UserId = supplierUserId,
+                Type = "SupplierAssignedOrder",
+                TitleAr = "????? ??? ????",
+                TitleEn = "New Order Assignment",
+                BodyAr = $"?? ?????? ???? '{order.Title}' � ???? ???????? ??????? ?? ?????.",
+                BodyEn = $"You have been assigned to order '{order.Title}' � please review and accept or decline.",
+                Channel = "InApp",
+                RelatedOrderId = orderId
+            });
+        }
+
+        await _unitOfWork.SaveChangesAsync(cancellationToken);
+
+        return new { message = "Supplier assigned. Waiting for supplier approval.", orderStatus = OrderStatus.PendingApproval, supplierId };
+    }
+
     private static GroupOrderDto MapToDto(GroupOrder o) =>
         new(o.Id, o.CreatorId, o.SupplierId, o.RegionId, o.Title, o.Description,
             o.OrderNumber, o.Notes, o.Visibility, o.DeadlineAt, o.Status,
             o.ClosedAt, o.CreatedAt, o.UpdatedAt);
+
+    public async Task<IReadOnlyList<BuyerDeliveryDto>> GetMyDeliveriesAsync(Guid userId, CancellationToken cancellationToken = default)
+    {
+        var buyer = await _buyerRepository.GetByUserIdAsync(userId, cancellationToken)
+            ?? throw new KeyNotFoundException("Buyer profile not found.");
+
+        var invoices = await _invoiceRepository.GetByBuyerAsync(buyer.Id, cancellationToken);
+        var result = new List<BuyerDeliveryDto>();
+
+        foreach (var invoice in invoices)
+        {
+            var delivery = invoice.GroupOrder?.Deliveries?.FirstOrDefault();
+            if (delivery == null) continue;
+
+            var items = invoice.Participant?.Items?
+                .Where(pi => pi.Quantity > 0)
+                .Select(pi => new BuyerDeliveryItemDto
+                {
+                    ProductName = pi.GroupOrderItem?.Product?.Name ?? "",
+                    Quantity = pi.Quantity
+                }).ToList() ?? [];
+
+            result.Add(new BuyerDeliveryDto
+            {
+                Id = delivery.Id,
+                OrderId = delivery.GroupOrderId,
+                OrderTitle = invoice.GroupOrder?.Title ?? "",
+                Status = delivery.Status,
+                ScheduledAt = delivery.ScheduledAt,
+                DeliveryPersonName = delivery.DeliveryPerson?.FullName,
+                VerificationCode = invoice.VerificationCode,
+                ShippingRegion = delivery.ShippingRegion,
+                Items = items
+            });
+        }
+
+        return result;
+    }
 
     private static string ToArabicNumerals(string input)
     {

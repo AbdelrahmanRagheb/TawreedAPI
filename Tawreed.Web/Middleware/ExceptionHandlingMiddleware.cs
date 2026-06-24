@@ -30,21 +30,21 @@ public class ExceptionHandlingMiddleware
     private async Task HandleExceptionAsync(HttpContext context, Exception exception)
     {
         var statusCode = HttpStatusCode.InternalServerError;
-        object response = new { error = "An internal server error occurred." };
+        object response = new { message = "An internal server error occurred." };
 
         switch (exception)
         {
             case NotFoundException:
                 statusCode = HttpStatusCode.NotFound;
-                response = new { error = exception.Message };
+                response = new { message = exception.Message };
                 break;
             case ValidationException validationEx:
                 statusCode = HttpStatusCode.BadRequest;
-                response = new { error = "Validation failed.", errors = validationEx.Errors };
+                response = new { message = "Validation failed.", errors = validationEx.Errors };
                 break;
             case FluentValidation.ValidationException:
                 statusCode = HttpStatusCode.BadRequest;
-                response = new { error = exception.Message };
+                response = new { message = exception.Message };
                 break;
         }
 

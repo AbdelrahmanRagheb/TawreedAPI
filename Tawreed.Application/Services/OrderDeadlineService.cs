@@ -47,6 +47,7 @@ internal sealed class OrderDeadlineService : BackgroundService
                         GroupOrderId = order.Id,
                         EventType = "Closed",
                         NotesEn = "Auto-closed after deadline passed",
+                        NotesAr = "تم الإغلاق تلقائياً بعد انتهاء المهلة",
                         CreatedBy = Guid.Empty
                     });
                 }

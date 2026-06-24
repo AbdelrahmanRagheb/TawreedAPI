@@ -13,6 +13,7 @@ public class SupplierOrderService : ISupplierOrderService
     private readonly IDeliveryRepository _deliveryRepository;
     private readonly ISupplierRepository _supplierRepository;
     private readonly IRegionRepository _regionRepository;
+    private readonly IInvoiceRepository _invoiceRepository;
     private readonly INotificationRepository _notificationRepository;
     private readonly IUnitOfWork _unitOfWork;
 
@@ -22,6 +23,7 @@ public class SupplierOrderService : ISupplierOrderService
         IDeliveryRepository deliveryRepository,
         ISupplierRepository supplierRepository,
         IRegionRepository regionRepository,
+        IInvoiceRepository invoiceRepository,
         INotificationRepository notificationRepository,
         IUnitOfWork unitOfWork)
     {
@@ -30,6 +32,7 @@ public class SupplierOrderService : ISupplierOrderService
         _deliveryRepository = deliveryRepository;
         _supplierRepository = supplierRepository;
         _regionRepository = regionRepository;
+        _invoiceRepository = invoiceRepository;
         _notificationRepository = notificationRepository;
         _unitOfWork = unitOfWork;
     }
@@ -75,9 +78,9 @@ public class SupplierOrderService : ISupplierOrderService
             {
                 ProductId = i.ProductId,
                 ProductName = i.Product?.Name ?? "",
-                Quantity = i.ParticipantItems?.Sum(pi => pi.Quantity) ?? 0,
+                Quantity = i.TargetQty,
                 UnitPrice = i.UnitPrice ?? 0,
-                LineTotal = (i.UnitPrice ?? 0) * (i.ParticipantItems?.Sum(pi => pi.Quantity) ?? 0)
+                LineTotal = (i.UnitPrice ?? 0) * i.TargetQty
             }).ToList() ?? []
         }).ToList();
 
@@ -91,14 +94,21 @@ public class SupplierOrderService : ISupplierOrderService
         };
     }
 
-    public async Task<object> AcceptOrderAsync(Guid orderId, Guid userId, string? notes = null, CancellationToken cancellationToken = default)
+    public async Task<object> AcceptOrderAsync(Guid orderId, Guid userId, AcceptOrderRequest request, CancellationToken cancellationToken = default)
     {
         var order = await _groupOrderRepository.GetWithDetailsAsync(orderId, cancellationToken)
             ?? throw new KeyNotFoundException("Order not found.");
 
-        if (order.Status != OrderStatus.Open)
-            throw new InvalidOperationException("Order is not open for acceptance.");
+        if (order.Status != OrderStatus.PendingApproval)
+            throw new InvalidOperationException("Order is not pending approval.");
 
+        var supplier = await _supplierRepository.GetByUserIdAsync(userId, cancellationToken)
+            ?? throw new KeyNotFoundException("Supplier profile not found.");
+
+        if (order.SupplierId != supplier.Id)
+            throw new InvalidOperationException("This order is not assigned to you.");
+
+        order.Status = OrderStatus.Locked;
         _groupOrderRepository.Update(order);
 
         _eventRepository.Add(new GroupOrderEvent
@@ -106,16 +116,54 @@ public class SupplierOrderService : ISupplierOrderService
             Id = Guid.NewGuid(),
             GroupOrderId = order.Id,
             EventType = "SupplierApproved",
-            NotesEn = notes,
+            NotesEn = string.IsNullOrEmpty(request.Notes) ? "The supplier has accepted the order" : request.Notes,
             CreatedBy = userId
         });
+
+        // Create invoices and deliveries for each participant
+        var shippingRegion = order.Region?.NameEn ?? "Main Address";
+        var joinedParticipants = order.Participants?.Where(p => p.Status == "Joined" && p.Items != null && p.Items.Any(i => i.Quantity > 0)).ToList() ?? [];
+
+        foreach (var participant in joinedParticipants)
+        {
+            decimal subtotal = participant.Items!.Sum(pi => pi.Quantity * (pi.GroupOrderItem?.UnitPrice ?? 0));
+
+            var invoice = new Invoice
+            {
+                Id = Guid.NewGuid(),
+                InvoiceNumber = $"INV-{DateTimeOffset.UtcNow:yyyyMMdd}-{Guid.NewGuid():N}"[..30],
+                GroupOrderId = order.Id,
+                BuyerId = participant.BuyerId,
+                ParticipantId = participant.Id,
+                Subtotal = subtotal,
+                DeliveryFee = 0,
+                Total = subtotal,
+                PaymentMethod = "Cash",
+                PaymentStatus = "Unpaid",
+                ShippingRegion = shippingRegion,
+                VerificationCode = Random.Shared.Next(100000, 999999).ToString()
+            };
+            _invoiceRepository.Add(invoice);
+        }
+
+        // Create a single delivery for the entire order
+        var delivery = new Delivery
+        {
+            Id = Guid.NewGuid(),
+            GroupOrderId = order.Id,
+            SupplierId = supplier.Id,
+            Status = "Pending",
+            ScheduledAt = request.ScheduledDeliveryAt,
+            TrackingNotes = request.DeliveryNotes,
+            ShippingRegion = shippingRegion
+        };
+        _deliveryRepository.Add(delivery);
 
         await _unitOfWork.SaveChangesAsync(cancellationToken);
 
         // Notify all participants (creator + joined buyers)
         var participantUserIds = GetAllParticipantUserIds(order);
-        var supplier = await _supplierRepository.GetByUserIdAsync(userId, cancellationToken);
-        var supplierName = supplier?.CompanyName ?? "المورد";
+        var supplierName = supplier.CompanyName;
 
         foreach (var participantUserId in participantUserIds)
         {
@@ -134,7 +182,7 @@ public class SupplierOrderService : ISupplierOrderService
         }
         await _unitOfWork.SaveChangesAsync(cancellationToken);
 
-        return new { message = "Order accepted", orderStatus = OrderStatus.Open };
+        return new { message = "Order accepted", orderStatus = OrderStatus.Locked };
     }
 
     public async Task<object> DeclineOrderAsync(Guid orderId, Guid userId, string reason, CancellationToken cancellationToken = default)
@@ -142,10 +190,17 @@ public class SupplierOrderService : ISupplierOrderService
         var order = await _groupOrderRepository.GetWithDetailsAsync(orderId, cancellationToken)
             ?? throw new KeyNotFoundException("Order not found.");
 
-        if (order.Status != OrderStatus.Open)
-            throw new InvalidOperationException("Order is not open for acceptance.");
+        if (order.Status != OrderStatus.PendingApproval)
+            throw new InvalidOperationException("Order is not pending approval.");
 
-        order.Status = OrderStatus.Cancelled;
+        var supplier = await _supplierRepository.GetByUserIdAsync(userId, cancellationToken)
+            ?? throw new KeyNotFoundException("Supplier profile not found.");
+
+        if (order.SupplierId != supplier.Id)
+            throw new InvalidOperationException("This order is not assigned to you.");
+
+        order.Status = OrderStatus.Open;
+        order.SupplierId = null;
         _groupOrderRepository.Update(order);
 
         _eventRepository.Add(new GroupOrderEvent
@@ -159,20 +214,17 @@ public class SupplierOrderService : ISupplierOrderService
 
         await _unitOfWork.SaveChangesAsync(cancellationToken);
 
-        // Notify all participants (creator + joined buyers)
-        var participantUserIds = GetAllParticipantUserIds(order);
-        var supplier = await _supplierRepository.GetByUserIdAsync(userId, cancellationToken);
-        var supplierName = supplier?.CompanyName ?? "المورد";
-
-        foreach (var participantUserId in participantUserIds)
+        // Notify the creator that the supplier declined
+        if (order.Creator?.UserId is Guid creatorUserId)
         {
+            var supplierName = supplier.CompanyName;
             _notificationRepository.Add(new Notification
             {
                 Id = Guid.NewGuid(),
-                UserId = participantUserId,
+                UserId = creatorUserId,
                 Type = "SupplierDeclinedOrder",
-                TitleAr = "تم رفض طلبك الجماعي",
-                TitleEn = "Your Group Order Was Declined",
+                TitleAr = "رفض المورد الطلب",
+                TitleEn = "Supplier Declined Order",
                 BodyAr = $"رفض المورد '{supplierName}' طلبك الجماعي '{order.Title}'. السبب: {reason}",
                 BodyEn = $"Supplier '{supplierName}' has declined the group order '{order.Title}'. Reason: {reason}",
                 Channel = "InApp",
@@ -181,7 +233,7 @@ public class SupplierOrderService : ISupplierOrderService
         }
         await _unitOfWork.SaveChangesAsync(cancellationToken);
 
-        return new { message = "Order declined", orderStatus = OrderStatus.Cancelled };
+        return new { message = "Order declined. You can assign a different supplier.", orderStatus = OrderStatus.Open };
     }
 
     public async Task<PaginatedResult<DeliveryListDto>> GetDeliveriesAsync(Guid userId, string? status = null, int page = 1, int limit = 20, CancellationToken cancellationToken = default)
@@ -205,12 +257,12 @@ public class SupplierOrderService : ISupplierOrderService
             Id = d.Id,
             OrderId = d.GroupOrderId,
             Title = d.GroupOrder?.Title ?? "",
-            Address = d.ShippingAddress,
+            Address = d.ShippingRegion,
             Status = d.Status,
             ScheduledAt = d.ScheduledAt,
             DeliveredAt = d.DeliveredAt,
             TrackingNotes = d.TrackingNotes,
-            BuyerName = d.Invoice?.Buyer?.User?.FullName ?? "",
+            BuyerName = d.GroupOrder?.Creator?.User?.FullName ?? "",
             Items = (d.GroupOrder?.Items?.Select(i => new DeliveryItemDto
             {
                 ProductName = i.Product?.Name ?? "",
@@ -241,10 +293,11 @@ public class SupplierOrderService : ISupplierOrderService
         _deliveryRepository.Update(delivery);
         await _unitOfWork.SaveChangesAsync(cancellationToken);
 
-        // Notify the buyer linked to this delivery's invoice
-        var buyerUserId = delivery.Invoice?.Buyer?.UserId;
-        if (buyerUserId.HasValue)
+        // Notify all participants via the group order
+        var order = await _groupOrderRepository.GetWithDetailsAsync(delivery.GroupOrderId, cancellationToken);
+        if (order != null)
         {
+            var participantUserIds = GetAllParticipantUserIds(order);
             var (titleAr, titleEn, bodyAr, bodyEn) = status switch
             {
                 "Scheduled" => ("تم جدولة التسليم", "Delivery Scheduled",
@@ -261,18 +314,21 @@ public class SupplierOrderService : ISupplierOrderService
                     $"Your delivery status has been updated to: {status}.")
             };
 
-            _notificationRepository.Add(new Notification
+            foreach (var participantUserId in participantUserIds)
             {
-                Id = Guid.NewGuid(),
-                UserId = buyerUserId.Value,
-                Type = "DeliveryStatusUpdated",
-                TitleAr = titleAr,
-                TitleEn = titleEn,
-                BodyAr = bodyAr,
-                BodyEn = bodyEn,
-                Channel = "InApp",
-                RelatedOrderId = delivery.GroupOrderId
-            });
+                _notificationRepository.Add(new Notification
+                {
+                    Id = Guid.NewGuid(),
+                    UserId = participantUserId,
+                    Type = "DeliveryStatusUpdated",
+                    TitleAr = titleAr,
+                    TitleEn = titleEn,
+                    BodyAr = bodyAr,
+                    BodyEn = bodyEn,
+                    Channel = "InApp",
+                    RelatedOrderId = delivery.GroupOrderId
+                });
+            }
             await _unitOfWork.SaveChangesAsync(cancellationToken);
         }
 
