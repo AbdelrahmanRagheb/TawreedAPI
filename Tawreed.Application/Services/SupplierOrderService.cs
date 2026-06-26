@@ -15,6 +15,8 @@ public class SupplierOrderService : ISupplierOrderService
     private readonly IRegionRepository _regionRepository;
     private readonly IInvoiceRepository _invoiceRepository;
     private readonly INotificationRepository _notificationRepository;
+    private readonly IDeliveryPersonProfileRepository _deliveryPersonProfileRepository;
+    private readonly IDeliveryAssignmentRequestRepository _deliveryAssignmentRequestRepository;
     private readonly IUnitOfWork _unitOfWork;
 
     public SupplierOrderService(
@@ -25,6 +27,8 @@ public class SupplierOrderService : ISupplierOrderService
         IRegionRepository regionRepository,
         IInvoiceRepository invoiceRepository,
         INotificationRepository notificationRepository,
+        IDeliveryPersonProfileRepository deliveryPersonProfileRepository,
+        IDeliveryAssignmentRequestRepository deliveryAssignmentRequestRepository,
         IUnitOfWork unitOfWork)
     {
         _groupOrderRepository = groupOrderRepository;
@@ -34,6 +38,8 @@ public class SupplierOrderService : ISupplierOrderService
         _regionRepository = regionRepository;
         _invoiceRepository = invoiceRepository;
         _notificationRepository = notificationRepository;
+        _deliveryPersonProfileRepository = deliveryPersonProfileRepository;
+        _deliveryAssignmentRequestRepository = deliveryAssignmentRequestRepository;
         _unitOfWork = unitOfWork;
     }
 
@@ -74,6 +80,9 @@ public class SupplierOrderService : ISupplierOrderService
             Deadline = o.DeadlineAt,
             Region = o.Region?.NameEn ?? "",
             ReceivedAt = o.CreatedAt,
+            DeliveryPreference = o.DeliveryPreference,
+            PreferredDeliveryPersonId = o.PreferredDeliveryPersonId,
+            PreferredDeliveryPersonName = o.PreferredDeliveryPerson?.User?.FullName,
             Items = o.Items?.Select(i => new SupplierOrderItemDto
             {
                 ProductId = i.ProductId,
@@ -117,6 +126,7 @@ public class SupplierOrderService : ISupplierOrderService
             GroupOrderId = order.Id,
             EventType = "SupplierApproved",
             NotesEn = string.IsNullOrEmpty(request.Notes) ? "The supplier has accepted the order" : request.Notes,
+            NotesAr = "وافق المورد على الطلب",
             CreatedBy = userId
         });
 
@@ -209,6 +219,7 @@ public class SupplierOrderService : ISupplierOrderService
             GroupOrderId = order.Id,
             EventType = "SupplierDeclined",
             NotesEn = reason,
+            NotesAr = $"رفض المورد الطلب. السبب: {reason}",
             CreatedBy = userId
         });
 
@@ -352,5 +363,288 @@ public class SupplierOrderService : ISupplierOrderService
 
         ids.AddRange(participantIds);
         return ids.Distinct().ToList();
+    }
+
+    // Browse available delivery persons for supplier to choose from
+    public async Task<IReadOnlyList<AvailableDeliveryPersonDto>> BrowseAvailableDeliveryPersonsAsync(Guid orderId, Guid userId, CancellationToken cancellationToken = default)
+    {
+        var order = await _groupOrderRepository.GetWithDetailsAsync(orderId, cancellationToken)
+            ?? throw new KeyNotFoundException("Order not found.");
+
+        var supplier = await _supplierRepository.GetByUserIdAsync(userId, cancellationToken)
+            ?? throw new KeyNotFoundException("Supplier profile not found.");
+
+        if (order.SupplierId != supplier.Id)
+            throw new InvalidOperationException("This order is not assigned to you.");
+
+        // If buyer selected a specific delivery person, only show that one
+        if (order.DeliveryPreference == "SpecificPerson" && order.PreferredDeliveryPersonId.HasValue)
+        {
+            var profile = await _deliveryPersonProfileRepository.GetByIdAsync(order.PreferredDeliveryPersonId.Value, cancellationToken);
+            if (profile == null) return [];
+            return [MapToDto(profile)];
+        }
+
+        var regionId = order.RegionId;
+        var profiles = await _deliveryPersonProfileRepository.GetForRegionAsync(regionId, cancellationToken);
+
+        return profiles.Select(MapToDto).ToList();
+    }
+
+    // Send a delivery request (not direct assignment)
+    public async Task<object> RequestDeliveryPersonAsync(Guid orderId, Guid deliveryPersonId, Guid userId, CancellationToken cancellationToken = default)
+    {
+        var order = await _groupOrderRepository.GetWithDetailsAsync(orderId, cancellationToken)
+            ?? throw new KeyNotFoundException("Order not found.");
+
+        var supplier = await _supplierRepository.GetByUserIdAsync(userId, cancellationToken)
+            ?? throw new KeyNotFoundException("Supplier profile not found.");
+
+        if (order.SupplierId != supplier.Id)
+            throw new InvalidOperationException("This order is not assigned to you.");
+
+        if (order.Status != OrderStatus.Locked)
+            throw new InvalidOperationException("Order must be locked to assign a delivery person.");
+
+        var deliveryPerson = await _deliveryPersonProfileRepository.GetByIdAsync(deliveryPersonId, cancellationToken)
+            ?? throw new KeyNotFoundException("Delivery person not found.");
+
+        if (!deliveryPerson.IsActive)
+            throw new InvalidOperationException("Delivery person is not active.");
+
+        if (order.DeliveryPreference == "OwnDelivery")
+            throw new InvalidOperationException("Buyer chose to use their own delivery.");
+
+        if (order.DeliveryPreference == "SpecificPerson" && order.PreferredDeliveryPersonId != deliveryPersonId)
+            throw new InvalidOperationException("Buyer specified a different delivery person.");
+
+        // Create the request
+        var request = new DeliveryAssignmentRequest
+        {
+            Id = Guid.NewGuid(),
+            OrderId = orderId,
+            DeliveryPersonId = deliveryPersonId,
+            SupplierId = supplier.Id,
+            Status = "Pending",
+            ProposedFee = deliveryPerson.BaseDeliveryFee
+        };
+        _deliveryAssignmentRequestRepository.Add(request);
+
+        // Notify the delivery person
+        _notificationRepository.Add(new Notification
+        {
+            Id = Guid.NewGuid(),
+            UserId = deliveryPerson.UserId,
+            Type = "DeliveryAssignmentRequest",
+            TitleAr = "طلب توصيل جديد",
+            TitleEn = "New Delivery Request",
+            BodyAr = $"لديك طلب توصيل جديد للطلب '{order.Title}' من المورد {order.Supplier?.CompanyName ?? ""}",
+            BodyEn = $"You have a new delivery request for order '{order.Title}' from supplier {order.Supplier?.CompanyName ?? ""}",
+            Channel = "InApp",
+            RelatedOrderId = orderId
+        });
+
+        await _unitOfWork.SaveChangesAsync(cancellationToken);
+
+        return new { message = "Delivery request sent to provider.", requestId = request.Id };
+    }
+
+    // Assign a delivery person to a locked order
+    public async Task<object> AssignDeliveryPersonAsync(Guid orderId, Guid deliveryPersonId, Guid userId, CancellationToken cancellationToken = default)
+    {
+        var order = await _groupOrderRepository.GetWithDetailsAsync(orderId, cancellationToken)
+            ?? throw new KeyNotFoundException("Order not found.");
+
+        var supplier = await _supplierRepository.GetByUserIdAsync(userId, cancellationToken)
+            ?? throw new KeyNotFoundException("Supplier profile not found.");
+
+        if (order.SupplierId != supplier.Id)
+            throw new InvalidOperationException("This order is not assigned to you.");
+
+        if (order.Status != OrderStatus.Locked)
+            throw new InvalidOperationException("Order must be locked to assign a delivery person.");
+
+        var deliveryPerson = await _deliveryPersonProfileRepository.GetByIdAsync(deliveryPersonId, cancellationToken)
+            ?? throw new KeyNotFoundException("Delivery person not found.");
+
+        if (!deliveryPerson.IsActive)
+            throw new InvalidOperationException("Delivery person is not active.");
+
+        // If buyer chose own delivery, only allow own
+        if (order.DeliveryPreference == "OwnDelivery")
+            throw new InvalidOperationException("Buyer chose to use their own delivery.");
+
+        // If buyer chose specific person, only allow that person
+        if (order.DeliveryPreference == "SpecificPerson" && order.PreferredDeliveryPersonId != deliveryPersonId)
+            throw new InvalidOperationException("Buyer specified a different delivery person.");
+
+        order.AssignedDeliveryPersonId = deliveryPersonId;
+        order.ProposedDeliveryFee = deliveryPerson.BaseDeliveryFee;
+        order.DeliveryApprovalStatus = "Pending";
+        _groupOrderRepository.Update(order);
+
+        // Update delivery record
+        var delivery = await _deliveryRepository.FindOneAsync(d => d.GroupOrderId == orderId, cancellationToken);
+        if (delivery != null)
+        {
+            delivery.DeliveryPersonId = deliveryPerson.UserId;
+            delivery.DeliveryType = "System";
+            delivery.DeliveryFee = deliveryPerson.BaseDeliveryFee;
+            _deliveryRepository.Update(delivery);
+        }
+
+        await _unitOfWork.SaveChangesAsync(cancellationToken);
+
+        return new { message = "Delivery person assigned. Waiting for buyer approval.", fee = deliveryPerson.BaseDeliveryFee };
+    }
+
+    // Propose a delivery fee and send to buyer for approval
+    public async Task<object> ProposeDeliveryFeeAsync(Guid orderId, decimal fee, string? notes, Guid userId, CancellationToken cancellationToken = default)
+    {
+        var order = await _groupOrderRepository.GetWithDetailsAsync(orderId, cancellationToken)
+            ?? throw new KeyNotFoundException("Order not found.");
+
+        var supplier = await _supplierRepository.GetByUserIdAsync(userId, cancellationToken)
+            ?? throw new KeyNotFoundException("Supplier profile not found.");
+
+        if (order.SupplierId != supplier.Id)
+            throw new InvalidOperationException("This order is not assigned to you.");
+
+        if (order.Status != OrderStatus.Locked)
+            throw new InvalidOperationException("Order must be locked to propose a delivery fee.");
+
+        if (order.AssignedDeliveryPersonId == null)
+            throw new InvalidOperationException("No delivery person assigned.");
+
+        order.ProposedDeliveryFee = fee;
+        order.DeliveryApprovalStatus = "Pending";
+        _groupOrderRepository.Update(order);
+
+        // Update delivery record fee
+        var delivery = await _deliveryRepository.FindOneAsync(d => d.GroupOrderId == orderId, cancellationToken);
+        if (delivery != null)
+        {
+            delivery.DeliveryFee = fee;
+            _deliveryRepository.Update(delivery);
+        }
+
+        // Notify creator for approval
+        if (order.Creator?.UserId is Guid creatorUserId)
+        {
+            _notificationRepository.Add(new Notification
+            {
+                Id = Guid.NewGuid(),
+                UserId = creatorUserId,
+                Type = "DeliveryFeeProposal",
+                TitleAr = "عرض جديد لرسوم التوصيل",
+                TitleEn = "New Delivery Fee Proposal",
+                BodyAr = $"قدم المورد عرض لرسوم التوصيل لطلبك '{order.Title ?? ""}'. يرجى المراجعة. Fee: {fee}",
+                BodyEn = $"The supplier proposed a delivery fee for '{order.Title ?? ""}'. Please review and approve. Fee: {fee}",
+                Channel = "InApp",
+                RelatedOrderId = orderId
+            });
+        }
+
+        await _unitOfWork.SaveChangesAsync(cancellationToken);
+        return new { message = "Delivery fee proposed. Waiting for buyer approval.", proposedFee = fee };
+    }
+
+    // Mark delivery as supplier's own delivery (free for participants)
+    public async Task<object> UseOwnDeliveryAsync(Guid orderId, Guid userId, CancellationToken cancellationToken = default)
+    {
+        var order = await _groupOrderRepository.GetWithDetailsAsync(orderId, cancellationToken)
+            ?? throw new KeyNotFoundException("Order not found.");
+
+        var supplier = await _supplierRepository.GetByUserIdAsync(userId, cancellationToken)
+            ?? throw new KeyNotFoundException("Supplier profile not found.");
+
+        if (order.SupplierId != supplier.Id)
+            throw new InvalidOperationException("This order is not assigned to you.");
+
+        if (order.DeliveryPreference == "SpecificPerson" || order.DeliveryPreference == "SystemDelivery")
+            throw new InvalidOperationException("Buyer chose to use a system delivery person.");
+
+        order.AssignedDeliveryPersonId = null;
+        order.ProposedDeliveryFee = 0;
+        order.DeliveryApprovalStatus = null;
+        _groupOrderRepository.Update(order);
+
+        var delivery = await _deliveryRepository.FindOneAsync(d => d.GroupOrderId == orderId, cancellationToken);
+        if (delivery != null)
+        {
+            delivery.DeliveryPersonId = null;
+            delivery.DeliveryType = "Own";
+            delivery.DeliveryFee = 0;
+            _deliveryRepository.Update(delivery);
+        }
+
+        await _unitOfWork.SaveChangesAsync(cancellationToken);
+        return new { message = "Delivery set to own delivery (free)." };
+    }
+
+    // Cancel order from supplier side (if buyer rejects delivery fee or for any other reason)
+    public async Task<object> CancelOrderFromSupplierAsync(Guid orderId, Guid userId, CancellationToken cancellationToken = default)
+    {
+        var order = await _groupOrderRepository.GetWithDetailsAsync(orderId, cancellationToken)
+            ?? throw new KeyNotFoundException("Order not found.");
+
+        var supplier = await _supplierRepository.GetByUserIdAsync(userId, cancellationToken)
+            ?? throw new KeyNotFoundException("Supplier profile not found.");
+
+        if (order.SupplierId != supplier.Id)
+            throw new InvalidOperationException("This order is not assigned to you.");
+
+        order.Status = OrderStatus.Open;
+        order.SupplierId = null;
+        order.AssignedDeliveryPersonId = null;
+        order.ProposedDeliveryFee = null;
+        order.DeliveryApprovalStatus = null;
+        order.DeliveryPreference = "None";
+        _groupOrderRepository.Update(order);
+
+        _eventRepository.Add(new GroupOrderEvent
+        {
+            Id = Guid.NewGuid(),
+            GroupOrderId = order.Id,
+            EventType = "SupplierCancelled",
+            NotesEn = "Supplier cancelled the order",
+            NotesAr = "ألغى المورد الطلب",
+            CreatedBy = userId
+        });
+
+        // Notify creator
+        if (order.Creator?.UserId is Guid creatorUserId)
+        {
+            _notificationRepository.Add(new Notification
+            {
+                Id = Guid.NewGuid(),
+                UserId = creatorUserId,
+                Type = "SupplierCancelledOrder",
+                TitleAr = "تم إلغاء الطلب",
+                TitleEn = "Order Cancelled",
+                BodyAr = $"قام المورد بإلغاء الطلب '{order.Title ?? ""}'.",
+                BodyEn = $"The supplier cancelled the order '{order.Title ?? ""}'.",
+                Channel = "InApp",
+                RelatedOrderId = orderId
+            });
+        }
+
+        await _unitOfWork.SaveChangesAsync(cancellationToken);
+        return new { message = "Order cancelled. It is now open again.", orderStatus = OrderStatus.Open };
+    }
+
+    private static AvailableDeliveryPersonDto MapToDto(DeliveryPersonProfile profile)
+    {
+return new AvailableDeliveryPersonDto
+        {
+            Id = profile.Id,
+            FullName = profile.User?.FullName ?? "",
+            Rating = (double)profile.Rating,
+            TotalDeliveries = profile.TotalDeliveries,
+            BaseDeliveryFee = profile.BaseDeliveryFee,
+            VehicleType = profile.VehicleType,
+            CoverageRegionId = profile.CoverageRegionId,
+            CoverageRegionName = profile.CoverageRegion?.NameEn
+        };
     }
 }

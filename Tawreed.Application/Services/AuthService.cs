@@ -14,6 +14,7 @@ public class AuthService : IAuthService
     private readonly IBuyerRepository _buyerRepository;
     private readonly ISupplierRepository _supplierRepository;
     private readonly ISupplierCategoryRepository _supplierCategoryRepository;
+    private readonly IDeliveryPersonProfileRepository _deliveryPersonProfileRepository;
     private readonly IRefreshTokenRepository _refreshTokenRepository;
     private readonly IJwtService _jwtService;
     private readonly IUnitOfWork _unitOfWork;
@@ -23,6 +24,7 @@ public class AuthService : IAuthService
         IBuyerRepository buyerRepository,
         ISupplierRepository supplierRepository,
         ISupplierCategoryRepository supplierCategoryRepository,
+        IDeliveryPersonProfileRepository deliveryPersonProfileRepository,
         IRefreshTokenRepository refreshTokenRepository,
         IJwtService jwtService,
         IUnitOfWork unitOfWork)
@@ -31,6 +33,7 @@ public class AuthService : IAuthService
         _buyerRepository = buyerRepository;
         _supplierRepository = supplierRepository;
         _supplierCategoryRepository = supplierCategoryRepository;
+        _deliveryPersonProfileRepository = deliveryPersonProfileRepository;
         _refreshTokenRepository = refreshTokenRepository;
         _jwtService = jwtService;
         _unitOfWork = unitOfWork;
@@ -154,6 +157,44 @@ public class AuthService : IAuthService
         return await GenerateAuthResponse(user, cancellationToken);
     }
 
+    public async Task<AuthResponse> RegisterDeliveryPersonAsync(RegisterDeliveryPersonRequest request, CancellationToken cancellationToken = default)
+    {
+        if (await _userRepository.IsEmailUniqueAsync(request.Email, cancellationToken) == false)
+            throw new InvalidOperationException("Email already registered.");
+
+        var user = new User
+        {
+            Id = Guid.NewGuid(),
+            Email = request.Email,
+            PasswordHash = HashPassword(request.Password),
+            Phone = request.Phone,
+            FullName = request.FullName,
+            Role = "DeliveryPerson",
+            Status = "Active",
+            PreferredLang = "en",
+            EmailVerified = false,
+            PhoneVerified = false
+        };
+        _userRepository.Add(user);
+
+        var profile = new DeliveryPersonProfile
+        {
+            Id = Guid.NewGuid(),
+            UserId = user.Id,
+            VehicleType = request.VehicleType,
+            LicenseInfo = request.LicenseInfo,
+            BaseDeliveryFee = request.BaseDeliveryFee,
+            Rating = 0,
+            TotalDeliveries = 0,
+            IsActive = true,
+            CoverageRegionId = request.CoverageRegionId
+        };
+        _deliveryPersonProfileRepository.Add(profile);
+
+        await _unitOfWork.SaveChangesAsync(cancellationToken);
+        return await GenerateAuthResponse(user, cancellationToken);
+    }
+
     public async Task LogoutAsync(Guid userId, CancellationToken cancellationToken = default)
     {
         await _refreshTokenRepository.RevokeByUserAsync(userId, cancellationToken);
@@ -226,7 +267,7 @@ public class AuthService : IAuthService
         );
     }
 
-    private static string HashPassword(string password)
+    public static string HashPassword(string password)
     {
         var salt = new byte[16];
         using var rng = RandomNumberGenerator.Create();

@@ -33,6 +33,8 @@ public class ApplicationDbContext : DbContext
     public DbSet<Notification> Notifications => Set<Notification>();
     public DbSet<AuditLog> AuditLogs => Set<AuditLog>();
     public DbSet<AppSetting> AppSettings => Set<AppSetting>();
+    public DbSet<DeliveryPersonProfile> DeliveryPersonProfiles => Set<DeliveryPersonProfile>();
+    public DbSet<DeliveryAssignmentRequest> DeliveryAssignmentRequests => Set<DeliveryAssignmentRequest>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -40,7 +42,7 @@ public class ApplicationDbContext : DbContext
         base.OnModelCreating(modelBuilder);
 
         var seedDate = new DateTime(2026, 1, 1, 0, 0, 0, DateTimeKind.Utc);
-        var pwd = "AQIDBAUGBwgJCgsMDQ4PEA==.gX0bTflqCjSgps4WRDCI1xtjk/h96ukaUfpnl/iu+QY=";
+        var pwd = "zH42ipi5/1vZEOde4rMTgw==.Ojo4Rc6Uf2z7Wur0CIAX4kuX57iB1c/6kOGvJxmBQMY=";
 
         // ── Units ─────────────────────────────────────────────────────────
         modelBuilder.Entity<Unit>().HasData(
@@ -229,6 +231,20 @@ public class ApplicationDbContext : DbContext
             {
                 Id = SeedConstants.UserSupplier10, FullName = "دينا مزرعة", Email = "supplier.dina@example.com",
                 PasswordHash = pwd, Phone = "01100000010", Role = "Supplier",
+                Status = "Active", PreferredLang = "ar", EmailVerified = true, PhoneVerified = true,
+                CreatedAt = seedDate
+            },
+            new User
+            {
+                Id = SeedConstants.UserDeliveryPerson1, FullName = "محمود سعيد", Email = "delivery1@tawreed.com",
+                PasswordHash = pwd, Phone = "01200000001", Role = "DeliveryPerson",
+                Status = "Active", PreferredLang = "ar", EmailVerified = true, PhoneVerified = true,
+                CreatedAt = seedDate
+            },
+            new User
+            {
+                Id = SeedConstants.UserDeliveryPerson2, FullName = "خالد إبراهيم", Email = "delivery2@tawreed.com",
+                PasswordHash = pwd, Phone = "01200000002", Role = "DeliveryPerson",
                 Status = "Active", PreferredLang = "ar", EmailVerified = true, PhoneVerified = true,
                 CreatedAt = seedDate
             }
@@ -664,6 +680,12 @@ public class ApplicationDbContext : DbContext
             new Notification { Id = SeedConstants.Notification3, UserId = SeedConstants.UserBuyer4, Type = "order_update", TitleAr = "تم تأكيد الطلب", TitleEn = "Order confirmed", BodyAr = "تم فتح طلب الكوكاكولا للمشاركة", BodyEn = "Coca-Cola order is now open", Channel = "in_app", IsRead = false, RelatedOrderId = SeedConstants.Order2, CreatedAt = seedDate },
             new Notification { Id = SeedConstants.Notification4, UserId = SeedConstants.UserBuyer6, Type = "pending_approval", TitleAr = "في انتظار موافقة المورد", TitleEn = "Awaiting supplier approval", BodyAr = "طلب الدجاج في انتظار موافقة مورد السلسلة", BodyEn = "Chicken order awaiting El Selsela approval", Channel = "in_app", IsRead = false, RelatedOrderId = SeedConstants.Order3, CreatedAt = seedDate },
             new Notification { Id = SeedConstants.Notification5, UserId = SeedConstants.UserAdmin, Type = "system", TitleAr = "تم تسجيل مورد جديد", TitleEn = "New supplier registered", BodyAr = "تم تسجيل مورد جديد في المنصة", BodyEn = "A new supplier has joined the platform", Channel = "in_app", IsRead = false, CreatedAt = seedDate }
+        );
+
+        // ── DeliveryPersonProfiles ────────────────────────────────────────
+        modelBuilder.Entity<DeliveryPersonProfile>().HasData(
+            new DeliveryPersonProfile { Id = SeedConstants.DeliveryPersonProfile1, UserId = SeedConstants.UserDeliveryPerson1, VehicleType = "Car", LicenseInfo = "محمود - رخصة قيادة مهنية", BaseDeliveryFee = 25m, Rating = 4.5m, TotalDeliveries = 150, IsActive = true, CoverageRegionId = SeedConstants.RegionCairo, CreatedAt = seedDate },
+            new DeliveryPersonProfile { Id = SeedConstants.DeliveryPersonProfile2, UserId = SeedConstants.UserDeliveryPerson2, VehicleType = "Motorcycle", LicenseInfo = "خالد - رخصة قيادة دراجة", BaseDeliveryFee = 15m, Rating = 4.2m, TotalDeliveries = 87, IsActive = true, CoverageRegionId = SeedConstants.RegionAlexandria, CreatedAt = seedDate }
         );
     }
 

@@ -505,7 +505,8 @@ PendingSupplierApplications = allSuppliers
             timeline = order.Events?.Select(e => new
             {
                 eventType = e.EventType,
-                notes = e.NotesEn,
+                notesEn = e.NotesEn,
+                notesAr = e.NotesAr,
                 actorName = e.Creator?.FullName ?? "",
                 createdAt = e.CreatedAt
             }).OrderByDescending(e => e.createdAt).ToList() ?? []
@@ -524,7 +525,7 @@ PendingSupplierApplications = allSuppliers
         _eventRepository.Add(new GroupOrderEvent
         {
             Id = Guid.NewGuid(), GroupOrderId = order.Id,
-            EventType = "Cancelled", NotesEn = reason, CreatedBy = adminUserId
+            EventType = "Cancelled", NotesEn = reason, NotesAr = $"تم إلغاء الطلب. السبب: {reason}", CreatedBy = adminUserId
         });
 
         await _unitOfWork.SaveChangesAsync(cancellationToken);

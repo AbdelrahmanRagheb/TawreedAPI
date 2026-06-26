@@ -425,4 +425,10 @@ public static class SeedConstants
     public static readonly Guid Notification3 = new("35fcc1ab-2bdd-4d25-8028-b63e924f1e5b");
     public static readonly Guid Notification4 = new("80202a6e-7b62-4050-8c9d-7e6099f9d465");
     public static readonly Guid Notification5 = new("837a1e2d-e76a-4d45-bdf4-ffd354870eb3");
+
+    // Delivery Persons
+    public static readonly Guid UserDeliveryPerson1 = new("11111111-1111-4111-8111-111111111001");
+    public static readonly Guid UserDeliveryPerson2 = new("22222222-2222-4222-8222-222222222001");
+    public static readonly Guid DeliveryPersonProfile1 = new("aaaaaaa1-1111-4a1a-8a1a-aaaaaaaaaa01");
+    public static readonly Guid DeliveryPersonProfile2 = new("bbbbbbb2-2222-4b2b-8b2b-bbbbbbbbbb02");
 }

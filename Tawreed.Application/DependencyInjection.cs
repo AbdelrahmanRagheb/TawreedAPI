@@ -26,6 +26,7 @@ public static class DependencyInjection
         services.AddScoped<IBuyerProfileService, BuyerProfileService>();
         services.AddScoped<IBuyerSupplierService, BuyerSupplierService>();
         services.AddScoped<IAdminService, AdminService>();
+        services.AddScoped<IDeliveryPersonService, DeliveryPersonService>();
 
         services.AddHostedService<OrderDeadlineService>();
 

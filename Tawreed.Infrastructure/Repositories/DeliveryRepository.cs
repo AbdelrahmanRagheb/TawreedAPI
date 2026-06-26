@@ -14,6 +14,7 @@ public class DeliveryRepository : GenericRepository<Delivery>, IDeliveryReposito
     public async Task<IReadOnlyList<Delivery>> GetByDeliveryPersonAsync(Guid deliveryPersonId, CancellationToken cancellationToken = default)
     {
         return await DbSet
+            .Include(d => d.GroupOrder).ThenInclude(go => go.Invoices)
             .Where(d => d.DeliveryPersonId == deliveryPersonId)
             .ToListAsync(cancellationToken);
     }
@@ -21,5 +22,13 @@ public class DeliveryRepository : GenericRepository<Delivery>, IDeliveryReposito
     public async Task<IReadOnlyList<Delivery>> GetByStatusAsync(string status, CancellationToken cancellationToken = default)
     {
         return await DbSet.Where(d => d.Status == status).ToListAsync(cancellationToken);
+    }
+
+    public async Task<Delivery?> GetByIdWithGroupOrderAsync(Guid id, CancellationToken cancellationToken = default)
+    {
+        return await DbSet
+            .Include(d => d.GroupOrder).ThenInclude(go => go.Items).ThenInclude(goi => goi.Product)
+            .Include(d => d.GroupOrder).ThenInclude(go => go.Invoices)
+            .FirstOrDefaultAsync(d => d.Id == id, cancellationToken);
     }
 }

@@ -16,6 +16,15 @@ public class GroupOrder : BaseAuditableEntity
     public string Status { get; set; } = string.Empty;
     public DateTimeOffset? ClosedAt { get; set; }
 
+    // Added for delivery person assignment
+    public string DeliveryPreference { get; set; } = "None";
+    public Guid? PreferredDeliveryPersonId { get; set; }
+    public Guid? AssignedDeliveryPersonId { get; set; }
+    public decimal? ProposedDeliveryFee { get; set; }
+    public string? DeliveryApprovalStatus { get; set; }
+
+    public DeliveryPersonProfile? AssignedDeliveryPerson { get; set; }
+    public DeliveryPersonProfile? PreferredDeliveryPerson { get; set; }
     public Buyer Creator { get; set; } = null!;
     public Supplier? Supplier { get; set; }
     public Region Region { get; set; } = null!;

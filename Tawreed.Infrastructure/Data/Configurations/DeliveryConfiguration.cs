@@ -16,6 +16,9 @@ public class DeliveryConfiguration : IEntityTypeConfiguration<Delivery>
         builder.Property(d => d.TrackingNotes).HasColumnType("nvarchar(max)");
         builder.Property(d => d.ShippingRegion).HasMaxLength(500).IsRequired();
 
+        builder.Property(d => d.DeliveryFee).HasColumnType("decimal(12,2)");
+        builder.Property(d => d.DeliveryType).HasMaxLength(20);
+
         builder.HasOne(d => d.GroupOrder)
             .WithMany(o => o.Deliveries)
             .HasForeignKey(d => d.GroupOrderId)

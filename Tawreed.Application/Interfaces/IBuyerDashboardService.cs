@@ -29,6 +29,7 @@ public class ActiveOrderDto
 public class NearbyOrderDto
 {
     public Guid Id { get; set; }
+    public string Title { get; set; } = string.Empty;
     public string CreatorName { get; set; } = string.Empty;
     public string ProductName { get; set; } = string.Empty;
     public int Quantity { get; set; }

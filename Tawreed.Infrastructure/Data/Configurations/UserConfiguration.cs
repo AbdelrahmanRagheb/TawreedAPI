@@ -23,6 +23,11 @@ public class UserConfiguration : IEntityTypeConfiguration<User>
 
         builder.HasIndex(u => u.Email).IsUnique();
 
+        builder.HasOne(u => u.DeliveryPersonProfile)
+            .WithOne(d => d.User)
+            .HasForeignKey<DeliveryPersonProfile>(d => d.UserId)
+            .OnDelete(DeleteBehavior.Restrict);
+
         builder.HasQueryFilter(u => !u.IsDeleted);
     }
 }

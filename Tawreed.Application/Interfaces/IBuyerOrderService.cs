@@ -46,6 +46,12 @@ public class OrderDetailDto
     public decimal TotalOrderValue { get; set; }
     public string SupplierName { get; set; } = string.Empty;
     public Guid? SupplierId { get; set; }
+    public string? DeliveryPreference { get; set; }
+    public Guid? PreferredDeliveryPersonId { get; set; }
+    public string? PreferredDeliveryPersonName { get; set; }
+    public decimal? ProposedDeliveryFee { get; set; }
+    public string? DeliveryApprovalStatus { get; set; }
+    public string? AssignedDeliveryPersonName { get; set; }
     public required List<OrderProductDto> Products { get; set; }
     public required List<OrderParticipantDto> Participants { get; set; }
     public required List<OrderActivityDto> Activities { get; set; }
@@ -86,7 +92,8 @@ public class OrderActivityDto
 {
     public Guid Id { get; set; }
     public string EventType { get; set; } = string.Empty;
-    public string? Notes { get; set; }
+    public string? NotesAr { get; set; }
+    public string? NotesEn { get; set; }
     public string CreatedBy { get; set; } = string.Empty;
     public DateTimeOffset CreatedAt { get; set; }
 }
@@ -169,4 +176,9 @@ public interface IBuyerOrderService
     Task<IReadOnlyList<EligibleSupplierDto>> GetEligibleSuppliersAsync(Guid orderId, Guid userId, CancellationToken cancellationToken = default);
     Task<object> AssignSupplierAsync(Guid orderId, Guid supplierId, Guid userId, CancellationToken cancellationToken = default);
     Task<IReadOnlyList<BuyerDeliveryDto>> GetMyDeliveriesAsync(Guid userId, CancellationToken cancellationToken = default);
+
+    // Delivery person methods
+    Task<object> SetDeliveryPreferenceAsync(Guid orderId, string preference, Guid? preferredDeliveryPersonId, Guid userId, CancellationToken cancellationToken = default);
+    Task<object> ApproveDeliveryFeeAsync(Guid orderId, bool isApproved, string? reason, Guid userId, CancellationToken cancellationToken = default);
+    Task<IReadOnlyList<DeliveryPersonProfileDto>> GetAvailableDeliveryPersonsAsync(Guid orderId, CancellationToken cancellationToken = default);
 }

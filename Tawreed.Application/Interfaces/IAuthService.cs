@@ -7,6 +7,7 @@ public interface IAuthService
     Task<AuthResponse> LoginAsync(LoginRequest request, CancellationToken cancellationToken = default);
     Task<AuthResponse> RegisterBuyerAsync(RegisterBuyerRequest request, CancellationToken cancellationToken = default);
     Task<AuthResponse> RegisterSupplierAsync(RegisterSupplierRequest request, CancellationToken cancellationToken = default);
+    Task<AuthResponse> RegisterDeliveryPersonAsync(RegisterDeliveryPersonRequest request, CancellationToken cancellationToken = default);
     Task LogoutAsync(Guid userId, CancellationToken cancellationToken = default);
     Task<AuthResponse> RefreshTokenAsync(string refreshToken, CancellationToken cancellationToken = default);
     Task ChangePasswordAsync(Guid userId, string currentPassword, string newPassword, CancellationToken cancellationToken = default);

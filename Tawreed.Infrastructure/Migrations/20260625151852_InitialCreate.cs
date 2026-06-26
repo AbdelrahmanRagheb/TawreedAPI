@@ -204,6 +204,39 @@ namespace Tawreed.Infrastructure.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "delivery_person_profiles",
+                columns: table => new
+                {
+                    id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    user_id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    vehicle_type = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
+                    license_info = table.Column<string>(type: "nvarchar(500)", maxLength: 500, nullable: true),
+                    base_delivery_fee = table.Column<decimal>(type: "decimal(12,2)", nullable: false),
+                    coverage_region_id = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    rating = table.Column<decimal>(type: "decimal(2,1)", nullable: false),
+                    total_deliveries = table.Column<int>(type: "int", nullable: false),
+                    is_active = table.Column<bool>(type: "bit", nullable: false),
+                    created_at = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    updated_at = table.Column<DateTime>(type: "datetime2", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("pk_delivery_person_profiles", x => x.id);
+                    table.ForeignKey(
+                        name: "fk_delivery_person_profiles_regions_coverage_region_id",
+                        column: x => x.coverage_region_id,
+                        principalTable: "regions",
+                        principalColumn: "id",
+                        onDelete: ReferentialAction.SetNull);
+                    table.ForeignKey(
+                        name: "fk_delivery_person_profiles_users_user_id",
+                        column: x => x.user_id,
+                        principalTable: "users",
+                        principalColumn: "id",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "notifications",
                 columns: table => new
                 {
@@ -311,6 +344,11 @@ namespace Tawreed.Infrastructure.Migrations
                     deadline_at = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: false),
                     status = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: false),
                     closed_at = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: true),
+                    delivery_preference = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: false),
+                    preferred_delivery_person_id = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    assigned_delivery_person_id = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    proposed_delivery_fee = table.Column<decimal>(type: "decimal(18,2)", nullable: true),
+                    delivery_approval_status = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: true),
                     created_at = table.Column<DateTime>(type: "datetime2", nullable: false),
                     updated_at = table.Column<DateTime>(type: "datetime2", nullable: true)
                 },
@@ -323,6 +361,12 @@ namespace Tawreed.Infrastructure.Migrations
                         principalTable: "buyers",
                         principalColumn: "id",
                         onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "fk_group_orders_delivery_person_profiles_assigned_delivery_person_id",
+                        column: x => x.assigned_delivery_person_id,
+                        principalTable: "delivery_person_profiles",
+                        principalColumn: "id",
+                        onDelete: ReferentialAction.SetNull);
                     table.ForeignKey(
                         name: "fk_group_orders_regions_region_id",
                         column: x => x.region_id,
@@ -433,6 +477,8 @@ namespace Tawreed.Infrastructure.Migrations
                     delivered_at = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: true),
                     tracking_notes = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     shipping_region = table.Column<string>(type: "nvarchar(500)", maxLength: 500, nullable: false),
+                    delivery_fee = table.Column<decimal>(type: "decimal(12,2)", nullable: true),
+                    delivery_type = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: false),
                     created_at = table.Column<DateTime>(type: "datetime2", nullable: false),
                     updated_at = table.Column<DateTime>(type: "datetime2", nullable: true)
                 },
@@ -708,27 +754,29 @@ namespace Tawreed.Infrastructure.Migrations
                 columns: new[] { "id", "avatar_url", "created_at", "email", "email_verified", "full_name", "is_deleted", "last_login_at", "password_hash", "phone", "phone_verified", "preferred_lang", "role", "status", "updated_at" },
                 values: new object[,]
                 {
-                    { new Guid("0d7bbea3-6470-4ed5-b473-37cd22f45b95"), null, new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "supplier.dina@example.com", true, "دينا مزرعة", false, null, "AQIDBAUGBwgJCgsMDQ4PEA==.gX0bTflqCjSgps4WRDCI1xtjk/h96ukaUfpnl/iu+QY=", "01100000010", true, "ar", "Supplier", "Active", null },
-                    { new Guid("16459628-b0fa-4465-a194-4febc611081d"), null, new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "admin@tawreed.com", true, "مدير النظام", false, null, "AQIDBAUGBwgJCgsMDQ4PEA==.gX0bTflqCjSgps4WRDCI1xtjk/h96ukaUfpnl/iu+QY=", "01000000000", true, "ar", "Admin", "Active", null },
-                    { new Guid("255cb26a-f00b-4ff0-813b-56d0204c64d6"), null, new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "mohamed.hassan@example.com", true, "محمد حسن", false, null, "AQIDBAUGBwgJCgsMDQ4PEA==.gX0bTflqCjSgps4WRDCI1xtjk/h96ukaUfpnl/iu+QY=", "01000000002", true, "ar", "Buyer", "Active", null },
-                    { new Guid("3c9e0478-d108-4fcd-9431-fbea4be5dd54"), null, new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "supplier.biscomisr@example.com", true, "جمال بسكو", false, null, "AQIDBAUGBwgJCgsMDQ4PEA==.gX0bTflqCjSgps4WRDCI1xtjk/h96ukaUfpnl/iu+QY=", "01100000005", true, "ar", "Supplier", "Active", null },
-                    { new Guid("3ecef09b-9609-4524-97d3-b7eddd08d0e8"), null, new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "ahmad.ali@example.com", true, "أحمد علي", false, null, "AQIDBAUGBwgJCgsMDQ4PEA==.gX0bTflqCjSgps4WRDCI1xtjk/h96ukaUfpnl/iu+QY=", "01000000001", true, "ar", "Buyer", "Active", null },
-                    { new Guid("4686a8ed-0c74-4648-bd5b-49d7d166679d"), null, new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "sara.ahmed@example.com", true, "سارة أحمد", false, null, "AQIDBAUGBwgJCgsMDQ4PEA==.gX0bTflqCjSgps4WRDCI1xtjk/h96ukaUfpnl/iu+QY=", "01000000003", true, "ar", "Buyer", "Active", null },
-                    { new Guid("69d10245-5505-4853-a8cc-01217ba4f08f"), null, new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "dina.youssef@example.com", true, "دينا يوسف", false, null, "AQIDBAUGBwgJCgsMDQ4PEA==.gX0bTflqCjSgps4WRDCI1xtjk/h96ukaUfpnl/iu+QY=", "01000000007", true, "ar", "Buyer", "Active", null },
-                    { new Guid("6f2336cd-5d33-41dc-8ab9-874ab779fd03"), null, new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "supplier.edita@example.com", true, "نادر ايديتا", false, null, "AQIDBAUGBwgJCgsMDQ4PEA==.gX0bTflqCjSgps4WRDCI1xtjk/h96ukaUfpnl/iu+QY=", "01100000007", true, "ar", "Supplier", "Active", null },
-                    { new Guid("86d86b94-fc93-4e9a-a37d-90f5d89a740c"), null, new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "omar.khaled@example.com", true, "عمر خالد", false, null, "AQIDBAUGBwgJCgsMDQ4PEA==.gX0bTflqCjSgps4WRDCI1xtjk/h96ukaUfpnl/iu+QY=", "01000000004", true, "ar", "Buyer", "Active", null },
-                    { new Guid("9bfa4e4e-e5ce-4d68-bee3-808e0cd3a791"), null, new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "khaled.abdelrahman@example.com", true, "خالد عبدالرحمن", false, null, "AQIDBAUGBwgJCgsMDQ4PEA==.gX0bTflqCjSgps4WRDCI1xtjk/h96ukaUfpnl/iu+QY=", "01000000010", true, "ar", "Buyer", "Active", null },
-                    { new Guid("acd25e71-da22-41c7-824e-5a9fd154333a"), null, new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "ibrahim.abdallah@example.com", true, "إبراهيم عبدالله", false, null, "AQIDBAUGBwgJCgsMDQ4PEA==.gX0bTflqCjSgps4WRDCI1xtjk/h96ukaUfpnl/iu+QY=", "01000000008", true, "ar", "Buyer", "Active", null },
-                    { new Guid("cde4bb82-3c7f-4f20-b0b1-dcc6a20b3c26"), null, new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "supplier.juhayna@example.com", true, "محمد الجهيني", false, null, "AQIDBAUGBwgJCgsMDQ4PEA==.gX0bTflqCjSgps4WRDCI1xtjk/h96ukaUfpnl/iu+QY=", "01100000001", true, "ar", "Supplier", "Active", null },
-                    { new Guid("e2d20e2b-aff0-4248-b50c-e5460a248d3a"), null, new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "nourhan.saeed@example.com", true, "نورهان سعيد", false, null, "AQIDBAUGBwgJCgsMDQ4PEA==.gX0bTflqCjSgps4WRDCI1xtjk/h96ukaUfpnl/iu+QY=", "01000000005", true, "ar", "Buyer", "Active", null },
-                    { new Guid("e424e914-7c65-4596-b5ee-2ea234643946"), null, new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "supplier.almarai@example.com", true, "أحمد المراعي", false, null, "AQIDBAUGBwgJCgsMDQ4PEA==.gX0bTflqCjSgps4WRDCI1xtjk/h96ukaUfpnl/iu+QY=", "01100000002", true, "ar", "Supplier", "Active", null },
-                    { new Guid("e6ea6265-20b4-4c39-a9ed-a77e9a1ebd78"), null, new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "supplier.pepsi@example.com", true, "سعيد بيبسي", false, null, "AQIDBAUGBwgJCgsMDQ4PEA==.gX0bTflqCjSgps4WRDCI1xtjk/h96ukaUfpnl/iu+QY=", "01100000004", true, "ar", "Supplier", "Active", null },
-                    { new Guid("eee99f22-24f6-4e6b-b9dc-05b7b99cadd0"), null, new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "supplier.domty@example.com", true, "هاني دومتي", false, null, "AQIDBAUGBwgJCgsMDQ4PEA==.gX0bTflqCjSgps4WRDCI1xtjk/h96ukaUfpnl/iu+QY=", "01100000006", true, "ar", "Supplier", "Active", null },
-                    { new Guid("f803a6f5-d484-423a-b48a-3b51fa7f3ad7"), null, new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "supplier.selsela@example.com", true, "أيمن السلسلة", false, null, "AQIDBAUGBwgJCgsMDQ4PEA==.gX0bTflqCjSgps4WRDCI1xtjk/h96ukaUfpnl/iu+QY=", "01100000008", true, "ar", "Supplier", "Active", null },
-                    { new Guid("fa057c2b-5927-4f9d-ad92-fef953feed8d"), null, new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "supplier.cocacola@example.com", true, "عمر كولا", false, null, "AQIDBAUGBwgJCgsMDQ4PEA==.gX0bTflqCjSgps4WRDCI1xtjk/h96ukaUfpnl/iu+QY=", "01100000003", true, "ar", "Supplier", "Active", null },
-                    { new Guid("fa77e489-6f2e-4070-8edb-decc8851585c"), null, new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "mariam.gamal@example.com", true, "مريم جمال", false, null, "AQIDBAUGBwgJCgsMDQ4PEA==.gX0bTflqCjSgps4WRDCI1xtjk/h96ukaUfpnl/iu+QY=", "01000000009", true, "ar", "Buyer", "Active", null },
-                    { new Guid("fc11d91a-3dd4-4f67-87c1-acf40b944d65"), null, new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "karim.mahmoud@example.com", true, "كريم محمود", false, null, "AQIDBAUGBwgJCgsMDQ4PEA==.gX0bTflqCjSgps4WRDCI1xtjk/h96ukaUfpnl/iu+QY=", "01000000006", true, "ar", "Buyer", "Active", null },
-                    { new Guid("ff8d954d-149f-4c79-a2f2-df6ab74bfc4b"), null, new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "supplier.fath@example.com", true, "فتحي الفتح", false, null, "AQIDBAUGBwgJCgsMDQ4PEA==.gX0bTflqCjSgps4WRDCI1xtjk/h96ukaUfpnl/iu+QY=", "01100000009", true, "ar", "Supplier", "Active", null }
+                    { new Guid("0d7bbea3-6470-4ed5-b473-37cd22f45b95"), null, new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "supplier.dina@example.com", true, "دينا مزرعة", false, null, "zH42ipi5/1vZEOde4rMTgw==.Ojo4Rc6Uf2z7Wur0CIAX4kuX57iB1c/6kOGvJxmBQMY=", "01100000010", true, "ar", "Supplier", "Active", null },
+                    { new Guid("11111111-1111-4111-8111-111111111001"), null, new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "delivery1@tawreed.com", true, "محمود سعيد", false, null, "zH42ipi5/1vZEOde4rMTgw==.Ojo4Rc6Uf2z7Wur0CIAX4kuX57iB1c/6kOGvJxmBQMY=", "01200000001", true, "ar", "DeliveryPerson", "Active", null },
+                    { new Guid("16459628-b0fa-4465-a194-4febc611081d"), null, new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "admin@tawreed.com", true, "مدير النظام", false, null, "zH42ipi5/1vZEOde4rMTgw==.Ojo4Rc6Uf2z7Wur0CIAX4kuX57iB1c/6kOGvJxmBQMY=", "01000000000", true, "ar", "Admin", "Active", null },
+                    { new Guid("22222222-2222-4222-8222-222222222001"), null, new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "delivery2@tawreed.com", true, "خالد إبراهيم", false, null, "zH42ipi5/1vZEOde4rMTgw==.Ojo4Rc6Uf2z7Wur0CIAX4kuX57iB1c/6kOGvJxmBQMY=", "01200000002", true, "ar", "DeliveryPerson", "Active", null },
+                    { new Guid("255cb26a-f00b-4ff0-813b-56d0204c64d6"), null, new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "mohamed.hassan@example.com", true, "محمد حسن", false, null, "zH42ipi5/1vZEOde4rMTgw==.Ojo4Rc6Uf2z7Wur0CIAX4kuX57iB1c/6kOGvJxmBQMY=", "01000000002", true, "ar", "Buyer", "Active", null },
+                    { new Guid("3c9e0478-d108-4fcd-9431-fbea4be5dd54"), null, new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "supplier.biscomisr@example.com", true, "جمال بسكو", false, null, "zH42ipi5/1vZEOde4rMTgw==.Ojo4Rc6Uf2z7Wur0CIAX4kuX57iB1c/6kOGvJxmBQMY=", "01100000005", true, "ar", "Supplier", "Active", null },
+                    { new Guid("3ecef09b-9609-4524-97d3-b7eddd08d0e8"), null, new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "ahmad.ali@example.com", true, "أحمد علي", false, null, "zH42ipi5/1vZEOde4rMTgw==.Ojo4Rc6Uf2z7Wur0CIAX4kuX57iB1c/6kOGvJxmBQMY=", "01000000001", true, "ar", "Buyer", "Active", null },
+                    { new Guid("4686a8ed-0c74-4648-bd5b-49d7d166679d"), null, new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "sara.ahmed@example.com", true, "سارة أحمد", false, null, "zH42ipi5/1vZEOde4rMTgw==.Ojo4Rc6Uf2z7Wur0CIAX4kuX57iB1c/6kOGvJxmBQMY=", "01000000003", true, "ar", "Buyer", "Active", null },
+                    { new Guid("69d10245-5505-4853-a8cc-01217ba4f08f"), null, new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "dina.youssef@example.com", true, "دينا يوسف", false, null, "zH42ipi5/1vZEOde4rMTgw==.Ojo4Rc6Uf2z7Wur0CIAX4kuX57iB1c/6kOGvJxmBQMY=", "01000000007", true, "ar", "Buyer", "Active", null },
+                    { new Guid("6f2336cd-5d33-41dc-8ab9-874ab779fd03"), null, new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "supplier.edita@example.com", true, "نادر ايديتا", false, null, "zH42ipi5/1vZEOde4rMTgw==.Ojo4Rc6Uf2z7Wur0CIAX4kuX57iB1c/6kOGvJxmBQMY=", "01100000007", true, "ar", "Supplier", "Active", null },
+                    { new Guid("86d86b94-fc93-4e9a-a37d-90f5d89a740c"), null, new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "omar.khaled@example.com", true, "عمر خالد", false, null, "zH42ipi5/1vZEOde4rMTgw==.Ojo4Rc6Uf2z7Wur0CIAX4kuX57iB1c/6kOGvJxmBQMY=", "01000000004", true, "ar", "Buyer", "Active", null },
+                    { new Guid("9bfa4e4e-e5ce-4d68-bee3-808e0cd3a791"), null, new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "khaled.abdelrahman@example.com", true, "خالد عبدالرحمن", false, null, "zH42ipi5/1vZEOde4rMTgw==.Ojo4Rc6Uf2z7Wur0CIAX4kuX57iB1c/6kOGvJxmBQMY=", "01000000010", true, "ar", "Buyer", "Active", null },
+                    { new Guid("acd25e71-da22-41c7-824e-5a9fd154333a"), null, new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "ibrahim.abdallah@example.com", true, "إبراهيم عبدالله", false, null, "zH42ipi5/1vZEOde4rMTgw==.Ojo4Rc6Uf2z7Wur0CIAX4kuX57iB1c/6kOGvJxmBQMY=", "01000000008", true, "ar", "Buyer", "Active", null },
+                    { new Guid("cde4bb82-3c7f-4f20-b0b1-dcc6a20b3c26"), null, new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "supplier.juhayna@example.com", true, "محمد الجهيني", false, null, "zH42ipi5/1vZEOde4rMTgw==.Ojo4Rc6Uf2z7Wur0CIAX4kuX57iB1c/6kOGvJxmBQMY=", "01100000001", true, "ar", "Supplier", "Active", null },
+                    { new Guid("e2d20e2b-aff0-4248-b50c-e5460a248d3a"), null, new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "nourhan.saeed@example.com", true, "نورهان سعيد", false, null, "zH42ipi5/1vZEOde4rMTgw==.Ojo4Rc6Uf2z7Wur0CIAX4kuX57iB1c/6kOGvJxmBQMY=", "01000000005", true, "ar", "Buyer", "Active", null },
+                    { new Guid("e424e914-7c65-4596-b5ee-2ea234643946"), null, new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "supplier.almarai@example.com", true, "أحمد المراعي", false, null, "zH42ipi5/1vZEOde4rMTgw==.Ojo4Rc6Uf2z7Wur0CIAX4kuX57iB1c/6kOGvJxmBQMY=", "01100000002", true, "ar", "Supplier", "Active", null },
+                    { new Guid("e6ea6265-20b4-4c39-a9ed-a77e9a1ebd78"), null, new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "supplier.pepsi@example.com", true, "سعيد بيبسي", false, null, "zH42ipi5/1vZEOde4rMTgw==.Ojo4Rc6Uf2z7Wur0CIAX4kuX57iB1c/6kOGvJxmBQMY=", "01100000004", true, "ar", "Supplier", "Active", null },
+                    { new Guid("eee99f22-24f6-4e6b-b9dc-05b7b99cadd0"), null, new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "supplier.domty@example.com", true, "هاني دومتي", false, null, "zH42ipi5/1vZEOde4rMTgw==.Ojo4Rc6Uf2z7Wur0CIAX4kuX57iB1c/6kOGvJxmBQMY=", "01100000006", true, "ar", "Supplier", "Active", null },
+                    { new Guid("f803a6f5-d484-423a-b48a-3b51fa7f3ad7"), null, new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "supplier.selsela@example.com", true, "أيمن السلسلة", false, null, "zH42ipi5/1vZEOde4rMTgw==.Ojo4Rc6Uf2z7Wur0CIAX4kuX57iB1c/6kOGvJxmBQMY=", "01100000008", true, "ar", "Supplier", "Active", null },
+                    { new Guid("fa057c2b-5927-4f9d-ad92-fef953feed8d"), null, new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "supplier.cocacola@example.com", true, "عمر كولا", false, null, "zH42ipi5/1vZEOde4rMTgw==.Ojo4Rc6Uf2z7Wur0CIAX4kuX57iB1c/6kOGvJxmBQMY=", "01100000003", true, "ar", "Supplier", "Active", null },
+                    { new Guid("fa77e489-6f2e-4070-8edb-decc8851585c"), null, new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "mariam.gamal@example.com", true, "مريم جمال", false, null, "zH42ipi5/1vZEOde4rMTgw==.Ojo4Rc6Uf2z7Wur0CIAX4kuX57iB1c/6kOGvJxmBQMY=", "01000000009", true, "ar", "Buyer", "Active", null },
+                    { new Guid("fc11d91a-3dd4-4f67-87c1-acf40b944d65"), null, new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "karim.mahmoud@example.com", true, "كريم محمود", false, null, "zH42ipi5/1vZEOde4rMTgw==.Ojo4Rc6Uf2z7Wur0CIAX4kuX57iB1c/6kOGvJxmBQMY=", "01000000006", true, "ar", "Buyer", "Active", null },
+                    { new Guid("ff8d954d-149f-4c79-a2f2-df6ab74bfc4b"), null, new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "supplier.fath@example.com", true, "فتحي الفتح", false, null, "zH42ipi5/1vZEOde4rMTgw==.Ojo4Rc6Uf2z7Wur0CIAX4kuX57iB1c/6kOGvJxmBQMY=", "01100000009", true, "ar", "Supplier", "Active", null }
                 });
 
             migrationBuilder.InsertData(
@@ -809,6 +857,15 @@ namespace Tawreed.Infrastructure.Migrations
                     { new Guid("00000000-0000-0000-0000-000000000028"), new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), true, "مطروح", "Matrouh", new Guid("00000000-0000-0000-0000-000000000001"), "Governorate", null },
                     { new Guid("00000000-0000-0000-0000-000000000029"), new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), true, "شمال سيناء", "North Sinai", new Guid("00000000-0000-0000-0000-000000000001"), "Governorate", null },
                     { new Guid("00000000-0000-0000-0000-000000000030"), new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), true, "جنوب سيناء", "South Sinai", new Guid("00000000-0000-0000-0000-000000000001"), "Governorate", null }
+                });
+
+            migrationBuilder.InsertData(
+                table: "delivery_person_profiles",
+                columns: new[] { "id", "base_delivery_fee", "coverage_region_id", "created_at", "is_active", "license_info", "rating", "total_deliveries", "updated_at", "user_id", "vehicle_type" },
+                values: new object[,]
+                {
+                    { new Guid("aaaaaaa1-1111-4a1a-8a1a-aaaaaaaaaa01"), 25m, new Guid("00000000-0000-0000-0000-000000000004"), new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), true, "محمود - رخصة قيادة مهنية", 4.5m, 150, null, new Guid("11111111-1111-4111-8111-111111111001"), "Car" },
+                    { new Guid("bbbbbbb2-2222-4b2b-8b2b-bbbbbbbbbb02"), 15m, new Guid("00000000-0000-0000-0000-000000000005"), new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), true, "خالد - رخصة قيادة دراجة", 4.2m, 87, null, new Guid("22222222-2222-4222-8222-222222222001"), "Motorcycle" }
                 });
 
             migrationBuilder.InsertData(
@@ -7042,15 +7099,15 @@ namespace Tawreed.Infrastructure.Migrations
 
             migrationBuilder.InsertData(
                 table: "group_orders",
-                columns: new[] { "id", "closed_at", "created_at", "creator_id", "deadline_at", "description", "notes", "order_number", "region_id", "status", "supplier_id", "title", "updated_at", "visibility" },
+                columns: new[] { "id", "assigned_delivery_person_id", "closed_at", "created_at", "creator_id", "deadline_at", "delivery_approval_status", "delivery_preference", "description", "notes", "order_number", "preferred_delivery_person_id", "proposed_delivery_fee", "region_id", "status", "supplier_id", "title", "updated_at", "visibility" },
                 values: new object[,]
                 {
-                    { new Guid("382e6a64-ea3a-4dcc-8c05-379aa01a3461"), new DateTimeOffset(new DateTime(2026, 6, 14, 12, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), new Guid("da16cd54-e3dc-4b3e-b167-069060b2780b"), new DateTimeOffset(new DateTime(2026, 6, 14, 12, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), "تم الإلغاء لعدم التوفر", null, "ORD-20260617-A007", new Guid("00000001-0000-0000-0000-000000000209"), "Cancelled", new Guid("40c42c46-3774-4ee0-ad5f-d6b16c8c0f6f"), "طلب ألبان المراعي", null, null },
-                    { new Guid("38e769df-7e03-4d47-82e2-4fe4c7a6d3ae"), new DateTimeOffset(new DateTime(2026, 6, 16, 12, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), new Guid("5bc19380-dbcc-4d71-b7cd-261fd03d1797"), new DateTimeOffset(new DateTime(2026, 6, 16, 12, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), "وجبات خفيفة للمطعم", null, "ORD-20260617-A005", new Guid("00000001-0000-0000-0000-000000000029"), "Closed", new Guid("59925002-c1a0-4489-b279-943f1269819e"), "طلب هوهوز و بسكويت", null, null },
-                    { new Guid("3d1335a9-a25c-4762-9f39-8046fc475f7a"), null, new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), new Guid("da16cd54-e3dc-4b3e-b167-069060b2780b"), new DateTimeOffset(new DateTime(2026, 6, 24, 12, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), "دجاج كامل للمطعم الرياضي", null, "ORD-20260617-A003", new Guid("00000001-0000-0000-0000-000000000029"), "Open", new Guid("590d8027-2ace-4e51-b627-9a10c5fcfce1"), "طلب دجاج للنادي", null, null },
-                    { new Guid("6b1ac916-146a-44e8-a523-7d69d833f055"), null, new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), new Guid("247babb0-a7cd-4af3-a292-b5e313ce85d0"), new DateTimeOffset(new DateTime(2026, 6, 22, 12, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), "مشروبات غازية للفندق", null, "ORD-20260617-A002", new Guid("00000001-0000-0000-0000-000000000007"), "Open", new Guid("5374892c-cf76-4192-ad6a-f7142bcb1842"), "طلب كوكاكولا للفندق", null, null },
-                    { new Guid("7e0d7a95-b9f5-40d9-beaf-4ac077593cf5"), new DateTimeOffset(new DateTime(2026, 6, 13, 12, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), new Guid("34b72b5a-a8e4-46fe-bda4-cba1dc8fc5a0"), new DateTimeOffset(new DateTime(2026, 6, 12, 12, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), "بسكويت شاي وماري", null, "ORD-20260617-A006", new Guid("00000001-0000-0000-0000-000000000047"), "Completed", new Guid("d3d792d0-2e84-4415-8345-90cf3eef943f"), "طلب بسكويت للسوبر ماركت", null, null },
-                    { new Guid("bba56c6a-827e-4394-a10a-b81c6d9dbeaf"), null, new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), new Guid("5bc19380-dbcc-4d71-b7cd-261fd03d1797"), new DateTimeOffset(new DateTime(2026, 6, 20, 12, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), "حليب كامل الدسم للتوزيع على المطعم", null, "ORD-20260617-A001", new Guid("00000001-0000-0000-0000-000000000029"), "Open", new Guid("d6a1a124-f64a-4b4f-b7cd-03642969e000"), "طلب حليب جهينة", null, null }
+                    { new Guid("382e6a64-ea3a-4dcc-8c05-379aa01a3461"), null, new DateTimeOffset(new DateTime(2026, 6, 14, 12, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), new Guid("da16cd54-e3dc-4b3e-b167-069060b2780b"), new DateTimeOffset(new DateTime(2026, 6, 14, 12, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), null, "None", "تم الإلغاء لعدم التوفر", null, "ORD-20260617-A007", null, null, new Guid("00000001-0000-0000-0000-000000000209"), "Cancelled", new Guid("40c42c46-3774-4ee0-ad5f-d6b16c8c0f6f"), "طلب ألبان المراعي", null, null },
+                    { new Guid("38e769df-7e03-4d47-82e2-4fe4c7a6d3ae"), null, new DateTimeOffset(new DateTime(2026, 6, 16, 12, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), new Guid("5bc19380-dbcc-4d71-b7cd-261fd03d1797"), new DateTimeOffset(new DateTime(2026, 6, 16, 12, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), null, "None", "وجبات خفيفة للمطعم", null, "ORD-20260617-A005", null, null, new Guid("00000001-0000-0000-0000-000000000029"), "Closed", new Guid("59925002-c1a0-4489-b279-943f1269819e"), "طلب هوهوز و بسكويت", null, null },
+                    { new Guid("3d1335a9-a25c-4762-9f39-8046fc475f7a"), null, null, new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), new Guid("da16cd54-e3dc-4b3e-b167-069060b2780b"), new DateTimeOffset(new DateTime(2026, 6, 24, 12, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), null, "None", "دجاج كامل للمطعم الرياضي", null, "ORD-20260617-A003", null, null, new Guid("00000001-0000-0000-0000-000000000029"), "Open", new Guid("590d8027-2ace-4e51-b627-9a10c5fcfce1"), "طلب دجاج للنادي", null, null },
+                    { new Guid("6b1ac916-146a-44e8-a523-7d69d833f055"), null, null, new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), new Guid("247babb0-a7cd-4af3-a292-b5e313ce85d0"), new DateTimeOffset(new DateTime(2026, 6, 22, 12, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), null, "None", "مشروبات غازية للفندق", null, "ORD-20260617-A002", null, null, new Guid("00000001-0000-0000-0000-000000000007"), "Open", new Guid("5374892c-cf76-4192-ad6a-f7142bcb1842"), "طلب كوكاكولا للفندق", null, null },
+                    { new Guid("7e0d7a95-b9f5-40d9-beaf-4ac077593cf5"), null, new DateTimeOffset(new DateTime(2026, 6, 13, 12, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), new Guid("34b72b5a-a8e4-46fe-bda4-cba1dc8fc5a0"), new DateTimeOffset(new DateTime(2026, 6, 12, 12, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), null, "None", "بسكويت شاي وماري", null, "ORD-20260617-A006", null, null, new Guid("00000001-0000-0000-0000-000000000047"), "Completed", new Guid("d3d792d0-2e84-4415-8345-90cf3eef943f"), "طلب بسكويت للسوبر ماركت", null, null },
+                    { new Guid("bba56c6a-827e-4394-a10a-b81c6d9dbeaf"), null, null, new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), new Guid("5bc19380-dbcc-4d71-b7cd-261fd03d1797"), new DateTimeOffset(new DateTime(2026, 6, 20, 12, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), null, "None", "حليب كامل الدسم للتوزيع على المطعم", null, "ORD-20260617-A001", null, null, new Guid("00000001-0000-0000-0000-000000000029"), "Open", new Guid("d6a1a124-f64a-4b4f-b7cd-03642969e000"), "طلب حليب جهينة", null, null }
                 });
 
             migrationBuilder.InsertData(
@@ -7239,8 +7296,8 @@ namespace Tawreed.Infrastructure.Migrations
 
             migrationBuilder.InsertData(
                 table: "group_orders",
-                columns: new[] { "id", "closed_at", "created_at", "creator_id", "deadline_at", "description", "notes", "order_number", "region_id", "status", "supplier_id", "title", "updated_at", "visibility" },
-                values: new object[] { new Guid("85085d3d-4938-4ba1-8b6a-2ef99f9995b0"), null, new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), new Guid("3e701ef7-758c-4631-b371-9de27d609984"), new DateTimeOffset(new DateTime(2026, 6, 27, 12, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), "أجبان متنوعة للمطعم", null, "ORD-20260617-A004", new Guid("00000002-0000-0000-0000-000000000435"), "Draft", new Guid("d967d2d6-a707-430f-b404-9b9b5858086e"), "طلب جبن دومتي", null, null });
+                columns: new[] { "id", "assigned_delivery_person_id", "closed_at", "created_at", "creator_id", "deadline_at", "delivery_approval_status", "delivery_preference", "description", "notes", "order_number", "preferred_delivery_person_id", "proposed_delivery_fee", "region_id", "status", "supplier_id", "title", "updated_at", "visibility" },
+                values: new object[] { new Guid("85085d3d-4938-4ba1-8b6a-2ef99f9995b0"), null, null, new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), new Guid("3e701ef7-758c-4631-b371-9de27d609984"), new DateTimeOffset(new DateTime(2026, 6, 27, 12, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), null, "None", "أجبان متنوعة للمطعم", null, "ORD-20260617-A004", null, null, new Guid("00000002-0000-0000-0000-000000000435"), "Draft", new Guid("d967d2d6-a707-430f-b404-9b9b5858086e"), "طلب جبن دومتي", null, null });
 
             migrationBuilder.InsertData(
                 table: "pricing_tiers",
@@ -7352,6 +7409,17 @@ namespace Tawreed.Infrastructure.Migrations
                 column: "supplier_id");
 
             migrationBuilder.CreateIndex(
+                name: "ix_delivery_person_profiles_coverage_region_id",
+                table: "delivery_person_profiles",
+                column: "coverage_region_id");
+
+            migrationBuilder.CreateIndex(
+                name: "ix_delivery_person_profiles_user_id",
+                table: "delivery_person_profiles",
+                column: "user_id",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
                 name: "ix_group_order_events_created_by",
                 table: "group_order_events",
                 column: "created_by");
@@ -7386,6 +7454,11 @@ namespace Tawreed.Infrastructure.Migrations
                 table: "group_order_participants",
                 columns: new[] { "group_order_id", "buyer_id" },
                 unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "ix_group_orders_assigned_delivery_person_id",
+                table: "group_orders",
+                column: "assigned_delivery_person_id");
 
             migrationBuilder.CreateIndex(
                 name: "ix_group_orders_creator_id",
@@ -7566,6 +7639,9 @@ namespace Tawreed.Infrastructure.Migrations
 
             migrationBuilder.DropTable(
                 name: "buyers");
+
+            migrationBuilder.DropTable(
+                name: "delivery_person_profiles");
 
             migrationBuilder.DropTable(
                 name: "suppliers");

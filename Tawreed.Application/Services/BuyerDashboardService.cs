@@ -75,6 +75,7 @@ public class BuyerDashboardService : IBuyerDashboardService
                 return new NearbyOrderDto
                 {
                     Id = o.Id,
+                    Title = o.Title,
                     CreatorName = o.Creator?.User?.FullName ?? "",
                     ProductName = product?.Product?.Name ?? "",
                     Quantity = product?.TargetQty ?? 0,

@@ -18,6 +18,7 @@ public class User : BaseSoftDeletableEntity
 
     public Buyer? Buyer { get; set; }
     public Supplier? Supplier { get; set; }
+    public DeliveryPersonProfile? DeliveryPersonProfile { get; set; }
     public ICollection<RefreshToken> RefreshTokens { get; set; } = [];
     public ICollection<Notification> Notifications { get; set; } = [];
 }

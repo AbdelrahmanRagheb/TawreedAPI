@@ -12,8 +12,8 @@ using Tawreed.Infrastructure.Data;
 namespace Tawreed.Infrastructure.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20260624195156_InitialCreate")]
-    partial class InitialCreate
+    [Migration("20260625232331_AddDeliveryAssignmentRequest")]
+    partial class AddDeliveryAssignmentRequest
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -574,9 +574,19 @@ namespace Tawreed.Infrastructure.Migrations
                         .HasColumnType("datetimeoffset")
                         .HasColumnName("delivered_at");
 
+                    b.Property<decimal?>("DeliveryFee")
+                        .HasColumnType("decimal(12,2)")
+                        .HasColumnName("delivery_fee");
+
                     b.Property<Guid?>("DeliveryPersonId")
                         .HasColumnType("uniqueidentifier")
                         .HasColumnName("delivery_person_id");
+
+                    b.Property<string>("DeliveryType")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)")
+                        .HasColumnName("delivery_type");
 
                     b.Property<Guid>("GroupOrderId")
                         .HasColumnType("uniqueidentifier")
@@ -625,12 +635,171 @@ namespace Tawreed.Infrastructure.Migrations
                     b.ToTable("deliveries", (string)null);
                 });
 
+            modelBuilder.Entity("Tawreed.Domain.Entities.DeliveryAssignmentRequest", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier")
+                        .HasColumnName("id");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2")
+                        .HasColumnName("created_at");
+
+                    b.Property<string>("DeclineReason")
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)")
+                        .HasColumnName("decline_reason");
+
+                    b.Property<Guid>("DeliveryPersonId")
+                        .HasColumnType("uniqueidentifier")
+                        .HasColumnName("delivery_person_id");
+
+                    b.Property<Guid>("OrderId")
+                        .HasColumnType("uniqueidentifier")
+                        .HasColumnName("order_id");
+
+                    b.Property<decimal?>("ProposedFee")
+                        .HasColumnType("decimal(12,2)")
+                        .HasColumnName("proposed_fee");
+
+                    b.Property<DateTimeOffset?>("RespondedAt")
+                        .HasColumnType("datetimeoffset")
+                        .HasColumnName("responded_at");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)")
+                        .HasColumnName("status");
+
+                    b.Property<Guid>("SupplierId")
+                        .HasColumnType("uniqueidentifier")
+                        .HasColumnName("supplier_id");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime2")
+                        .HasColumnName("updated_at");
+
+                    b.HasKey("Id")
+                        .HasName("pk_delivery_assignment_requests");
+
+                    b.HasIndex("DeliveryPersonId")
+                        .HasDatabaseName("ix_delivery_assignment_requests_delivery_person_id");
+
+                    b.HasIndex("Status")
+                        .HasDatabaseName("ix_delivery_assignment_requests_status");
+
+                    b.HasIndex("SupplierId")
+                        .HasDatabaseName("ix_delivery_assignment_requests_supplier_id");
+
+                    b.HasIndex("OrderId", "DeliveryPersonId")
+                        .HasDatabaseName("ix_delivery_assignment_requests_order_id_delivery_person_id");
+
+                    b.ToTable("delivery_assignment_requests", (string)null);
+                });
+
+            modelBuilder.Entity("Tawreed.Domain.Entities.DeliveryPersonProfile", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier")
+                        .HasColumnName("id");
+
+                    b.Property<decimal>("BaseDeliveryFee")
+                        .HasColumnType("decimal(12,2)")
+                        .HasColumnName("base_delivery_fee");
+
+                    b.Property<Guid?>("CoverageRegionId")
+                        .HasColumnType("uniqueidentifier")
+                        .HasColumnName("coverage_region_id");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2")
+                        .HasColumnName("created_at");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit")
+                        .HasColumnName("is_active");
+
+                    b.Property<string>("LicenseInfo")
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)")
+                        .HasColumnName("license_info");
+
+                    b.Property<decimal>("Rating")
+                        .HasColumnType("decimal(2,1)")
+                        .HasColumnName("rating");
+
+                    b.Property<int>("TotalDeliveries")
+                        .HasColumnType("int")
+                        .HasColumnName("total_deliveries");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime2")
+                        .HasColumnName("updated_at");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uniqueidentifier")
+                        .HasColumnName("user_id");
+
+                    b.Property<string>("VehicleType")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)")
+                        .HasColumnName("vehicle_type");
+
+                    b.HasKey("Id")
+                        .HasName("pk_delivery_person_profiles");
+
+                    b.HasIndex("CoverageRegionId")
+                        .HasDatabaseName("ix_delivery_person_profiles_coverage_region_id");
+
+                    b.HasIndex("UserId")
+                        .IsUnique()
+                        .HasDatabaseName("ix_delivery_person_profiles_user_id");
+
+                    b.ToTable("delivery_person_profiles", (string)null);
+
+                    b.HasData(
+                        new
+                        {
+                            Id = new Guid("aaaaaaa1-1111-4a1a-8a1a-aaaaaaaaaa01"),
+                            BaseDeliveryFee = 25m,
+                            CoverageRegionId = new Guid("00000000-0000-0000-0000-000000000004"),
+                            CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            IsActive = true,
+                            LicenseInfo = "محمود - رخصة قيادة مهنية",
+                            Rating = 4.5m,
+                            TotalDeliveries = 150,
+                            UserId = new Guid("11111111-1111-4111-8111-111111111001"),
+                            VehicleType = "Car"
+                        },
+                        new
+                        {
+                            Id = new Guid("bbbbbbb2-2222-4b2b-8b2b-bbbbbbbbbb02"),
+                            BaseDeliveryFee = 15m,
+                            CoverageRegionId = new Guid("00000000-0000-0000-0000-000000000005"),
+                            CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            IsActive = true,
+                            LicenseInfo = "خالد - رخصة قيادة دراجة",
+                            Rating = 4.2m,
+                            TotalDeliveries = 87,
+                            UserId = new Guid("22222222-2222-4222-8222-222222222001"),
+                            VehicleType = "Motorcycle"
+                        });
+                });
+
             modelBuilder.Entity("Tawreed.Domain.Entities.GroupOrder", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier")
                         .HasColumnName("id");
+
+                    b.Property<Guid?>("AssignedDeliveryPersonId")
+                        .HasColumnType("uniqueidentifier")
+                        .HasColumnName("assigned_delivery_person_id");
 
                     b.Property<DateTimeOffset?>("ClosedAt")
                         .HasColumnType("datetimeoffset")
@@ -648,6 +817,17 @@ namespace Tawreed.Infrastructure.Migrations
                         .HasColumnType("datetimeoffset")
                         .HasColumnName("deadline_at");
 
+                    b.Property<string>("DeliveryApprovalStatus")
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)")
+                        .HasColumnName("delivery_approval_status");
+
+                    b.Property<string>("DeliveryPreference")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)")
+                        .HasColumnName("delivery_preference");
+
                     b.Property<string>("Description")
                         .HasColumnType("nvarchar(max)")
                         .HasColumnName("description");
@@ -661,6 +841,14 @@ namespace Tawreed.Infrastructure.Migrations
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)")
                         .HasColumnName("order_number");
+
+                    b.Property<Guid?>("PreferredDeliveryPersonId")
+                        .HasColumnType("uniqueidentifier")
+                        .HasColumnName("preferred_delivery_person_id");
+
+                    b.Property<decimal?>("ProposedDeliveryFee")
+                        .HasColumnType("decimal(18,2)")
+                        .HasColumnName("proposed_delivery_fee");
 
                     b.Property<Guid>("RegionId")
                         .HasColumnType("uniqueidentifier")
@@ -694,8 +882,14 @@ namespace Tawreed.Infrastructure.Migrations
                     b.HasKey("Id")
                         .HasName("pk_group_orders");
 
+                    b.HasIndex("AssignedDeliveryPersonId")
+                        .HasDatabaseName("ix_group_orders_assigned_delivery_person_id");
+
                     b.HasIndex("CreatorId")
                         .HasDatabaseName("ix_group_orders_creator_id");
+
+                    b.HasIndex("PreferredDeliveryPersonId")
+                        .HasDatabaseName("ix_group_orders_preferred_delivery_person_id");
 
                     b.HasIndex("RegionId")
                         .HasDatabaseName("ix_group_orders_region_id");
@@ -712,6 +906,7 @@ namespace Tawreed.Infrastructure.Migrations
                             CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             CreatorId = new Guid("5bc19380-dbcc-4d71-b7cd-261fd03d1797"),
                             DeadlineAt = new DateTimeOffset(new DateTime(2026, 6, 20, 12, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)),
+                            DeliveryPreference = "None",
                             Description = "حليب كامل الدسم للتوزيع على المطعم",
                             OrderNumber = "ORD-20260617-A001",
                             RegionId = new Guid("00000001-0000-0000-0000-000000000029"),
@@ -725,6 +920,7 @@ namespace Tawreed.Infrastructure.Migrations
                             CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             CreatorId = new Guid("247babb0-a7cd-4af3-a292-b5e313ce85d0"),
                             DeadlineAt = new DateTimeOffset(new DateTime(2026, 6, 22, 12, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)),
+                            DeliveryPreference = "None",
                             Description = "مشروبات غازية للفندق",
                             OrderNumber = "ORD-20260617-A002",
                             RegionId = new Guid("00000001-0000-0000-0000-000000000007"),
@@ -738,6 +934,7 @@ namespace Tawreed.Infrastructure.Migrations
                             CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             CreatorId = new Guid("da16cd54-e3dc-4b3e-b167-069060b2780b"),
                             DeadlineAt = new DateTimeOffset(new DateTime(2026, 6, 24, 12, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)),
+                            DeliveryPreference = "None",
                             Description = "دجاج كامل للمطعم الرياضي",
                             OrderNumber = "ORD-20260617-A003",
                             RegionId = new Guid("00000001-0000-0000-0000-000000000029"),
@@ -751,6 +948,7 @@ namespace Tawreed.Infrastructure.Migrations
                             CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             CreatorId = new Guid("3e701ef7-758c-4631-b371-9de27d609984"),
                             DeadlineAt = new DateTimeOffset(new DateTime(2026, 6, 27, 12, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)),
+                            DeliveryPreference = "None",
                             Description = "أجبان متنوعة للمطعم",
                             OrderNumber = "ORD-20260617-A004",
                             RegionId = new Guid("00000002-0000-0000-0000-000000000435"),
@@ -765,6 +963,7 @@ namespace Tawreed.Infrastructure.Migrations
                             CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             CreatorId = new Guid("5bc19380-dbcc-4d71-b7cd-261fd03d1797"),
                             DeadlineAt = new DateTimeOffset(new DateTime(2026, 6, 16, 12, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)),
+                            DeliveryPreference = "None",
                             Description = "وجبات خفيفة للمطعم",
                             OrderNumber = "ORD-20260617-A005",
                             RegionId = new Guid("00000001-0000-0000-0000-000000000029"),
@@ -779,6 +978,7 @@ namespace Tawreed.Infrastructure.Migrations
                             CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             CreatorId = new Guid("34b72b5a-a8e4-46fe-bda4-cba1dc8fc5a0"),
                             DeadlineAt = new DateTimeOffset(new DateTime(2026, 6, 12, 12, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)),
+                            DeliveryPreference = "None",
                             Description = "بسكويت شاي وماري",
                             OrderNumber = "ORD-20260617-A006",
                             RegionId = new Guid("00000001-0000-0000-0000-000000000047"),
@@ -793,6 +993,7 @@ namespace Tawreed.Infrastructure.Migrations
                             CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             CreatorId = new Guid("da16cd54-e3dc-4b3e-b167-069060b2780b"),
                             DeadlineAt = new DateTimeOffset(new DateTime(2026, 6, 14, 12, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)),
+                            DeliveryPreference = "None",
                             Description = "تم الإلغاء لعدم التوفر",
                             OrderNumber = "ORD-20260617-A007",
                             RegionId = new Guid("00000001-0000-0000-0000-000000000209"),
@@ -65036,7 +65237,7 @@ namespace Tawreed.Infrastructure.Migrations
                             EmailVerified = true,
                             FullName = "مدير النظام",
                             IsDeleted = false,
-                            PasswordHash = "AQIDBAUGBwgJCgsMDQ4PEA==.gX0bTflqCjSgps4WRDCI1xtjk/h96ukaUfpnl/iu+QY=",
+                            PasswordHash = "zH42ipi5/1vZEOde4rMTgw==.Ojo4Rc6Uf2z7Wur0CIAX4kuX57iB1c/6kOGvJxmBQMY=",
                             Phone = "01000000000",
                             PhoneVerified = true,
                             PreferredLang = "ar",
@@ -65051,7 +65252,7 @@ namespace Tawreed.Infrastructure.Migrations
                             EmailVerified = true,
                             FullName = "أحمد علي",
                             IsDeleted = false,
-                            PasswordHash = "AQIDBAUGBwgJCgsMDQ4PEA==.gX0bTflqCjSgps4WRDCI1xtjk/h96ukaUfpnl/iu+QY=",
+                            PasswordHash = "zH42ipi5/1vZEOde4rMTgw==.Ojo4Rc6Uf2z7Wur0CIAX4kuX57iB1c/6kOGvJxmBQMY=",
                             Phone = "01000000001",
                             PhoneVerified = true,
                             PreferredLang = "ar",
@@ -65066,7 +65267,7 @@ namespace Tawreed.Infrastructure.Migrations
                             EmailVerified = true,
                             FullName = "محمد حسن",
                             IsDeleted = false,
-                            PasswordHash = "AQIDBAUGBwgJCgsMDQ4PEA==.gX0bTflqCjSgps4WRDCI1xtjk/h96ukaUfpnl/iu+QY=",
+                            PasswordHash = "zH42ipi5/1vZEOde4rMTgw==.Ojo4Rc6Uf2z7Wur0CIAX4kuX57iB1c/6kOGvJxmBQMY=",
                             Phone = "01000000002",
                             PhoneVerified = true,
                             PreferredLang = "ar",
@@ -65081,7 +65282,7 @@ namespace Tawreed.Infrastructure.Migrations
                             EmailVerified = true,
                             FullName = "سارة أحمد",
                             IsDeleted = false,
-                            PasswordHash = "AQIDBAUGBwgJCgsMDQ4PEA==.gX0bTflqCjSgps4WRDCI1xtjk/h96ukaUfpnl/iu+QY=",
+                            PasswordHash = "zH42ipi5/1vZEOde4rMTgw==.Ojo4Rc6Uf2z7Wur0CIAX4kuX57iB1c/6kOGvJxmBQMY=",
                             Phone = "01000000003",
                             PhoneVerified = true,
                             PreferredLang = "ar",
@@ -65096,7 +65297,7 @@ namespace Tawreed.Infrastructure.Migrations
                             EmailVerified = true,
                             FullName = "عمر خالد",
                             IsDeleted = false,
-                            PasswordHash = "AQIDBAUGBwgJCgsMDQ4PEA==.gX0bTflqCjSgps4WRDCI1xtjk/h96ukaUfpnl/iu+QY=",
+                            PasswordHash = "zH42ipi5/1vZEOde4rMTgw==.Ojo4Rc6Uf2z7Wur0CIAX4kuX57iB1c/6kOGvJxmBQMY=",
                             Phone = "01000000004",
                             PhoneVerified = true,
                             PreferredLang = "ar",
@@ -65111,7 +65312,7 @@ namespace Tawreed.Infrastructure.Migrations
                             EmailVerified = true,
                             FullName = "نورهان سعيد",
                             IsDeleted = false,
-                            PasswordHash = "AQIDBAUGBwgJCgsMDQ4PEA==.gX0bTflqCjSgps4WRDCI1xtjk/h96ukaUfpnl/iu+QY=",
+                            PasswordHash = "zH42ipi5/1vZEOde4rMTgw==.Ojo4Rc6Uf2z7Wur0CIAX4kuX57iB1c/6kOGvJxmBQMY=",
                             Phone = "01000000005",
                             PhoneVerified = true,
                             PreferredLang = "ar",
@@ -65126,7 +65327,7 @@ namespace Tawreed.Infrastructure.Migrations
                             EmailVerified = true,
                             FullName = "كريم محمود",
                             IsDeleted = false,
-                            PasswordHash = "AQIDBAUGBwgJCgsMDQ4PEA==.gX0bTflqCjSgps4WRDCI1xtjk/h96ukaUfpnl/iu+QY=",
+                            PasswordHash = "zH42ipi5/1vZEOde4rMTgw==.Ojo4Rc6Uf2z7Wur0CIAX4kuX57iB1c/6kOGvJxmBQMY=",
                             Phone = "01000000006",
                             PhoneVerified = true,
                             PreferredLang = "ar",
@@ -65141,7 +65342,7 @@ namespace Tawreed.Infrastructure.Migrations
                             EmailVerified = true,
                             FullName = "دينا يوسف",
                             IsDeleted = false,
-                            PasswordHash = "AQIDBAUGBwgJCgsMDQ4PEA==.gX0bTflqCjSgps4WRDCI1xtjk/h96ukaUfpnl/iu+QY=",
+                            PasswordHash = "zH42ipi5/1vZEOde4rMTgw==.Ojo4Rc6Uf2z7Wur0CIAX4kuX57iB1c/6kOGvJxmBQMY=",
                             Phone = "01000000007",
                             PhoneVerified = true,
                             PreferredLang = "ar",
@@ -65156,7 +65357,7 @@ namespace Tawreed.Infrastructure.Migrations
                             EmailVerified = true,
                             FullName = "إبراهيم عبدالله",
                             IsDeleted = false,
-                            PasswordHash = "AQIDBAUGBwgJCgsMDQ4PEA==.gX0bTflqCjSgps4WRDCI1xtjk/h96ukaUfpnl/iu+QY=",
+                            PasswordHash = "zH42ipi5/1vZEOde4rMTgw==.Ojo4Rc6Uf2z7Wur0CIAX4kuX57iB1c/6kOGvJxmBQMY=",
                             Phone = "01000000008",
                             PhoneVerified = true,
                             PreferredLang = "ar",
@@ -65171,7 +65372,7 @@ namespace Tawreed.Infrastructure.Migrations
                             EmailVerified = true,
                             FullName = "مريم جمال",
                             IsDeleted = false,
-                            PasswordHash = "AQIDBAUGBwgJCgsMDQ4PEA==.gX0bTflqCjSgps4WRDCI1xtjk/h96ukaUfpnl/iu+QY=",
+                            PasswordHash = "zH42ipi5/1vZEOde4rMTgw==.Ojo4Rc6Uf2z7Wur0CIAX4kuX57iB1c/6kOGvJxmBQMY=",
                             Phone = "01000000009",
                             PhoneVerified = true,
                             PreferredLang = "ar",
@@ -65186,7 +65387,7 @@ namespace Tawreed.Infrastructure.Migrations
                             EmailVerified = true,
                             FullName = "خالد عبدالرحمن",
                             IsDeleted = false,
-                            PasswordHash = "AQIDBAUGBwgJCgsMDQ4PEA==.gX0bTflqCjSgps4WRDCI1xtjk/h96ukaUfpnl/iu+QY=",
+                            PasswordHash = "zH42ipi5/1vZEOde4rMTgw==.Ojo4Rc6Uf2z7Wur0CIAX4kuX57iB1c/6kOGvJxmBQMY=",
                             Phone = "01000000010",
                             PhoneVerified = true,
                             PreferredLang = "ar",
@@ -65201,7 +65402,7 @@ namespace Tawreed.Infrastructure.Migrations
                             EmailVerified = true,
                             FullName = "محمد الجهيني",
                             IsDeleted = false,
-                            PasswordHash = "AQIDBAUGBwgJCgsMDQ4PEA==.gX0bTflqCjSgps4WRDCI1xtjk/h96ukaUfpnl/iu+QY=",
+                            PasswordHash = "zH42ipi5/1vZEOde4rMTgw==.Ojo4Rc6Uf2z7Wur0CIAX4kuX57iB1c/6kOGvJxmBQMY=",
                             Phone = "01100000001",
                             PhoneVerified = true,
                             PreferredLang = "ar",
@@ -65216,7 +65417,7 @@ namespace Tawreed.Infrastructure.Migrations
                             EmailVerified = true,
                             FullName = "أحمد المراعي",
                             IsDeleted = false,
-                            PasswordHash = "AQIDBAUGBwgJCgsMDQ4PEA==.gX0bTflqCjSgps4WRDCI1xtjk/h96ukaUfpnl/iu+QY=",
+                            PasswordHash = "zH42ipi5/1vZEOde4rMTgw==.Ojo4Rc6Uf2z7Wur0CIAX4kuX57iB1c/6kOGvJxmBQMY=",
                             Phone = "01100000002",
                             PhoneVerified = true,
                             PreferredLang = "ar",
@@ -65231,7 +65432,7 @@ namespace Tawreed.Infrastructure.Migrations
                             EmailVerified = true,
                             FullName = "عمر كولا",
                             IsDeleted = false,
-                            PasswordHash = "AQIDBAUGBwgJCgsMDQ4PEA==.gX0bTflqCjSgps4WRDCI1xtjk/h96ukaUfpnl/iu+QY=",
+                            PasswordHash = "zH42ipi5/1vZEOde4rMTgw==.Ojo4Rc6Uf2z7Wur0CIAX4kuX57iB1c/6kOGvJxmBQMY=",
                             Phone = "01100000003",
                             PhoneVerified = true,
                             PreferredLang = "ar",
@@ -65246,7 +65447,7 @@ namespace Tawreed.Infrastructure.Migrations
                             EmailVerified = true,
                             FullName = "سعيد بيبسي",
                             IsDeleted = false,
-                            PasswordHash = "AQIDBAUGBwgJCgsMDQ4PEA==.gX0bTflqCjSgps4WRDCI1xtjk/h96ukaUfpnl/iu+QY=",
+                            PasswordHash = "zH42ipi5/1vZEOde4rMTgw==.Ojo4Rc6Uf2z7Wur0CIAX4kuX57iB1c/6kOGvJxmBQMY=",
                             Phone = "01100000004",
                             PhoneVerified = true,
                             PreferredLang = "ar",
@@ -65261,7 +65462,7 @@ namespace Tawreed.Infrastructure.Migrations
                             EmailVerified = true,
                             FullName = "جمال بسكو",
                             IsDeleted = false,
-                            PasswordHash = "AQIDBAUGBwgJCgsMDQ4PEA==.gX0bTflqCjSgps4WRDCI1xtjk/h96ukaUfpnl/iu+QY=",
+                            PasswordHash = "zH42ipi5/1vZEOde4rMTgw==.Ojo4Rc6Uf2z7Wur0CIAX4kuX57iB1c/6kOGvJxmBQMY=",
                             Phone = "01100000005",
                             PhoneVerified = true,
                             PreferredLang = "ar",
@@ -65276,7 +65477,7 @@ namespace Tawreed.Infrastructure.Migrations
                             EmailVerified = true,
                             FullName = "هاني دومتي",
                             IsDeleted = false,
-                            PasswordHash = "AQIDBAUGBwgJCgsMDQ4PEA==.gX0bTflqCjSgps4WRDCI1xtjk/h96ukaUfpnl/iu+QY=",
+                            PasswordHash = "zH42ipi5/1vZEOde4rMTgw==.Ojo4Rc6Uf2z7Wur0CIAX4kuX57iB1c/6kOGvJxmBQMY=",
                             Phone = "01100000006",
                             PhoneVerified = true,
                             PreferredLang = "ar",
@@ -65291,7 +65492,7 @@ namespace Tawreed.Infrastructure.Migrations
                             EmailVerified = true,
                             FullName = "نادر ايديتا",
                             IsDeleted = false,
-                            PasswordHash = "AQIDBAUGBwgJCgsMDQ4PEA==.gX0bTflqCjSgps4WRDCI1xtjk/h96ukaUfpnl/iu+QY=",
+                            PasswordHash = "zH42ipi5/1vZEOde4rMTgw==.Ojo4Rc6Uf2z7Wur0CIAX4kuX57iB1c/6kOGvJxmBQMY=",
                             Phone = "01100000007",
                             PhoneVerified = true,
                             PreferredLang = "ar",
@@ -65306,7 +65507,7 @@ namespace Tawreed.Infrastructure.Migrations
                             EmailVerified = true,
                             FullName = "أيمن السلسلة",
                             IsDeleted = false,
-                            PasswordHash = "AQIDBAUGBwgJCgsMDQ4PEA==.gX0bTflqCjSgps4WRDCI1xtjk/h96ukaUfpnl/iu+QY=",
+                            PasswordHash = "zH42ipi5/1vZEOde4rMTgw==.Ojo4Rc6Uf2z7Wur0CIAX4kuX57iB1c/6kOGvJxmBQMY=",
                             Phone = "01100000008",
                             PhoneVerified = true,
                             PreferredLang = "ar",
@@ -65321,7 +65522,7 @@ namespace Tawreed.Infrastructure.Migrations
                             EmailVerified = true,
                             FullName = "فتحي الفتح",
                             IsDeleted = false,
-                            PasswordHash = "AQIDBAUGBwgJCgsMDQ4PEA==.gX0bTflqCjSgps4WRDCI1xtjk/h96ukaUfpnl/iu+QY=",
+                            PasswordHash = "zH42ipi5/1vZEOde4rMTgw==.Ojo4Rc6Uf2z7Wur0CIAX4kuX57iB1c/6kOGvJxmBQMY=",
                             Phone = "01100000009",
                             PhoneVerified = true,
                             PreferredLang = "ar",
@@ -65336,11 +65537,41 @@ namespace Tawreed.Infrastructure.Migrations
                             EmailVerified = true,
                             FullName = "دينا مزرعة",
                             IsDeleted = false,
-                            PasswordHash = "AQIDBAUGBwgJCgsMDQ4PEA==.gX0bTflqCjSgps4WRDCI1xtjk/h96ukaUfpnl/iu+QY=",
+                            PasswordHash = "zH42ipi5/1vZEOde4rMTgw==.Ojo4Rc6Uf2z7Wur0CIAX4kuX57iB1c/6kOGvJxmBQMY=",
                             Phone = "01100000010",
                             PhoneVerified = true,
                             PreferredLang = "ar",
                             Role = "Supplier",
+                            Status = "Active"
+                        },
+                        new
+                        {
+                            Id = new Guid("11111111-1111-4111-8111-111111111001"),
+                            CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            Email = "delivery1@tawreed.com",
+                            EmailVerified = true,
+                            FullName = "محمود سعيد",
+                            IsDeleted = false,
+                            PasswordHash = "zH42ipi5/1vZEOde4rMTgw==.Ojo4Rc6Uf2z7Wur0CIAX4kuX57iB1c/6kOGvJxmBQMY=",
+                            Phone = "01200000001",
+                            PhoneVerified = true,
+                            PreferredLang = "ar",
+                            Role = "DeliveryPerson",
+                            Status = "Active"
+                        },
+                        new
+                        {
+                            Id = new Guid("22222222-2222-4222-8222-222222222001"),
+                            CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            Email = "delivery2@tawreed.com",
+                            EmailVerified = true,
+                            FullName = "خالد إبراهيم",
+                            IsDeleted = false,
+                            PasswordHash = "zH42ipi5/1vZEOde4rMTgw==.Ojo4Rc6Uf2z7Wur0CIAX4kuX57iB1c/6kOGvJxmBQMY=",
+                            Phone = "01200000002",
+                            PhoneVerified = true,
+                            PreferredLang = "ar",
+                            Role = "DeliveryPerson",
                             Status = "Active"
                         });
                 });
@@ -65418,14 +65649,75 @@ namespace Tawreed.Infrastructure.Migrations
                     b.Navigation("Supplier");
                 });
 
+            modelBuilder.Entity("Tawreed.Domain.Entities.DeliveryAssignmentRequest", b =>
+                {
+                    b.HasOne("Tawreed.Domain.Entities.DeliveryPersonProfile", "DeliveryPerson")
+                        .WithMany()
+                        .HasForeignKey("DeliveryPersonId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired()
+                        .HasConstraintName("fk_delivery_assignment_requests_delivery_person_profiles_delivery_person_id");
+
+                    b.HasOne("Tawreed.Domain.Entities.GroupOrder", "Order")
+                        .WithMany()
+                        .HasForeignKey("OrderId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("fk_delivery_assignment_requests_group_orders_order_id");
+
+                    b.HasOne("Tawreed.Domain.Entities.Supplier", "Supplier")
+                        .WithMany()
+                        .HasForeignKey("SupplierId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired()
+                        .HasConstraintName("fk_delivery_assignment_requests_suppliers_supplier_id");
+
+                    b.Navigation("DeliveryPerson");
+
+                    b.Navigation("Order");
+
+                    b.Navigation("Supplier");
+                });
+
+            modelBuilder.Entity("Tawreed.Domain.Entities.DeliveryPersonProfile", b =>
+                {
+                    b.HasOne("Tawreed.Domain.Entities.Region", "CoverageRegion")
+                        .WithMany()
+                        .HasForeignKey("CoverageRegionId")
+                        .OnDelete(DeleteBehavior.SetNull)
+                        .HasConstraintName("fk_delivery_person_profiles_regions_coverage_region_id");
+
+                    b.HasOne("Tawreed.Domain.Entities.User", "User")
+                        .WithOne("DeliveryPersonProfile")
+                        .HasForeignKey("Tawreed.Domain.Entities.DeliveryPersonProfile", "UserId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired()
+                        .HasConstraintName("fk_delivery_person_profiles_users_user_id");
+
+                    b.Navigation("CoverageRegion");
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("Tawreed.Domain.Entities.GroupOrder", b =>
                 {
+                    b.HasOne("Tawreed.Domain.Entities.DeliveryPersonProfile", "AssignedDeliveryPerson")
+                        .WithMany()
+                        .HasForeignKey("AssignedDeliveryPersonId")
+                        .OnDelete(DeleteBehavior.SetNull)
+                        .HasConstraintName("fk_group_orders_delivery_person_profiles_assigned_delivery_person_id");
+
                     b.HasOne("Tawreed.Domain.Entities.Buyer", "Creator")
                         .WithMany("CreatedGroupOrders")
                         .HasForeignKey("CreatorId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired()
                         .HasConstraintName("fk_group_orders_buyers_creator_id");
+
+                    b.HasOne("Tawreed.Domain.Entities.DeliveryPersonProfile", "PreferredDeliveryPerson")
+                        .WithMany()
+                        .HasForeignKey("PreferredDeliveryPersonId")
+                        .HasConstraintName("fk_group_orders_delivery_person_profiles_preferred_delivery_person_id");
 
                     b.HasOne("Tawreed.Domain.Entities.Region", "Region")
                         .WithMany("GroupOrders")
@@ -65440,7 +65732,11 @@ namespace Tawreed.Infrastructure.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .HasConstraintName("fk_group_orders_suppliers_supplier_id");
 
+                    b.Navigation("AssignedDeliveryPerson");
+
                     b.Navigation("Creator");
+
+                    b.Navigation("PreferredDeliveryPerson");
 
                     b.Navigation("Region");
 
@@ -65831,6 +66127,8 @@ namespace Tawreed.Infrastructure.Migrations
             modelBuilder.Entity("Tawreed.Domain.Entities.User", b =>
                 {
                     b.Navigation("Buyer");
+
+                    b.Navigation("DeliveryPersonProfile");
 
                     b.Navigation("Notifications");
 

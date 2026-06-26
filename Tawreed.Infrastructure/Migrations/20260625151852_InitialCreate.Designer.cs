@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Tawreed.Infrastructure.Data;
 
@@ -11,9 +12,11 @@ using Tawreed.Infrastructure.Data;
 namespace Tawreed.Infrastructure.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260625151852_InitialCreate")]
+    partial class InitialCreate
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -632,70 +635,6 @@ namespace Tawreed.Infrastructure.Migrations
                     b.ToTable("deliveries", (string)null);
                 });
 
-            modelBuilder.Entity("Tawreed.Domain.Entities.DeliveryAssignmentRequest", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier")
-                        .HasColumnName("id");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2")
-                        .HasColumnName("created_at");
-
-                    b.Property<string>("DeclineReason")
-                        .HasMaxLength(500)
-                        .HasColumnType("nvarchar(500)")
-                        .HasColumnName("decline_reason");
-
-                    b.Property<Guid>("DeliveryPersonId")
-                        .HasColumnType("uniqueidentifier")
-                        .HasColumnName("delivery_person_id");
-
-                    b.Property<Guid>("OrderId")
-                        .HasColumnType("uniqueidentifier")
-                        .HasColumnName("order_id");
-
-                    b.Property<decimal?>("ProposedFee")
-                        .HasColumnType("decimal(12,2)")
-                        .HasColumnName("proposed_fee");
-
-                    b.Property<DateTimeOffset?>("RespondedAt")
-                        .HasColumnType("datetimeoffset")
-                        .HasColumnName("responded_at");
-
-                    b.Property<string>("Status")
-                        .IsRequired()
-                        .HasMaxLength(20)
-                        .HasColumnType("nvarchar(20)")
-                        .HasColumnName("status");
-
-                    b.Property<Guid>("SupplierId")
-                        .HasColumnType("uniqueidentifier")
-                        .HasColumnName("supplier_id");
-
-                    b.Property<DateTime?>("UpdatedAt")
-                        .HasColumnType("datetime2")
-                        .HasColumnName("updated_at");
-
-                    b.HasKey("Id")
-                        .HasName("pk_delivery_assignment_requests");
-
-                    b.HasIndex("DeliveryPersonId")
-                        .HasDatabaseName("ix_delivery_assignment_requests_delivery_person_id");
-
-                    b.HasIndex("Status")
-                        .HasDatabaseName("ix_delivery_assignment_requests_status");
-
-                    b.HasIndex("SupplierId")
-                        .HasDatabaseName("ix_delivery_assignment_requests_supplier_id");
-
-                    b.HasIndex("OrderId", "DeliveryPersonId")
-                        .HasDatabaseName("ix_delivery_assignment_requests_order_id_delivery_person_id");
-
-                    b.ToTable("delivery_assignment_requests", (string)null);
-                });
-
             modelBuilder.Entity("Tawreed.Domain.Entities.DeliveryPersonProfile", b =>
                 {
                     b.Property<Guid>("Id")
@@ -884,9 +823,6 @@ namespace Tawreed.Infrastructure.Migrations
 
                     b.HasIndex("CreatorId")
                         .HasDatabaseName("ix_group_orders_creator_id");
-
-                    b.HasIndex("PreferredDeliveryPersonId")
-                        .HasDatabaseName("ix_group_orders_preferred_delivery_person_id");
 
                     b.HasIndex("RegionId")
                         .HasDatabaseName("ix_group_orders_region_id");
@@ -65646,36 +65582,6 @@ namespace Tawreed.Infrastructure.Migrations
                     b.Navigation("Supplier");
                 });
 
-            modelBuilder.Entity("Tawreed.Domain.Entities.DeliveryAssignmentRequest", b =>
-                {
-                    b.HasOne("Tawreed.Domain.Entities.DeliveryPersonProfile", "DeliveryPerson")
-                        .WithMany()
-                        .HasForeignKey("DeliveryPersonId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired()
-                        .HasConstraintName("fk_delivery_assignment_requests_delivery_person_profiles_delivery_person_id");
-
-                    b.HasOne("Tawreed.Domain.Entities.GroupOrder", "Order")
-                        .WithMany()
-                        .HasForeignKey("OrderId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired()
-                        .HasConstraintName("fk_delivery_assignment_requests_group_orders_order_id");
-
-                    b.HasOne("Tawreed.Domain.Entities.Supplier", "Supplier")
-                        .WithMany()
-                        .HasForeignKey("SupplierId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired()
-                        .HasConstraintName("fk_delivery_assignment_requests_suppliers_supplier_id");
-
-                    b.Navigation("DeliveryPerson");
-
-                    b.Navigation("Order");
-
-                    b.Navigation("Supplier");
-                });
-
             modelBuilder.Entity("Tawreed.Domain.Entities.DeliveryPersonProfile", b =>
                 {
                     b.HasOne("Tawreed.Domain.Entities.Region", "CoverageRegion")
@@ -65711,11 +65617,6 @@ namespace Tawreed.Infrastructure.Migrations
                         .IsRequired()
                         .HasConstraintName("fk_group_orders_buyers_creator_id");
 
-                    b.HasOne("Tawreed.Domain.Entities.DeliveryPersonProfile", "PreferredDeliveryPerson")
-                        .WithMany()
-                        .HasForeignKey("PreferredDeliveryPersonId")
-                        .HasConstraintName("fk_group_orders_delivery_person_profiles_preferred_delivery_person_id");
-
                     b.HasOne("Tawreed.Domain.Entities.Region", "Region")
                         .WithMany("GroupOrders")
                         .HasForeignKey("RegionId")
@@ -65732,8 +65633,6 @@ namespace Tawreed.Infrastructure.Migrations
                     b.Navigation("AssignedDeliveryPerson");
 
                     b.Navigation("Creator");
-
-                    b.Navigation("PreferredDeliveryPerson");
 
                     b.Navigation("Region");
 

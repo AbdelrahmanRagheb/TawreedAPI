@@ -24,8 +24,16 @@ public class InvoiceRepository : GenericRepository<Invoice>, IInvoiceRepository
     public async Task<IReadOnlyList<Invoice>> GetByGroupOrderAsync(Guid groupOrderId, CancellationToken cancellationToken = default)
     {
         return await DbSet
-            .Include(i => i.Buyer)
+            .Include(i => i.Buyer).ThenInclude(b => b.User)
+            .Include(i => i.Participant)
             .Where(i => i.GroupOrderId == groupOrderId)
             .ToListAsync(cancellationToken);
+    }
+
+    public async Task<Invoice?> GetByIdWithGroupOrderAsync(Guid id, CancellationToken cancellationToken = default)
+    {
+        return await DbSet
+            .Include(i => i.GroupOrder).ThenInclude(go => go.Deliveries)
+            .FirstOrDefaultAsync(i => i.Id == id, cancellationToken);
     }
 }

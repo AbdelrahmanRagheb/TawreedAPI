@@ -1,4 +1,4 @@
-using System.Text.Json;
+﻿using System.Text.Json;
 using Tawreed.Application.Common.Models;
 using Tawreed.Application.Interfaces;
 using Tawreed.Domain.Entities;
@@ -23,6 +23,8 @@ public class BuyerOrderService : IBuyerOrderService
     private readonly ISupplierRepository _supplierRepository;
     private readonly IInvoiceRepository _invoiceRepository;
     private readonly IDeliveryRepository _deliveryRepository;
+    private readonly IDeliveryPersonProfileRepository _deliveryPersonProfileRepository;
+    private readonly IDeliveryAssignmentRequestRepository _deliveryAssignmentRequestRepository;
     private readonly IUnitOfWork _unitOfWork;
 
     public BuyerOrderService(
@@ -40,6 +42,8 @@ public class BuyerOrderService : IBuyerOrderService
         ISupplierRepository supplierRepository,
         IInvoiceRepository invoiceRepository,
         IDeliveryRepository deliveryRepository,
+        IDeliveryPersonProfileRepository deliveryPersonProfileRepository,
+        IDeliveryAssignmentRequestRepository deliveryAssignmentRequestRepository,
         IUnitOfWork unitOfWork)
     {
         _groupOrderRepository = groupOrderRepository;
@@ -56,6 +60,8 @@ public class BuyerOrderService : IBuyerOrderService
         _supplierRepository = supplierRepository;
         _invoiceRepository = invoiceRepository;
         _deliveryRepository = deliveryRepository;
+        _deliveryPersonProfileRepository = deliveryPersonProfileRepository;
+        _deliveryAssignmentRequestRepository = deliveryAssignmentRequestRepository;
         _unitOfWork = unitOfWork;
     }
 
@@ -199,6 +205,12 @@ public class BuyerOrderService : IBuyerOrderService
             TotalOrderValue = order.Items?.Sum(i => (i.SupplierProduct?.Price ?? i.UnitPrice ?? 0) * i.TargetQty) ?? 0,
             SupplierName = order.Supplier?.CompanyName ?? "",
             SupplierId = order.SupplierId,
+            DeliveryPreference = order.DeliveryPreference,
+            PreferredDeliveryPersonId = order.PreferredDeliveryPersonId,
+            PreferredDeliveryPersonName = order.PreferredDeliveryPerson?.User?.FullName,
+            ProposedDeliveryFee = order.ProposedDeliveryFee,
+            DeliveryApprovalStatus = order.DeliveryApprovalStatus,
+            AssignedDeliveryPersonName = order.AssignedDeliveryPerson?.User?.FullName,
             Products = order.Items?.Select(i =>
             {
                 var currentQty = i.ParticipantItems?.Sum(pi => pi.Quantity) ?? 0;
@@ -233,7 +245,8 @@ public class BuyerOrderService : IBuyerOrderService
             {
                 Id = e.Id,
                 EventType = e.EventType,
-                Notes = e.NotesEn,
+                NotesAr = e.NotesAr,
+                NotesEn = e.NotesEn,
                 CreatedBy = e.Creator?.FullName ?? "",
                 CreatedAt = e.CreatedAt
             }).OrderByDescending(a => a.CreatedAt).ToList() ?? []
@@ -388,7 +401,7 @@ public class BuyerOrderService : IBuyerOrderService
             GroupOrderId = order.Id,
             EventType = "Created",
             NotesEn = $"{buyer.BusinessName ?? "A buyer"} created the order",
-            NotesAr = $"???? {buyer.BusinessName ?? "?????"} ?????",
+            NotesAr = $"أنشأ {buyer.BusinessName ?? "المشتري"} الطلب",
             CreatedBy = userId
         });
 
@@ -457,7 +470,7 @@ public class BuyerOrderService : IBuyerOrderService
             GroupOrderId = order.Id,
             EventType = "DraftCreated",
             NotesEn = $"{buyer.BusinessName ?? "A buyer"} saved a draft",
-            NotesAr = $"??? {buyer.BusinessName ?? "?????"} ?????",
+            NotesAr = $"حفظ {buyer.BusinessName ?? "المشتري"} مسودة",
             CreatedBy = userId
         });
 
@@ -518,7 +531,7 @@ public class BuyerOrderService : IBuyerOrderService
                 GroupOrderId = order.Id,
                 EventType = "BuyerJoined",
                 NotesEn = $"{buyer.User?.FullName ?? "A buyer"} joined the order",
-                NotesAr = $"???? {buyer.User?.FullName ?? "?????"} ??? ?????",
+                NotesAr = $"انضم {buyer.User?.FullName ?? "مشتري"} إلى الطلب",
                 CreatedBy = userId
             });
         }
@@ -535,7 +548,7 @@ public class BuyerOrderService : IBuyerOrderService
                 GroupOrderId = order.Id,
                 EventType = "BuyerJoined",
                 NotesEn = $"{buyer.User?.FullName ?? "A buyer"} rejoined the order",
-                NotesAr = $"???? {buyer.User?.FullName ?? "?????"} ??? ????? ??? ????",
+                NotesAr = $"انضم {buyer.User?.FullName ?? "مشتري"} مجدداً إلى الطلب",
                 CreatedBy = userId
             });
         }
@@ -650,21 +663,21 @@ public class BuyerOrderService : IBuyerOrderService
 
                 if (oldQty == null)
                 {
-                    enChanges.Add($"{productName} increased by �{item.Quantity}");
-                    arChanges.Add(ToArabicNumerals($"{productName} ?????? �{item.Quantity}"));
+                    enChanges.Add($"{productName} increased by �{item.Quantity}");
+                    arChanges.Add(ToArabicNumerals($"زيادة {productName} بمقدار {item.Quantity}"));
                 }
                 else if (oldQty.Value != item.Quantity)
                 {
                     int diff = item.Quantity - oldQty.Value;
                     if (diff > 0)
                     {
-                        enChanges.Add($"{productName} increased by �{diff}");
-                        arChanges.Add(ToArabicNumerals($"{productName} ?????? �{diff}"));
+                        enChanges.Add($"{productName} increased by �{diff}");
+                        arChanges.Add(ToArabicNumerals($"زيادة {productName} بمقدار {diff}"));
                     }
                     else
                     {
-                        enChanges.Add($"{productName} decreased by �{-diff}");
-                        arChanges.Add(ToArabicNumerals($"{productName} ???? �{-diff}"));
+                        enChanges.Add($"{productName} decreased by �{-diff}");
+                        arChanges.Add(ToArabicNumerals($"نقص {productName} بمقدار {-diff}"));
                     }
                 }
             }
@@ -675,7 +688,7 @@ public class BuyerOrderService : IBuyerOrderService
                 if (goi == null || requestedProductIds.Contains(goi.ProductId)) continue;
                 var productName = goi.Product?.Name ?? "Unknown";
                 enChanges.Add($"removed {productName}");
-                arChanges.Add($"????? {productName}");
+                arChanges.Add($"إزالة {productName}");
             }
 
             if (enChanges.Count > 0)
@@ -686,7 +699,7 @@ public class BuyerOrderService : IBuyerOrderService
                     GroupOrderId = order.Id,
                     EventType = "ItemsUpdated",
                     NotesEn = $"{buyer.User?.FullName ?? "A buyer"} updated items: {string.Join(", ", enChanges)}",
-                    NotesAr = $"??? {buyer.User?.FullName ?? "?????"} ?????? ????????: {string.Join(", ", arChanges)}",
+                    NotesAr = $"{buyer.User?.FullName ?? "مشتري"} قام بتحديث العناصر: {string.Join("، ", arChanges)}",
                     CreatedBy = userId
                 });
             }
@@ -1022,7 +1035,7 @@ public class BuyerOrderService : IBuyerOrderService
             {
                 int committedQty = existing.ParticipantItems?.Sum(pi => pi.Quantity) ?? 0;
                 if (req.TargetQuantity < committedQty)
-                    throw new InvalidOperationException($"Cannot set target quantity below {committedQty} � participants have already committed that amount.");
+                    throw new InvalidOperationException($"Cannot set target quantity below {committedQty} � participants have already committed that amount.");
                 existing.TargetQty = req.TargetQuantity;
                 _groupOrderItemRepository.Update(existing);
             }
@@ -1097,7 +1110,7 @@ public class BuyerOrderService : IBuyerOrderService
             GroupOrderId = order.Id,
             EventType = "SupplierAssigned",
             NotesEn = "A supplier has been assigned to this order",
-            NotesAr = "?? ????? ???? ???? ?????",
+            NotesAr = "تم تعيين مورد لهذا الطلب",
             CreatedBy = userId
         });
 
@@ -1111,8 +1124,8 @@ public class BuyerOrderService : IBuyerOrderService
                 Type = "SupplierAssignedOrder",
                 TitleAr = "????? ??? ????",
                 TitleEn = "New Order Assignment",
-                BodyAr = $"?? ?????? ???? '{order.Title}' � ???? ???????? ??????? ?? ?????.",
-                BodyEn = $"You have been assigned to order '{order.Title}' � please review and accept or decline.",
+                BodyAr = $"?? ?????? ???? '{order.Title}' � ???? ???????? ??????? ?? ?????.",
+                BodyEn = $"You have been assigned to order '{order.Title}' � please review and accept or decline.",
                 Channel = "InApp",
                 RelatedOrderId = orderId
             });
@@ -1164,6 +1177,153 @@ public class BuyerOrderService : IBuyerOrderService
         }
 
         return result;
+    }
+
+    public async Task<object> SetDeliveryPreferenceAsync(Guid orderId, string preference, Guid? preferredDeliveryPersonId, Guid userId, CancellationToken cancellationToken = default)
+    {
+        var order = await _groupOrderRepository.GetWithDetailsAsync(orderId, cancellationToken)
+            ?? throw new KeyNotFoundException("Order not found.");
+
+        if (order.Creator?.UserId != userId)
+            throw new UnauthorizedAccessException("Only the order creator can set delivery preferences.");
+
+        var validPreferences = new[] { "None", "OwnDelivery", "SystemDelivery", "SpecificPerson" };
+        if (!validPreferences.Contains(preference))
+            throw new InvalidOperationException($"Invalid preference '{preference}'. Valid values: {string.Join(", ", validPreferences)}");
+
+        order.DeliveryPreference = preference;
+        order.PreferredDeliveryPersonId = preference == "SpecificPerson" ? preferredDeliveryPersonId : null;
+        _groupOrderRepository.Update(order);
+
+        // If buyer selected a specific person, auto-create a delivery assignment request
+        if (preference == "SpecificPerson" && preferredDeliveryPersonId.HasValue)
+        {
+            if (order.SupplierId == null)
+                throw new InvalidOperationException("Order must have an assigned supplier before setting a specific delivery person.");
+
+            var deliveryPerson = await _deliveryPersonProfileRepository.GetByIdAsync(preferredDeliveryPersonId.Value, cancellationToken)
+                ?? throw new KeyNotFoundException("Selected delivery person not found.");
+
+            var request = new DeliveryAssignmentRequest
+            {
+                Id = Guid.NewGuid(),
+                OrderId = orderId,
+                DeliveryPersonId = preferredDeliveryPersonId.Value,
+                SupplierId = order.SupplierId.Value,
+                Status = "Pending",
+                ProposedFee = deliveryPerson.BaseDeliveryFee
+            };
+            _deliveryAssignmentRequestRepository.Add(request);
+
+            _notificationRepository.Add(new Notification
+            {
+                Id = Guid.NewGuid(),
+                UserId = deliveryPerson.UserId,
+                Type = "DeliveryAssignmentRequest",
+                TitleAr = "طلب توصيل جديد",
+                TitleEn = "New Delivery Request",
+                BodyAr = $"لديك طلب توصيل جديد للطلب '{order.Title}'",
+                BodyEn = $"You have a new delivery request for order '{order.Title}'",
+                Channel = "InApp",
+                RelatedOrderId = orderId
+            });
+        }
+
+        await _unitOfWork.SaveChangesAsync(cancellationToken);
+        return new { message = "Delivery preference set.", preference = order.DeliveryPreference, preferredId = order.PreferredDeliveryPersonId };
+    }
+
+    public async Task<object> ApproveDeliveryFeeAsync(Guid orderId, bool isApproved, string? reason, Guid userId, CancellationToken cancellationToken = default)
+    {
+        var order = await _groupOrderRepository.GetWithDetailsAsync(orderId, cancellationToken)
+            ?? throw new KeyNotFoundException("Order not found.");
+
+        if (order.Creator?.UserId != userId)
+            throw new UnauthorizedAccessException("Only the order creator can approve delivery fees.");
+
+        if (order.DeliveryApprovalStatus != "Pending")
+            throw new InvalidOperationException("No pending delivery fee to approve.");
+
+        if (isApproved)
+        {
+            order.DeliveryApprovalStatus = "Approved";
+            _groupOrderRepository.Update(order);
+
+            var participantCount = (order.Participants?.Count(p => p.Status == "Joined" && p.Items != null && p.Items.Any(i => i.Quantity > 0)) ?? 0) + 1;
+            var feePerPerson = order.ProposedDeliveryFee.GetValueOrDefault() / Math.Max(1, participantCount);
+
+            var invoices = await _invoiceRepository.GetByGroupOrderAsync(order.Id, cancellationToken);
+            foreach (var invoice in invoices)
+            {
+                invoice.DeliveryFee = feePerPerson;
+                invoice.Total = invoice.Subtotal + feePerPerson;
+                _invoiceRepository.Update(invoice);
+            }
+
+            _eventRepository.Add(new GroupOrderEvent
+            {
+                Id = Guid.NewGuid(),
+                GroupOrderId = order.Id,
+                EventType = "DeliveryFeeApproved",
+                NotesEn = $"Delivery fee approved: {order.ProposedDeliveryFee:C} total, {feePerPerson:C} per participant",
+                NotesAr = $"تمت الموافقة على رسوم التوصيل: {order.ProposedDeliveryFee:C} إجمالي، {feePerPerson:C} لكل مشارك",
+                CreatedBy = userId
+            });
+        }
+        else
+        {
+            order.DeliveryApprovalStatus = "Rejected";
+            order.ProposedDeliveryFee = null;
+            _groupOrderRepository.Update(order);
+
+            _eventRepository.Add(new GroupOrderEvent
+            {
+                Id = Guid.NewGuid(),
+                GroupOrderId = order.Id,
+                EventType = "DeliveryFeeRejected",
+                NotesEn = $"Delivery fee rejected. Reason: {reason}",
+                NotesAr = $"تم رفض رسوم التوصيل. السبب: {reason}",
+                CreatedBy = userId
+            });
+        }
+
+        await _unitOfWork.SaveChangesAsync(cancellationToken);
+        return new { message = isApproved ? "Delivery fee approved." : "Delivery fee rejected.", status = order.DeliveryApprovalStatus };
+    }
+
+    public async Task<IReadOnlyList<DeliveryPersonProfileDto>> GetAvailableDeliveryPersonsAsync(Guid orderId, CancellationToken cancellationToken = default)
+    {
+        var order = await _groupOrderRepository.GetWithDetailsAsync(orderId, cancellationToken)
+            ?? throw new KeyNotFoundException("Order not found.");
+
+        if (order.PreferredDeliveryPersonId.HasValue)
+        {
+            var profile = await _deliveryPersonProfileRepository.GetByIdAsync(order.PreferredDeliveryPersonId.Value, cancellationToken);
+            if (profile != null) return [MapToDeliveryPersonDto(profile)];
+        }
+
+        var regionId = order.Region?.Id ?? order.RegionId;
+        var profiles = await _deliveryPersonProfileRepository.GetForRegionAsync(regionId, cancellationToken);
+        return profiles.Select(MapToDeliveryPersonDto).ToList();
+    }
+
+    private static DeliveryPersonProfileDto MapToDeliveryPersonDto(DeliveryPersonProfile profile)
+    {
+        return new DeliveryPersonProfileDto
+        {
+            Id = profile.Id,
+            UserId = profile.UserId,
+            FullName = profile.User?.FullName ?? "",
+            Email = profile.User?.Email ?? "",
+            Phone = profile.User?.Phone,
+            VehicleType = profile.VehicleType ?? "",
+            BaseDeliveryFee = profile.BaseDeliveryFee,
+            Rating = profile.Rating,
+            TotalDeliveries = profile.TotalDeliveries,
+            IsActive = profile.IsActive,
+            CoverageRegionId = profile.CoverageRegionId,
+            CoverageRegionName = profile.CoverageRegion?.NameEn
+        };
     }
 
     private static string ToArabicNumerals(string input)

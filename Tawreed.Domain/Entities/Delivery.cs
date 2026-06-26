@@ -12,6 +12,8 @@ public class Delivery : BaseAuditableEntity
     public DateTimeOffset? DeliveredAt { get; set; }
     public string? TrackingNotes { get; set; }
     public string ShippingRegion { get; set; } = string.Empty;
+    public decimal? DeliveryFee { get; set; }
+    public string DeliveryType { get; set; } = string.Empty;
 
     public GroupOrder GroupOrder { get; set; } = null!;
     public Supplier Supplier { get; set; } = null!;

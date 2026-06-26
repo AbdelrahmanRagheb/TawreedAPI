@@ -59,6 +59,20 @@ public class AuthController : ControllerBase
         }
     }
 
+    [HttpPost("register/delivery-person")]
+    public async Task<ActionResult<AuthResponse>> RegisterDeliveryPerson(RegisterDeliveryPersonRequest request, CancellationToken cancellationToken)
+    {
+        try
+        {
+            var response = await _authService.RegisterDeliveryPersonAsync(request, cancellationToken);
+            return CreatedAtAction(nameof(Login), response);
+        }
+        catch (InvalidOperationException ex)
+        {
+            return Conflict(new { error = ex.Message });
+        }
+    }
+
     [HttpPost("logout")]
     [Authorize]
     public async Task<ActionResult> Logout(CancellationToken cancellationToken)
