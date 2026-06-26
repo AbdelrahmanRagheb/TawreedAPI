@@ -139,22 +139,68 @@ public class DeliveryPersonService : IDeliveryPersonService
                 ParticipantName = i.Buyer?.User?.FullName ?? "",
                 Email = i.Buyer?.User?.Email ?? "",
                 Phone = i.Buyer?.User?.Phone ?? "",
-                Address = i.Buyer?.Address ?? "",
+                Address = i.Buyer?.Address ?? i.Buyer?.Region?.NameEn ?? i.ShippingRegion ?? "",
                 Status = i.Participant?.Status ?? "Joined",
                 VerificationCode = i.VerificationCode ?? "",
                 Items = groupOrderItems.Select(goi =>
                 {
                     var pi = participantItems.FirstOrDefault(p => p.GroupOrderItemId == goi.Id);
+                    var qty = pi?.Quantity ?? 0;
+                    var unitPrice = pi?.UnitPriceAtJoin ?? goi.UnitPrice ?? 0;
                     return new DeliveryPersonDeliveryItemDto
                     {
                         Id = goi.Id,
                         Name = goi.Product?.Name ?? "",
-                        Quantity = pi?.Quantity ?? 0,
-                        Price = pi?.UnitPriceAtJoin ?? goi.UnitPrice ?? 0
+                        Quantity = qty,
+                        Price = unitPrice,
+                        UnitPrice = unitPrice,
+                        TotalPrice = qty * unitPrice
                     };
                 }).ToList()
             };
         }).ToList();
+
+        // Include the order creator in the delivery list
+        var creator = delivery.GroupOrder?.Creator;
+        if (creator != null)
+        {
+            var allParticipantItems = delivery.GroupOrder?.Participants
+                ?.SelectMany(p => p.Items ?? Enumerable.Empty<ParticipantItem>())
+                .ToList() ?? [];
+
+            var creatorItems = groupOrderItems
+                .Select(goi =>
+                {
+                    var takenQty = allParticipantItems
+                        .Where(pi => pi.GroupOrderItemId == goi.Id)
+                        .Sum(pi => pi.Quantity);
+                    var creatorQty = goi.TargetQty - takenQty;
+                    var unitPrice = goi.UnitPrice ?? 0;
+                    return new DeliveryPersonDeliveryItemDto
+                    {
+                        Id = goi.Id,
+                        Name = goi.Product?.Name ?? "",
+                        Quantity = Math.Max(0, creatorQty),
+                        Price = unitPrice,
+                        UnitPrice = unitPrice,
+                        TotalPrice = Math.Max(0, creatorQty) * unitPrice
+                    };
+                })
+                .ToList();
+
+            participantDetails.Add(new DeliveryPersonDeliveryParticipantDetailDto
+            {
+                InvoiceId = Guid.Empty,
+                ParticipantId = Guid.Empty,
+                ParticipantName = creator.User?.FullName ?? "",
+                Email = creator.User?.Email ?? "",
+                Phone = creator.User?.Phone ?? "",
+                    Address = creator.Address ?? creator.Region?.NameEn ?? delivery.ShippingRegion ?? "",
+                Status = "Joined",
+                VerificationCode = "",
+                Items = creatorItems.Where(i => i.Quantity > 0).ToList()
+            });
+        }
 
         return new DeliveryPersonDeliveryDetailDto
         {

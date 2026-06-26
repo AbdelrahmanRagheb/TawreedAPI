@@ -29,6 +29,9 @@ public class DeliveryRepository : GenericRepository<Delivery>, IDeliveryReposito
         return await DbSet
             .Include(d => d.GroupOrder).ThenInclude(go => go.Items).ThenInclude(goi => goi.Product)
             .Include(d => d.GroupOrder).ThenInclude(go => go.Invoices)
+            .Include(d => d.GroupOrder).ThenInclude(go => go.Participants).ThenInclude(p => p.Items)
+            .Include(d => d.GroupOrder).ThenInclude(go => go.Creator).ThenInclude(c => c.User)
+            .Include(d => d.GroupOrder).ThenInclude(go => go.Creator).ThenInclude(c => c.Region)
             .FirstOrDefaultAsync(d => d.Id == id, cancellationToken);
     }
 }

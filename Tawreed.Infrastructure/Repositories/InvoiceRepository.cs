@@ -25,7 +25,8 @@ public class InvoiceRepository : GenericRepository<Invoice>, IInvoiceRepository
     {
         return await DbSet
             .Include(i => i.Buyer).ThenInclude(b => b.User)
-            .Include(i => i.Participant)
+            .Include(i => i.Buyer).ThenInclude(b => b.Region)
+            .Include(i => i.Participant).ThenInclude(p => p.Items)
             .Where(i => i.GroupOrderId == groupOrderId)
             .ToListAsync(cancellationToken);
     }
