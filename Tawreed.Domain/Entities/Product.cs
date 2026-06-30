@@ -8,6 +8,7 @@ public class Product : BaseAuditableEntity
     public string? Description { get; set; }
     public Guid CategoryId { get; set; }
     public Guid UnitId { get; set; }
+    public decimal? MarketPrice { get; set; }
 
     public Category Category { get; set; } = null!;
     public Unit Unit { get; set; } = null!;

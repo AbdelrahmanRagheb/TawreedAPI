@@ -8,8 +8,6 @@ public record GroupOrderDto(
     string Title,
     string? Description,
     string OrderNumber,
-    string? Notes,
-    string? Visibility,
     DateTimeOffset DeadlineAt,
     string Status,
     DateTimeOffset? ClosedAt,

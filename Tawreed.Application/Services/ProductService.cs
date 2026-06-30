@@ -45,8 +45,9 @@ public class ProductService : IProductService
     {
         return new ProductDto(
             p.Id, p.Name, p.Description,
-            p.CategoryId, p.Category?.NameEn ?? "",
+            p.CategoryId, p.Category?.NameAr ?? "",
             p.UnitId, p.Unit?.Symbol ?? "",
+            p.MarketPrice,
             p.CreatedAt, p.UpdatedAt);
     }
 

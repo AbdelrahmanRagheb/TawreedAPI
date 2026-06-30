@@ -93,8 +93,6 @@ public class BuyerSupplierService : IBuyerSupplierService
         {
             SupplierId = supplierFull.Id,
             SupplierName = supplierFull.CompanyName,
-            Rating = supplierFull.RatingAvg,
-            Address = supplierFull.Address,
             Categories = categories,
             Products = productDtos
         };

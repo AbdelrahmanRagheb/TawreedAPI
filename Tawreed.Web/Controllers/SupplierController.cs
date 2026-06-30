@@ -222,101 +222,6 @@ public class SupplierController : ControllerBase
         }
     }
 
-    [HttpGet("orders/{orderId:guid}/available-delivery-persons")]
-    public async Task<ActionResult> BrowseAvailableDeliveryPersons(Guid orderId, CancellationToken cancellationToken)
-    {
-        try
-        {
-            var userId = GetUserId();
-            var result = await _orderService.BrowseAvailableDeliveryPersonsAsync(orderId, userId, cancellationToken);
-            return Ok(result);
-        }
-        catch (KeyNotFoundException ex)
-        {
-            return NotFound(new { error = ex.Message });
-        }
-        catch (InvalidOperationException ex)
-        {
-            return BadRequest(new { error = ex.Message });
-        }
-    }
-
-    [HttpPost("orders/{orderId:guid}/request-delivery/{deliveryPersonId:guid}")]
-    public async Task<ActionResult> RequestDeliveryPerson(Guid orderId, Guid deliveryPersonId, CancellationToken cancellationToken)
-    {
-        try
-        {
-            var userId = GetUserId();
-            var result = await _orderService.RequestDeliveryPersonAsync(orderId, deliveryPersonId, userId, cancellationToken);
-            return Ok(result);
-        }
-        catch (KeyNotFoundException ex)
-        {
-            return NotFound(new { error = ex.Message });
-        }
-        catch (InvalidOperationException ex)
-        {
-            return BadRequest(new { error = ex.Message });
-        }
-    }
-
-    [HttpPost("orders/{orderId:guid}/assign-delivery-person/{deliveryPersonId:guid}")]
-    public async Task<ActionResult> AssignDeliveryPerson(Guid orderId, Guid deliveryPersonId, CancellationToken cancellationToken)
-    {
-        try
-        {
-            var userId = GetUserId();
-            var result = await _orderService.AssignDeliveryPersonAsync(orderId, deliveryPersonId, userId, cancellationToken);
-            return Ok(result);
-        }
-        catch (KeyNotFoundException ex)
-        {
-            return NotFound(new { error = ex.Message });
-        }
-        catch (InvalidOperationException ex)
-        {
-            return BadRequest(new { error = ex.Message });
-        }
-    }
-
-    [HttpPost("orders/{orderId:guid}/propose-delivery-fee")]
-    public async Task<ActionResult> ProposeDeliveryFee(Guid orderId, [FromBody] ProposeDeliveryFeeRequest request, CancellationToken cancellationToken)
-    {
-        try
-        {
-            var userId = GetUserId();
-            var result = await _orderService.ProposeDeliveryFeeAsync(orderId, request.Fee, request.Notes, userId, cancellationToken);
-            return Ok(result);
-        }
-        catch (KeyNotFoundException ex)
-        {
-            return NotFound(new { error = ex.Message });
-        }
-        catch (InvalidOperationException ex)
-        {
-            return BadRequest(new { error = ex.Message });
-        }
-    }
-
-    [HttpPost("orders/{orderId:guid}/use-own-delivery")]
-    public async Task<ActionResult> UseOwnDelivery(Guid orderId, CancellationToken cancellationToken)
-    {
-        try
-        {
-            var userId = GetUserId();
-            var result = await _orderService.UseOwnDeliveryAsync(orderId, userId, cancellationToken);
-            return Ok(result);
-        }
-        catch (KeyNotFoundException ex)
-        {
-            return NotFound(new { error = ex.Message });
-        }
-        catch (InvalidOperationException ex)
-        {
-            return BadRequest(new { error = ex.Message });
-        }
-    }
-
     [HttpPost("orders/{orderId:guid}/cancel")]
     public async Task<ActionResult> CancelOrder(Guid orderId, CancellationToken cancellationToken)
     {
@@ -469,7 +374,6 @@ public class SupplierController : ControllerBase
     }
 }
 
-public record ProposeDeliveryFeeRequest(decimal Fee, string? Notes = null);
 public record UpdateDeliveryStatusRequest(string Status, string? TrackingNotes = null, DateTimeOffset? ScheduledAt = null);
 public record AddSupplierProductRequest(Guid ProductId, decimal Price, int Stock, List<CreatePricingTierRequest>? Tiers = null);
 public record UpdateSupplierProductRequest(decimal? Price = null, int? Stock = null, bool? IsActive = null);

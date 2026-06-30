@@ -194,9 +194,7 @@ PendingSupplierApplications = allSuppliers
             BusinessName = buyer?.BusinessName,
             BusinessType = buyer?.BusinessType,
             TaxId = buyer?.TaxId,
-            Address = buyer?.Address,
             Region = buyer?.Region?.NameEn,
-            RatingAvg = buyer?.RatingAvg ?? 0,
             JoinedDate = user.CreatedAt,
             LastLoginAt = user.LastLoginAt,
             EmailVerified = user.EmailVerified,
@@ -262,7 +260,7 @@ PendingSupplierApplications = allSuppliers
                 ContactName = s.User?.FullName ?? "", Email = s.User?.Email ?? "",
                 Phone = s.User?.Phone, Category = s.SupplierCategories?.FirstOrDefault()?.Category?.NameEn ?? "",
                 Status = s.User?.Status ?? "", Region = s.Region?.NameEn ?? "",
-                JoinedDate = s.CreatedAt, RatingAvg = s.RatingAvg,
+                JoinedDate = s.CreatedAt,
                 TotalProducts = s.SupplierProducts?.Count ?? 0, IsApproved = s.IsApproved
             }).ToList(),
             Page = page, Limit = limit, Total = total,
@@ -279,7 +277,10 @@ PendingSupplierApplications = allSuppliers
         var logs = await _approvalLogRepository.GetBySupplierAsync(supplierId, cancellationToken);
         var products = await _supplierProductRepository.GetBySupplierAsync(supplierId, cancellationToken);
 
-        var supplierOrders = await _groupOrderRepository.GetBySupplierAsync(supplierId, cancellationToken);
+        var allOrders = await _groupOrderRepository.GetAllAsync(cancellationToken);
+        var supplierOrders = allOrders
+            .Where(o => o.Items != null && o.Items.Any(i => i.SupplierId == supplierId))
+            .ToList();
 
         var allTiers = await _pricingTierRepository.GetAllAsync(cancellationToken);
         var productIds = products.Select(p => p.Id).ToHashSet();
@@ -298,8 +299,7 @@ PendingSupplierApplications = allSuppliers
             CategoryNames = supplier.SupplierCategories?.Select(sc => sc.Category?.NameEn ?? "").ToList() ?? [],
             Region = supplier.Region?.NameEn ?? "", Status = supplier.User?.Status ?? "",
             IsApproved = supplier.IsApproved, JoinedDate = supplier.CreatedAt,
-            RatingAvg = supplier.RatingAvg, TotalProducts = products.Count,
-            Address = supplier.Address,
+            TotalProducts = products.Count,
             EmailVerified = supplier.User?.EmailVerified ?? false,
             PhoneVerified = supplier.User?.PhoneVerified ?? false,
             LastLoginAt = supplier.User?.LastLoginAt,
@@ -490,6 +490,7 @@ PendingSupplierApplications = allSuppliers
             {
                 productId = i.ProductId.ToString(),
                 productName = i.Product?.Name ?? "",
+                marketPrice = i.Product?.MarketPrice,
                 quantity = i.ParticipantItems?.Sum(pi => pi.Quantity) ?? 0,
                 targetQuantity = i.TargetQty,
                 unitPrice = i.UnitPrice ?? 0,
@@ -872,6 +873,69 @@ PendingSupplierApplications = allSuppliers
         else
         {
             setting.Value = json;
+            _appSettingRepository.Update(setting);
+        }
+
+        await _unitOfWork.SaveChangesAsync(cancellationToken);
+    }
+
+    public async Task<int> GetDefaultDeadlineDaysAsync(CancellationToken cancellationToken = default)
+    {
+        var setting = await _appSettingRepository.GetByKeyAsync("DefaultDeadlineDays", cancellationToken);
+        if (setting is null || !int.TryParse(setting.Value, out var days))
+            return 3;
+        return days;
+    }
+
+    public async Task SetDefaultDeadlineDaysAsync(int days, CancellationToken cancellationToken = default)
+    {
+        var setting = await _appSettingRepository.GetByKeyAsync("DefaultDeadlineDays", cancellationToken);
+
+        if (setting is null)
+        {
+            _appSettingRepository.Add(new AppSetting
+            {
+                Id = Guid.NewGuid(),
+                Key = "DefaultDeadlineDays",
+                Value = days.ToString(),
+                Description = "Default deadline for new orders in days"
+            });
+        }
+        else
+        {
+            setting.Value = days.ToString();
+            _appSettingRepository.Update(setting);
+        }
+
+        await _unitOfWork.SaveChangesAsync(cancellationToken);
+    }
+
+    public async Task<int> GetUrgentDeadlineHoursAsync(CancellationToken cancellationToken = default)
+    {
+        var setting = await _appSettingRepository.GetByKeyAsync("UrgentDeadlineHours", cancellationToken);
+        if (setting is null || !int.TryParse(setting.Value, out var hours))
+            return 6;
+        return hours;
+    }
+
+    public async Task SetUrgentDeadlineHoursAsync(int hours, CancellationToken cancellationToken = default)
+    {
+        if (hours < 1) hours = 1;
+        var setting = await _appSettingRepository.GetByKeyAsync("UrgentDeadlineHours", cancellationToken);
+
+        if (setting is null)
+        {
+            _appSettingRepository.Add(new AppSetting
+            {
+                Id = Guid.NewGuid(),
+                Key = "UrgentDeadlineHours",
+                Value = hours.ToString(),
+                Description = "Default deadline for urgent orders in hours"
+            });
+        }
+        else
+        {
+            setting.Value = hours.ToString();
             _appSettingRepository.Update(setting);
         }
 

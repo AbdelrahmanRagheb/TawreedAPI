@@ -12,8 +12,8 @@ using Tawreed.Infrastructure.Data;
 namespace Tawreed.Infrastructure.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20260625232331_AddDeliveryAssignmentRequest")]
-    partial class AddDeliveryAssignmentRequest
+    [Migration("20260628175847_RemoveNotesAndVisibilityFromGroupOrder")]
+    partial class RemoveNotesAndVisibilityFromGroupOrder
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -114,11 +114,6 @@ namespace Tawreed.Infrastructure.Migrations
                         .HasColumnType("uniqueidentifier")
                         .HasColumnName("id");
 
-                    b.Property<string>("Address")
-                        .HasMaxLength(500)
-                        .HasColumnType("nvarchar(500)")
-                        .HasColumnName("address");
-
                     b.Property<string>("BusinessName")
                         .IsRequired()
                         .HasMaxLength(200)
@@ -131,21 +126,14 @@ namespace Tawreed.Infrastructure.Migrations
                         .HasColumnType("nvarchar(20)")
                         .HasColumnName("business_type");
 
+                    b.Property<string>("CommercialRegistrationNo")
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)")
+                        .HasColumnName("commercial_registration_no");
+
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2")
                         .HasColumnName("created_at");
-
-                    b.Property<decimal?>("Latitude")
-                        .HasColumnType("decimal(9,6)")
-                        .HasColumnName("latitude");
-
-                    b.Property<decimal?>("Longitude")
-                        .HasColumnType("decimal(9,6)")
-                        .HasColumnName("longitude");
-
-                    b.Property<decimal>("RatingAvg")
-                        .HasColumnType("decimal(3,2)")
-                        .HasColumnName("rating_avg");
 
                     b.Property<Guid>("RegionId")
                         .HasColumnType("uniqueidentifier")
@@ -183,7 +171,6 @@ namespace Tawreed.Infrastructure.Migrations
                             BusinessName = "مطعم الأهرام",
                             BusinessType = "Restaurant",
                             CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
-                            RatingAvg = 4.5m,
                             RegionId = new Guid("00000001-0000-0000-0000-000000000029"),
                             UserId = new Guid("3ecef09b-9609-4524-97d3-b7eddd08d0e8")
                         },
@@ -193,7 +180,6 @@ namespace Tawreed.Infrastructure.Migrations
                             BusinessName = "سوبر ماركت النيل",
                             BusinessType = "Supermarket",
                             CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
-                            RatingAvg = 4.5m,
                             RegionId = new Guid("00000001-0000-0000-0000-000000000047"),
                             UserId = new Guid("255cb26a-f00b-4ff0-813b-56d0204c64d6")
                         },
@@ -203,7 +189,6 @@ namespace Tawreed.Infrastructure.Migrations
                             BusinessName = "كافeteria القاهرة",
                             BusinessType = "Cafe",
                             CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
-                            RatingAvg = 4.5m,
                             RegionId = new Guid("00000001-0000-0000-0000-000000000209"),
                             UserId = new Guid("4686a8ed-0c74-4648-bd5b-49d7d166679d")
                         },
@@ -213,7 +198,6 @@ namespace Tawreed.Infrastructure.Migrations
                             BusinessName = "فندق سفنكس",
                             BusinessType = "Hotel",
                             CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
-                            RatingAvg = 4.5m,
                             RegionId = new Guid("00000001-0000-0000-0000-000000000007"),
                             UserId = new Guid("86d86b94-fc93-4e9a-a37d-90f5d89a740c")
                         },
@@ -223,7 +207,6 @@ namespace Tawreed.Infrastructure.Migrations
                             BusinessName = "مخبز الشمس",
                             BusinessType = "Bakery",
                             CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
-                            RatingAvg = 4.5m,
                             RegionId = new Guid("00000001-0000-0000-0000-000000000214"),
                             UserId = new Guid("e2d20e2b-aff0-4248-b50c-e5460a248d3a")
                         },
@@ -233,7 +216,6 @@ namespace Tawreed.Infrastructure.Migrations
                             BusinessName = "نادي الرياض",
                             BusinessType = "SportsClub",
                             CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
-                            RatingAvg = 4.5m,
                             RegionId = new Guid("00000001-0000-0000-0000-000000000029"),
                             UserId = new Guid("fc11d91a-3dd4-4f67-87c1-acf40b944d65")
                         },
@@ -243,7 +225,6 @@ namespace Tawreed.Infrastructure.Migrations
                             BusinessName = "مطعم الفلاح",
                             BusinessType = "Restaurant",
                             CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
-                            RatingAvg = 4.5m,
                             RegionId = new Guid("00000002-0000-0000-0000-000000000435"),
                             UserId = new Guid("69d10245-5505-4853-a8cc-01217ba4f08f")
                         },
@@ -253,7 +234,6 @@ namespace Tawreed.Infrastructure.Migrations
                             BusinessName = "هايبر ماركت مصر",
                             BusinessType = "Supermarket",
                             CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
-                            RatingAvg = 4.5m,
                             RegionId = new Guid("00000001-0000-0000-0000-000000000209"),
                             UserId = new Guid("acd25e71-da22-41c7-824e-5a9fd154333a")
                         },
@@ -263,7 +243,6 @@ namespace Tawreed.Infrastructure.Migrations
                             BusinessName = "ش drip القهوة",
                             BusinessType = "Cafe",
                             CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
-                            RatingAvg = 4.5m,
                             RegionId = new Guid("00000001-0000-0000-0000-000000000047"),
                             UserId = new Guid("fa77e489-6f2e-4070-8edb-decc8851585c")
                         },
@@ -273,7 +252,6 @@ namespace Tawreed.Infrastructure.Migrations
                             BusinessName = "مستشفى السلام",
                             BusinessType = "Hospital",
                             CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
-                            RatingAvg = 4.5m,
                             RegionId = new Guid("00000001-0000-0000-0000-000000000007"),
                             UserId = new Guid("9bfa4e4e-e5ce-4d68-bee3-808e0cd3a791")
                         });
@@ -770,8 +748,8 @@ namespace Tawreed.Infrastructure.Migrations
                             CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             IsActive = true,
                             LicenseInfo = "محمود - رخصة قيادة مهنية",
-                            Rating = 4.5m,
-                            TotalDeliveries = 150,
+                            Rating = 0m,
+                            TotalDeliveries = 0,
                             UserId = new Guid("11111111-1111-4111-8111-111111111001"),
                             VehicleType = "Car"
                         },
@@ -783,8 +761,8 @@ namespace Tawreed.Infrastructure.Migrations
                             CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             IsActive = true,
                             LicenseInfo = "خالد - رخصة قيادة دراجة",
-                            Rating = 4.2m,
-                            TotalDeliveries = 87,
+                            Rating = 0m,
+                            TotalDeliveries = 0,
                             UserId = new Guid("22222222-2222-4222-8222-222222222001"),
                             VehicleType = "Motorcycle"
                         });
@@ -796,10 +774,6 @@ namespace Tawreed.Infrastructure.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier")
                         .HasColumnName("id");
-
-                    b.Property<Guid?>("AssignedDeliveryPersonId")
-                        .HasColumnType("uniqueidentifier")
-                        .HasColumnName("assigned_delivery_person_id");
 
                     b.Property<DateTimeOffset?>("ClosedAt")
                         .HasColumnType("datetimeoffset")
@@ -817,38 +791,15 @@ namespace Tawreed.Infrastructure.Migrations
                         .HasColumnType("datetimeoffset")
                         .HasColumnName("deadline_at");
 
-                    b.Property<string>("DeliveryApprovalStatus")
-                        .HasMaxLength(20)
-                        .HasColumnType("nvarchar(20)")
-                        .HasColumnName("delivery_approval_status");
-
-                    b.Property<string>("DeliveryPreference")
-                        .IsRequired()
-                        .HasMaxLength(20)
-                        .HasColumnType("nvarchar(20)")
-                        .HasColumnName("delivery_preference");
-
                     b.Property<string>("Description")
                         .HasColumnType("nvarchar(max)")
                         .HasColumnName("description");
-
-                    b.Property<string>("Notes")
-                        .HasColumnType("nvarchar(max)")
-                        .HasColumnName("notes");
 
                     b.Property<string>("OrderNumber")
                         .IsRequired()
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)")
                         .HasColumnName("order_number");
-
-                    b.Property<Guid?>("PreferredDeliveryPersonId")
-                        .HasColumnType("uniqueidentifier")
-                        .HasColumnName("preferred_delivery_person_id");
-
-                    b.Property<decimal?>("ProposedDeliveryFee")
-                        .HasColumnType("decimal(18,2)")
-                        .HasColumnName("proposed_delivery_fee");
 
                     b.Property<Guid>("RegionId")
                         .HasColumnType("uniqueidentifier")
@@ -874,22 +825,11 @@ namespace Tawreed.Infrastructure.Migrations
                         .HasColumnType("datetime2")
                         .HasColumnName("updated_at");
 
-                    b.Property<string>("Visibility")
-                        .HasMaxLength(10)
-                        .HasColumnType("nvarchar(10)")
-                        .HasColumnName("visibility");
-
                     b.HasKey("Id")
                         .HasName("pk_group_orders");
 
-                    b.HasIndex("AssignedDeliveryPersonId")
-                        .HasDatabaseName("ix_group_orders_assigned_delivery_person_id");
-
                     b.HasIndex("CreatorId")
                         .HasDatabaseName("ix_group_orders_creator_id");
-
-                    b.HasIndex("PreferredDeliveryPersonId")
-                        .HasDatabaseName("ix_group_orders_preferred_delivery_person_id");
 
                     b.HasIndex("RegionId")
                         .HasDatabaseName("ix_group_orders_region_id");
@@ -906,7 +846,6 @@ namespace Tawreed.Infrastructure.Migrations
                             CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             CreatorId = new Guid("5bc19380-dbcc-4d71-b7cd-261fd03d1797"),
                             DeadlineAt = new DateTimeOffset(new DateTime(2026, 6, 20, 12, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)),
-                            DeliveryPreference = "None",
                             Description = "حليب كامل الدسم للتوزيع على المطعم",
                             OrderNumber = "ORD-20260617-A001",
                             RegionId = new Guid("00000001-0000-0000-0000-000000000029"),
@@ -920,7 +859,6 @@ namespace Tawreed.Infrastructure.Migrations
                             CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             CreatorId = new Guid("247babb0-a7cd-4af3-a292-b5e313ce85d0"),
                             DeadlineAt = new DateTimeOffset(new DateTime(2026, 6, 22, 12, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)),
-                            DeliveryPreference = "None",
                             Description = "مشروبات غازية للفندق",
                             OrderNumber = "ORD-20260617-A002",
                             RegionId = new Guid("00000001-0000-0000-0000-000000000007"),
@@ -934,7 +872,6 @@ namespace Tawreed.Infrastructure.Migrations
                             CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             CreatorId = new Guid("da16cd54-e3dc-4b3e-b167-069060b2780b"),
                             DeadlineAt = new DateTimeOffset(new DateTime(2026, 6, 24, 12, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)),
-                            DeliveryPreference = "None",
                             Description = "دجاج كامل للمطعم الرياضي",
                             OrderNumber = "ORD-20260617-A003",
                             RegionId = new Guid("00000001-0000-0000-0000-000000000029"),
@@ -947,8 +884,7 @@ namespace Tawreed.Infrastructure.Migrations
                             Id = new Guid("85085d3d-4938-4ba1-8b6a-2ef99f9995b0"),
                             CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             CreatorId = new Guid("3e701ef7-758c-4631-b371-9de27d609984"),
-                            DeadlineAt = new DateTimeOffset(new DateTime(2026, 6, 27, 12, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)),
-                            DeliveryPreference = "None",
+                            DeadlineAt = new DateTimeOffset(new DateTime(2026, 6, 20, 12, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)),
                             Description = "أجبان متنوعة للمطعم",
                             OrderNumber = "ORD-20260617-A004",
                             RegionId = new Guid("00000002-0000-0000-0000-000000000435"),
@@ -963,7 +899,6 @@ namespace Tawreed.Infrastructure.Migrations
                             CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             CreatorId = new Guid("5bc19380-dbcc-4d71-b7cd-261fd03d1797"),
                             DeadlineAt = new DateTimeOffset(new DateTime(2026, 6, 16, 12, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)),
-                            DeliveryPreference = "None",
                             Description = "وجبات خفيفة للمطعم",
                             OrderNumber = "ORD-20260617-A005",
                             RegionId = new Guid("00000001-0000-0000-0000-000000000029"),
@@ -977,8 +912,7 @@ namespace Tawreed.Infrastructure.Migrations
                             ClosedAt = new DateTimeOffset(new DateTime(2026, 6, 13, 12, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)),
                             CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             CreatorId = new Guid("34b72b5a-a8e4-46fe-bda4-cba1dc8fc5a0"),
-                            DeadlineAt = new DateTimeOffset(new DateTime(2026, 6, 12, 12, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)),
-                            DeliveryPreference = "None",
+                            DeadlineAt = new DateTimeOffset(new DateTime(2026, 6, 20, 12, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)),
                             Description = "بسكويت شاي وماري",
                             OrderNumber = "ORD-20260617-A006",
                             RegionId = new Guid("00000001-0000-0000-0000-000000000047"),
@@ -993,7 +927,6 @@ namespace Tawreed.Infrastructure.Migrations
                             CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             CreatorId = new Guid("da16cd54-e3dc-4b3e-b167-069060b2780b"),
                             DeadlineAt = new DateTimeOffset(new DateTime(2026, 6, 14, 12, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)),
-                            DeliveryPreference = "None",
                             Description = "تم الإلغاء لعدم التوفر",
                             OrderNumber = "ORD-20260617-A007",
                             RegionId = new Guid("00000001-0000-0000-0000-000000000209"),
@@ -1481,8 +1414,6 @@ namespace Tawreed.Infrastructure.Migrations
                         new
                         {
                             Id = new Guid("fb61558d-8b3f-4dac-b4b9-c0ef2dc89b3f"),
-                            BodyAr = "انضم محمد حسن إلى طلب حليب جهينة",
-                            BodyEn = "Mohamed Hassan joined Juhayna Milk order",
                             Channel = "in_app",
                             CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             IsRead = false,
@@ -1495,8 +1426,6 @@ namespace Tawreed.Infrastructure.Migrations
                         new
                         {
                             Id = new Guid("a18e224d-7cee-4365-9f2f-44ad9ebf72f2"),
-                            BodyAr = "موعد تسليم طلب حليب جهينة بعد 3 أيام",
-                            BodyEn = "Juhayna Milk deadline in 3 days",
                             Channel = "in_app",
                             CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             IsRead = false,
@@ -1509,8 +1438,6 @@ namespace Tawreed.Infrastructure.Migrations
                         new
                         {
                             Id = new Guid("35fcc1ab-2bdd-4d25-8028-b63e924f1e5b"),
-                            BodyAr = "تم فتح طلب الكوكاكولا للمشاركة",
-                            BodyEn = "Coca-Cola order is now open",
                             Channel = "in_app",
                             CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             IsRead = false,
@@ -1523,8 +1450,6 @@ namespace Tawreed.Infrastructure.Migrations
                         new
                         {
                             Id = new Guid("80202a6e-7b62-4050-8c9d-7e6099f9d465"),
-                            BodyAr = "طلب الدجاج في انتظار موافقة مورد السلسلة",
-                            BodyEn = "Chicken order awaiting El Selsela approval",
                             Channel = "in_app",
                             CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             IsRead = false,
@@ -1537,8 +1462,6 @@ namespace Tawreed.Infrastructure.Migrations
                         new
                         {
                             Id = new Guid("837a1e2d-e76a-4d45-bdf4-ffd354870eb3"),
-                            BodyAr = "تم تسجيل مورد جديد في المنصة",
-                            BodyEn = "A new supplier has joined the platform",
                             Channel = "in_app",
                             CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             IsRead = false,
@@ -64208,11 +64131,6 @@ namespace Tawreed.Infrastructure.Migrations
                         .HasColumnType("uniqueidentifier")
                         .HasColumnName("id");
 
-                    b.Property<string>("Address")
-                        .HasMaxLength(500)
-                        .HasColumnType("nvarchar(500)")
-                        .HasColumnName("address");
-
                     b.Property<DateTimeOffset?>("ApprovedAt")
                         .HasColumnType("datetimeoffset")
                         .HasColumnName("approved_at");
@@ -64220,6 +64138,11 @@ namespace Tawreed.Infrastructure.Migrations
                     b.Property<Guid?>("ApprovedBy")
                         .HasColumnType("uniqueidentifier")
                         .HasColumnName("approved_by");
+
+                    b.Property<string>("CommercialRegistrationNo")
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)")
+                        .HasColumnName("commercial_registration_no");
 
                     b.Property<string>("CompanyName")
                         .IsRequired()
@@ -64234,10 +64157,6 @@ namespace Tawreed.Infrastructure.Migrations
                     b.Property<bool>("IsApproved")
                         .HasColumnType("bit")
                         .HasColumnName("is_approved");
-
-                    b.Property<decimal>("RatingAvg")
-                        .HasColumnType("decimal(3,2)")
-                        .HasColumnName("rating_avg");
 
                     b.Property<Guid>("RegionId")
                         .HasColumnType("uniqueidentifier")
@@ -64275,110 +64194,90 @@ namespace Tawreed.Infrastructure.Migrations
                         new
                         {
                             Id = new Guid("d6a1a124-f64a-4b4f-b7cd-03642969e000"),
-                            Address = "جهينة للصناعات الغذائية - المنطقة الصناعية",
                             CompanyName = "جهينة للصناعات الغذائية",
                             CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             IsApproved = true,
-                            RatingAvg = 4.5m,
                             RegionId = new Guid("00000001-0000-0000-0000-000000000214"),
                             UserId = new Guid("cde4bb82-3c7f-4f20-b0b1-dcc6a20b3c26")
                         },
                         new
                         {
                             Id = new Guid("40c42c46-3774-4ee0-ad5f-d6b16c8c0f6f"),
-                            Address = "المراعي مصر - المنطقة الصناعية",
                             CompanyName = "المراعي مصر",
                             CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             IsApproved = true,
-                            RatingAvg = 4.3m,
                             RegionId = new Guid("00000001-0000-0000-0000-000000000214"),
                             UserId = new Guid("e424e914-7c65-4596-b5ee-2ea234643946")
                         },
                         new
                         {
                             Id = new Guid("5374892c-cf76-4192-ad6a-f7142bcb1842"),
-                            Address = "كوكاكولا مصر - المنطقة الصناعية",
                             CompanyName = "كوكاكولا مصر",
                             CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             IsApproved = true,
-                            RatingAvg = 4.7m,
                             RegionId = new Guid("00000000-0000-0000-0000-000000000004"),
                             UserId = new Guid("fa057c2b-5927-4f9d-ad92-fef953feed8d")
                         },
                         new
                         {
                             Id = new Guid("f6120f7e-6c9a-4c61-a0d0-33cf4e96a791"),
-                            Address = "بيبسي كولا مصر - المنطقة الصناعية",
                             CompanyName = "بيبسي كولا مصر",
                             CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             IsApproved = true,
-                            RatingAvg = 4.4m,
                             RegionId = new Guid("00000000-0000-0000-0000-000000000004"),
                             UserId = new Guid("e6ea6265-20b4-4c39-a9ed-a77e9a1ebd78")
                         },
                         new
                         {
                             Id = new Guid("d3d792d0-2e84-4415-8345-90cf3eef943f"),
-                            Address = "بسكو مصر - المنطقة الصناعية",
                             CompanyName = "بسكو مصر",
                             CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             IsApproved = true,
-                            RatingAvg = 4.1m,
                             RegionId = new Guid("00000000-0000-0000-0000-000000000005"),
                             UserId = new Guid("3c9e0478-d108-4fcd-9431-fbea4be5dd54")
                         },
                         new
                         {
                             Id = new Guid("d967d2d6-a707-430f-b404-9b9b5858086e"),
-                            Address = "دومتي للصناعات الغذائية - المنطقة الصناعية",
                             CompanyName = "دومتي للصناعات الغذائية",
                             CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             IsApproved = true,
-                            RatingAvg = 4.6m,
                             RegionId = new Guid("00000000-0000-0000-0000-000000000010"),
                             UserId = new Guid("eee99f22-24f6-4e6b-b9dc-05b7b99cadd0")
                         },
                         new
                         {
                             Id = new Guid("59925002-c1a0-4489-b279-943f1269819e"),
-                            Address = "ايديتا للصناعات الغذائية - المنطقة الصناعية",
                             CompanyName = "ايديتا للصناعات الغذائية",
                             CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             IsApproved = true,
-                            RatingAvg = 4.2m,
                             RegionId = new Guid("00000000-0000-0000-0000-000000000010"),
                             UserId = new Guid("6f2336cd-5d33-41dc-8ab9-874ab779fd03")
                         },
                         new
                         {
                             Id = new Guid("590d8027-2ace-4e51-b627-9a10c5fcfce1"),
-                            Address = "شركة السلسلة للدواجن - المنطقة الصناعية",
                             CompanyName = "شركة السلسلة للدواجن",
                             CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             IsApproved = true,
-                            RatingAvg = 4.8m,
                             RegionId = new Guid("00000000-0000-0000-0000-000000000013"),
                             UserId = new Guid("f803a6f5-d484-423a-b48a-3b51fa7f3ad7")
                         },
                         new
                         {
                             Id = new Guid("5cd98e0e-585f-4a0a-a529-ac384684ad1b"),
-                            Address = "شركة الفتح للحوم - المنطقة الصناعية",
                             CompanyName = "شركة الفتح للحوم",
                             CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             IsApproved = true,
-                            RatingAvg = 4.0m,
                             RegionId = new Guid("00000000-0000-0000-0000-000000000019"),
                             UserId = new Guid("ff8d954d-149f-4c79-a2f2-df6ab74bfc4b")
                         },
                         new
                         {
                             Id = new Guid("fcf3bdbc-9e25-48b2-96b0-a00a755cef06"),
-                            Address = "مزارع دينا - المنطقة الصناعية",
                             CompanyName = "مزارع دينا",
                             CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             IsApproved = true,
-                            RatingAvg = 4.9m,
                             RegionId = new Guid("00000000-0000-0000-0000-000000000009"),
                             UserId = new Guid("0d7bbea3-6470-4ed5-b473-37cd22f45b95")
                         });
@@ -65701,23 +65600,12 @@ namespace Tawreed.Infrastructure.Migrations
 
             modelBuilder.Entity("Tawreed.Domain.Entities.GroupOrder", b =>
                 {
-                    b.HasOne("Tawreed.Domain.Entities.DeliveryPersonProfile", "AssignedDeliveryPerson")
-                        .WithMany()
-                        .HasForeignKey("AssignedDeliveryPersonId")
-                        .OnDelete(DeleteBehavior.SetNull)
-                        .HasConstraintName("fk_group_orders_delivery_person_profiles_assigned_delivery_person_id");
-
                     b.HasOne("Tawreed.Domain.Entities.Buyer", "Creator")
                         .WithMany("CreatedGroupOrders")
                         .HasForeignKey("CreatorId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired()
                         .HasConstraintName("fk_group_orders_buyers_creator_id");
-
-                    b.HasOne("Tawreed.Domain.Entities.DeliveryPersonProfile", "PreferredDeliveryPerson")
-                        .WithMany()
-                        .HasForeignKey("PreferredDeliveryPersonId")
-                        .HasConstraintName("fk_group_orders_delivery_person_profiles_preferred_delivery_person_id");
 
                     b.HasOne("Tawreed.Domain.Entities.Region", "Region")
                         .WithMany("GroupOrders")
@@ -65732,11 +65620,7 @@ namespace Tawreed.Infrastructure.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .HasConstraintName("fk_group_orders_suppliers_supplier_id");
 
-                    b.Navigation("AssignedDeliveryPerson");
-
                     b.Navigation("Creator");
-
-                    b.Navigation("PreferredDeliveryPerson");
 
                     b.Navigation("Region");
 

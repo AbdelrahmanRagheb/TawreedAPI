@@ -69,9 +69,7 @@ public class AdminUserDetailDto
     public string? BusinessName { get; set; }
     public string? BusinessType { get; set; }
     public string? TaxId { get; set; }
-    public string? Address { get; set; }
     public string? Region { get; set; }
-    public decimal RatingAvg { get; set; }
     public DateTimeOffset JoinedDate { get; set; }
     public DateTimeOffset? LastLoginAt { get; set; }
     public bool EmailVerified { get; set; }
@@ -105,7 +103,6 @@ public class AdminSupplierListDto
     public string Status { get; set; } = string.Empty;
     public string Region { get; set; } = string.Empty;
     public DateTimeOffset JoinedDate { get; set; }
-    public decimal RatingAvg { get; set; }
     public int TotalProducts { get; set; }
     public bool IsApproved { get; set; }
 }
@@ -122,9 +119,7 @@ public class AdminSupplierDetailDto
     public string Status { get; set; } = string.Empty;
     public bool IsApproved { get; set; }
     public DateTimeOffset JoinedDate { get; set; }
-    public decimal RatingAvg { get; set; }
     public int TotalProducts { get; set; }
-    public string? Address { get; set; }
     public bool EmailVerified { get; set; }
     public bool PhoneVerified { get; set; }
     public DateTimeOffset? LastLoginAt { get; set; }
@@ -252,4 +247,10 @@ public interface IAdminService
 
     Task<List<string>> GetGroupRegionTypesAsync(CancellationToken cancellationToken = default);
     Task SetGroupRegionTypesAsync(List<string> types, CancellationToken cancellationToken = default);
+
+    Task<int> GetDefaultDeadlineDaysAsync(CancellationToken cancellationToken = default);
+    Task SetDefaultDeadlineDaysAsync(int days, CancellationToken cancellationToken = default);
+
+    Task<int> GetUrgentDeadlineHoursAsync(CancellationToken cancellationToken = default);
+    Task SetUrgentDeadlineHoursAsync(int hours, CancellationToken cancellationToken = default);
 }

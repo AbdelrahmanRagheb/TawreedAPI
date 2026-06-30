@@ -19,7 +19,7 @@ public class GroupOrderRepository : GenericRepository<GroupOrder>, IGroupOrderRe
             .Include(o => o.Region)
             .Include(o => o.Creator).ThenInclude(c => c.User)
             .Include(o => o.Supplier)
-            .Include(o => o.PreferredDeliveryPerson).ThenInclude(p => p.User)
+            .Include(o => o.Deliveries)
             .ToListAsync(cancellationToken);
     }
 
@@ -37,8 +37,7 @@ public class GroupOrderRepository : GenericRepository<GroupOrder>, IGroupOrderRe
             .Include(o => o.Participants)
             .Include(o => o.Events)
             .Include(o => o.Region)
-            .Include(o => o.PreferredDeliveryPerson).ThenInclude(p => p.User)
-            .Where(o => o.SupplierId == supplierId)
+            .Where(o => o.SupplierId == supplierId || (o.Items != null && o.Items.Any(i => i.SupplierId == supplierId)))
             .ToListAsync(cancellationToken);
     }
 
@@ -59,8 +58,7 @@ public class GroupOrderRepository : GenericRepository<GroupOrder>, IGroupOrderRe
             .Include(o => o.Events).ThenInclude(e => e.Creator)
             .Include(o => o.Supplier)
             .Include(o => o.Region)
-            .Include(o => o.AssignedDeliveryPerson).ThenInclude(dp => dp.User)
-            .Include(o => o.PreferredDeliveryPerson).ThenInclude(dp => dp.User)
+            .Include(o => o.Deliveries).ThenInclude(d => d.DeliveryPerson)
             .FirstOrDefaultAsync(o => o.Id == id, cancellationToken);
     }
 

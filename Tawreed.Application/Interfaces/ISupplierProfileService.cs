@@ -9,12 +9,11 @@ public class SupplierProfileDto
     public string Phone { get; set; } = string.Empty;
     public string CompanyName { get; set; } = string.Empty;
     public string? TaxId { get; set; }
+    public string? CommercialRegistrationNo { get; set; }
     public string? Avatar { get; set; }
     public DateTimeOffset JoinedDate { get; set; }
-    public string? Address { get; set; }
     public string RegionName { get; set; } = string.Empty;
     public Guid RegionId { get; set; }
-    public decimal RatingAvg { get; set; }
     public bool IsApproved { get; set; }
     public string PreferredLang { get; set; } = string.Empty;
     public required List<Guid> CategoryIds { get; set; }

@@ -30,25 +30,29 @@ public class SupplierDashboardService : ISupplierDashboardService
         if (!supplier.IsApproved)
             throw new InvalidOperationException("Account pending approval.");
 
-        var allOrders = await _groupOrderRepository.GetBySupplierAsync(supplier.Id, cancellationToken);
+        var allOrders = await _groupOrderRepository.GetAllAsync(cancellationToken);
+        var ordersWithMyItems = allOrders
+            .Where(o => o.Items != null && o.Items.Any(i => i.SupplierId == supplier.Id))
+            .ToList();
         var products = await _supplierProductRepository.GetBySupplierAsync(supplier.Id, cancellationToken);
         var deliveries = await _deliveryRepository.GetAllAsync(cancellationToken);
         var supplierDeliveries = deliveries.Where(d => d.SupplierId == supplier.Id).ToList();
 
-        var totalRevenue = allOrders
+        var totalRevenue = ordersWithMyItems
             .Where(o => o.Status == OrderStatus.Completed)
-            .Sum(o => o.Items?.Sum(i => (i.UnitPrice ?? 0) * (i.ParticipantItems?.Sum(pi => pi.Quantity) ?? 0)) ?? 0);
+            .SelectMany(o => o.Items ?? [])
+            .Where(i => i.SupplierId == supplier.Id)
+            .Sum(i => (i.UnitPrice ?? 0) * (i.ParticipantItems?.Sum(pi => pi.Quantity) ?? 0));
 
         return new SupplierDashboardData
         {
             Kpi = new SupplierKpiDto
             {
                 TotalRevenue = totalRevenue,
-                TotalOrders = allOrders.Count,
-                ActiveOrders = allOrders.Count(o => o.Status == OrderStatus.Open),
+                TotalOrders = ordersWithMyItems.Count,
+                ActiveOrders = ordersWithMyItems.Count(o => o.Status == OrderStatus.Open),
                 PendingDeliveries = supplierDeliveries.Count(d => d.Status is "Pending" or "Preparing"),
-                TotalProducts = products.Count(p => p.IsActive),
-                RatingAvg = supplier.RatingAvg
+                TotalProducts = products.Count(p => p.IsActive)
             },
             PendingOrders = allOrders
                 .Where(o => o.Status == OrderStatus.PendingApproval)

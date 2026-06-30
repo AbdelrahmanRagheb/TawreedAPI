@@ -178,11 +178,8 @@ namespace Tawreed.Infrastructure.Migrations
                     business_name = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: false),
                     business_type = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: false),
                     tax_id = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: true),
+                    commercial_registration_no = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: true),
                     region_id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    address = table.Column<string>(type: "nvarchar(500)", maxLength: 500, nullable: true),
-                    latitude = table.Column<decimal>(type: "decimal(9,6)", nullable: true),
-                    longitude = table.Column<decimal>(type: "decimal(9,6)", nullable: true),
-                    rating_avg = table.Column<decimal>(type: "decimal(3,2)", nullable: false),
                     created_at = table.Column<DateTime>(type: "datetime2", nullable: false),
                     updated_at = table.Column<DateTime>(type: "datetime2", nullable: true)
                 },
@@ -296,12 +293,11 @@ namespace Tawreed.Infrastructure.Migrations
                     user_id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     company_name = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: false),
                     tax_id = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: true),
+                    commercial_registration_no = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: true),
                     region_id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     is_approved = table.Column<bool>(type: "bit", nullable: false),
                     approved_by = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     approved_at = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: true),
-                    rating_avg = table.Column<decimal>(type: "decimal(3,2)", nullable: false),
-                    address = table.Column<string>(type: "nvarchar(500)", maxLength: 500, nullable: true),
                     created_at = table.Column<DateTime>(type: "datetime2", nullable: false),
                     updated_at = table.Column<DateTime>(type: "datetime2", nullable: true)
                 },
@@ -344,11 +340,6 @@ namespace Tawreed.Infrastructure.Migrations
                     deadline_at = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: false),
                     status = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: false),
                     closed_at = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: true),
-                    delivery_preference = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: false),
-                    preferred_delivery_person_id = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
-                    assigned_delivery_person_id = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
-                    proposed_delivery_fee = table.Column<decimal>(type: "decimal(18,2)", nullable: true),
-                    delivery_approval_status = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: true),
                     created_at = table.Column<DateTime>(type: "datetime2", nullable: false),
                     updated_at = table.Column<DateTime>(type: "datetime2", nullable: true)
                 },
@@ -361,12 +352,6 @@ namespace Tawreed.Infrastructure.Migrations
                         principalTable: "buyers",
                         principalColumn: "id",
                         onDelete: ReferentialAction.Restrict);
-                    table.ForeignKey(
-                        name: "fk_group_orders_delivery_person_profiles_assigned_delivery_person_id",
-                        column: x => x.assigned_delivery_person_id,
-                        principalTable: "delivery_person_profiles",
-                        principalColumn: "id",
-                        onDelete: ReferentialAction.SetNull);
                     table.ForeignKey(
                         name: "fk_group_orders_regions_region_id",
                         column: x => x.region_id,
@@ -501,6 +486,44 @@ namespace Tawreed.Infrastructure.Migrations
                         name: "fk_deliveries_users_delivery_person_id",
                         column: x => x.delivery_person_id,
                         principalTable: "users",
+                        principalColumn: "id",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "delivery_assignment_requests",
+                columns: table => new
+                {
+                    id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    order_id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    delivery_person_id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    supplier_id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    status = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: false),
+                    proposed_fee = table.Column<decimal>(type: "decimal(12,2)", nullable: true),
+                    responded_at = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: true),
+                    decline_reason = table.Column<string>(type: "nvarchar(500)", maxLength: 500, nullable: true),
+                    created_at = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    updated_at = table.Column<DateTime>(type: "datetime2", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("pk_delivery_assignment_requests", x => x.id);
+                    table.ForeignKey(
+                        name: "fk_delivery_assignment_requests_delivery_person_profiles_delivery_person_id",
+                        column: x => x.delivery_person_id,
+                        principalTable: "delivery_person_profiles",
+                        principalColumn: "id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "fk_delivery_assignment_requests_group_orders_order_id",
+                        column: x => x.order_id,
+                        principalTable: "group_orders",
+                        principalColumn: "id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "fk_delivery_assignment_requests_suppliers_supplier_id",
+                        column: x => x.supplier_id,
+                        principalTable: "suppliers",
                         principalColumn: "id",
                         onDelete: ReferentialAction.Restrict);
                 });
@@ -802,11 +825,11 @@ namespace Tawreed.Infrastructure.Migrations
                 columns: new[] { "id", "body_ar", "body_en", "channel", "created_at", "is_read", "read_at", "related_order_id", "title_ar", "title_en", "type", "updated_at", "user_id" },
                 values: new object[,]
                 {
-                    { new Guid("35fcc1ab-2bdd-4d25-8028-b63e924f1e5b"), "تم فتح طلب الكوكاكولا للمشاركة", "Coca-Cola order is now open", "in_app", new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), false, null, new Guid("6b1ac916-146a-44e8-a523-7d69d833f055"), "تم تأكيد الطلب", "Order confirmed", "order_update", null, new Guid("86d86b94-fc93-4e9a-a37d-90f5d89a740c") },
-                    { new Guid("80202a6e-7b62-4050-8c9d-7e6099f9d465"), "طلب الدجاج في انتظار موافقة مورد السلسلة", "Chicken order awaiting El Selsela approval", "in_app", new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), false, null, new Guid("3d1335a9-a25c-4762-9f39-8046fc475f7a"), "في انتظار موافقة المورد", "Awaiting supplier approval", "pending_approval", null, new Guid("fc11d91a-3dd4-4f67-87c1-acf40b944d65") },
-                    { new Guid("837a1e2d-e76a-4d45-bdf4-ffd354870eb3"), "تم تسجيل مورد جديد في المنصة", "A new supplier has joined the platform", "in_app", new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), false, null, null, "تم تسجيل مورد جديد", "New supplier registered", "system", null, new Guid("16459628-b0fa-4465-a194-4febc611081d") },
-                    { new Guid("a18e224d-7cee-4365-9f2f-44ad9ebf72f2"), "موعد تسليم طلب حليب جهينة بعد 3 أيام", "Juhayna Milk deadline in 3 days", "in_app", new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), false, null, new Guid("bba56c6a-827e-4394-a10a-b81c6d9dbeaf"), "موعد التسليم يقترب", "Deadline approaching", "deadline_reminder", null, new Guid("3ecef09b-9609-4524-97d3-b7eddd08d0e8") },
-                    { new Guid("fb61558d-8b3f-4dac-b4b9-c0ef2dc89b3f"), "انضم محمد حسن إلى طلب حليب جهينة", "Mohamed Hassan joined Juhayna Milk order", "in_app", new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), false, null, new Guid("bba56c6a-827e-4394-a10a-b81c6d9dbeaf"), "انضم مشارك جديد", "New participant joined", "order_update", null, new Guid("3ecef09b-9609-4524-97d3-b7eddd08d0e8") }
+                    { new Guid("35fcc1ab-2bdd-4d25-8028-b63e924f1e5b"), null, null, "in_app", new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), false, null, new Guid("6b1ac916-146a-44e8-a523-7d69d833f055"), "تم تأكيد الطلب", "Order confirmed", "order_update", null, new Guid("86d86b94-fc93-4e9a-a37d-90f5d89a740c") },
+                    { new Guid("80202a6e-7b62-4050-8c9d-7e6099f9d465"), null, null, "in_app", new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), false, null, new Guid("3d1335a9-a25c-4762-9f39-8046fc475f7a"), "في انتظار موافقة المورد", "Awaiting supplier approval", "pending_approval", null, new Guid("fc11d91a-3dd4-4f67-87c1-acf40b944d65") },
+                    { new Guid("837a1e2d-e76a-4d45-bdf4-ffd354870eb3"), null, null, "in_app", new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), false, null, null, "تم تسجيل مورد جديد", "New supplier registered", "system", null, new Guid("16459628-b0fa-4465-a194-4febc611081d") },
+                    { new Guid("a18e224d-7cee-4365-9f2f-44ad9ebf72f2"), null, null, "in_app", new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), false, null, new Guid("bba56c6a-827e-4394-a10a-b81c6d9dbeaf"), "موعد التسليم يقترب", "Deadline approaching", "deadline_reminder", null, new Guid("3ecef09b-9609-4524-97d3-b7eddd08d0e8") },
+                    { new Guid("fb61558d-8b3f-4dac-b4b9-c0ef2dc89b3f"), null, null, "in_app", new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), false, null, new Guid("bba56c6a-827e-4394-a10a-b81c6d9dbeaf"), "انضم مشارك جديد", "New participant joined", "order_update", null, new Guid("3ecef09b-9609-4524-97d3-b7eddd08d0e8") }
                 });
 
             migrationBuilder.InsertData(
@@ -864,8 +887,8 @@ namespace Tawreed.Infrastructure.Migrations
                 columns: new[] { "id", "base_delivery_fee", "coverage_region_id", "created_at", "is_active", "license_info", "rating", "total_deliveries", "updated_at", "user_id", "vehicle_type" },
                 values: new object[,]
                 {
-                    { new Guid("aaaaaaa1-1111-4a1a-8a1a-aaaaaaaaaa01"), 25m, new Guid("00000000-0000-0000-0000-000000000004"), new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), true, "محمود - رخصة قيادة مهنية", 4.5m, 150, null, new Guid("11111111-1111-4111-8111-111111111001"), "Car" },
-                    { new Guid("bbbbbbb2-2222-4b2b-8b2b-bbbbbbbbbb02"), 15m, new Guid("00000000-0000-0000-0000-000000000005"), new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), true, "خالد - رخصة قيادة دراجة", 4.2m, 87, null, new Guid("22222222-2222-4222-8222-222222222001"), "Motorcycle" }
+                    { new Guid("aaaaaaa1-1111-4a1a-8a1a-aaaaaaaaaa01"), 25m, new Guid("00000000-0000-0000-0000-000000000004"), new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), true, "محمود - رخصة قيادة مهنية", 0m, 0, null, new Guid("11111111-1111-4111-8111-111111111001"), "Car" },
+                    { new Guid("bbbbbbb2-2222-4b2b-8b2b-bbbbbbbbbb02"), 15m, new Guid("00000000-0000-0000-0000-000000000005"), new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), true, "خالد - رخصة قيادة دراجة", 0m, 0, null, new Guid("22222222-2222-4222-8222-222222222001"), "Motorcycle" }
                 });
 
             migrationBuilder.InsertData(
@@ -1271,33 +1294,33 @@ namespace Tawreed.Infrastructure.Migrations
 
             migrationBuilder.InsertData(
                 table: "suppliers",
-                columns: new[] { "id", "address", "approved_at", "approved_by", "company_name", "created_at", "is_approved", "rating_avg", "region_id", "tax_id", "updated_at", "user_id" },
+                columns: new[] { "id", "approved_at", "approved_by", "commercial_registration_no", "company_name", "created_at", "is_approved", "region_id", "tax_id", "updated_at", "user_id" },
                 values: new object[,]
                 {
-                    { new Guid("5374892c-cf76-4192-ad6a-f7142bcb1842"), "كوكاكولا مصر - المنطقة الصناعية", null, null, "كوكاكولا مصر", new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), true, 4.7m, new Guid("00000000-0000-0000-0000-000000000004"), null, null, new Guid("fa057c2b-5927-4f9d-ad92-fef953feed8d") },
-                    { new Guid("590d8027-2ace-4e51-b627-9a10c5fcfce1"), "شركة السلسلة للدواجن - المنطقة الصناعية", null, null, "شركة السلسلة للدواجن", new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), true, 4.8m, new Guid("00000000-0000-0000-0000-000000000013"), null, null, new Guid("f803a6f5-d484-423a-b48a-3b51fa7f3ad7") },
-                    { new Guid("59925002-c1a0-4489-b279-943f1269819e"), "ايديتا للصناعات الغذائية - المنطقة الصناعية", null, null, "ايديتا للصناعات الغذائية", new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), true, 4.2m, new Guid("00000000-0000-0000-0000-000000000010"), null, null, new Guid("6f2336cd-5d33-41dc-8ab9-874ab779fd03") },
-                    { new Guid("5cd98e0e-585f-4a0a-a529-ac384684ad1b"), "شركة الفتح للحوم - المنطقة الصناعية", null, null, "شركة الفتح للحوم", new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), true, 4.0m, new Guid("00000000-0000-0000-0000-000000000019"), null, null, new Guid("ff8d954d-149f-4c79-a2f2-df6ab74bfc4b") },
-                    { new Guid("d3d792d0-2e84-4415-8345-90cf3eef943f"), "بسكو مصر - المنطقة الصناعية", null, null, "بسكو مصر", new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), true, 4.1m, new Guid("00000000-0000-0000-0000-000000000005"), null, null, new Guid("3c9e0478-d108-4fcd-9431-fbea4be5dd54") },
-                    { new Guid("d967d2d6-a707-430f-b404-9b9b5858086e"), "دومتي للصناعات الغذائية - المنطقة الصناعية", null, null, "دومتي للصناعات الغذائية", new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), true, 4.6m, new Guid("00000000-0000-0000-0000-000000000010"), null, null, new Guid("eee99f22-24f6-4e6b-b9dc-05b7b99cadd0") },
-                    { new Guid("f6120f7e-6c9a-4c61-a0d0-33cf4e96a791"), "بيبسي كولا مصر - المنطقة الصناعية", null, null, "بيبسي كولا مصر", new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), true, 4.4m, new Guid("00000000-0000-0000-0000-000000000004"), null, null, new Guid("e6ea6265-20b4-4c39-a9ed-a77e9a1ebd78") },
-                    { new Guid("fcf3bdbc-9e25-48b2-96b0-a00a755cef06"), "مزارع دينا - المنطقة الصناعية", null, null, "مزارع دينا", new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), true, 4.9m, new Guid("00000000-0000-0000-0000-000000000009"), null, null, new Guid("0d7bbea3-6470-4ed5-b473-37cd22f45b95") }
+                    { new Guid("5374892c-cf76-4192-ad6a-f7142bcb1842"), null, null, null, "كوكاكولا مصر", new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), true, new Guid("00000000-0000-0000-0000-000000000004"), null, null, new Guid("fa057c2b-5927-4f9d-ad92-fef953feed8d") },
+                    { new Guid("590d8027-2ace-4e51-b627-9a10c5fcfce1"), null, null, null, "شركة السلسلة للدواجن", new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), true, new Guid("00000000-0000-0000-0000-000000000013"), null, null, new Guid("f803a6f5-d484-423a-b48a-3b51fa7f3ad7") },
+                    { new Guid("59925002-c1a0-4489-b279-943f1269819e"), null, null, null, "ايديتا للصناعات الغذائية", new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), true, new Guid("00000000-0000-0000-0000-000000000010"), null, null, new Guid("6f2336cd-5d33-41dc-8ab9-874ab779fd03") },
+                    { new Guid("5cd98e0e-585f-4a0a-a529-ac384684ad1b"), null, null, null, "شركة الفتح للحوم", new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), true, new Guid("00000000-0000-0000-0000-000000000019"), null, null, new Guid("ff8d954d-149f-4c79-a2f2-df6ab74bfc4b") },
+                    { new Guid("d3d792d0-2e84-4415-8345-90cf3eef943f"), null, null, null, "بسكو مصر", new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), true, new Guid("00000000-0000-0000-0000-000000000005"), null, null, new Guid("3c9e0478-d108-4fcd-9431-fbea4be5dd54") },
+                    { new Guid("d967d2d6-a707-430f-b404-9b9b5858086e"), null, null, null, "دومتي للصناعات الغذائية", new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), true, new Guid("00000000-0000-0000-0000-000000000010"), null, null, new Guid("eee99f22-24f6-4e6b-b9dc-05b7b99cadd0") },
+                    { new Guid("f6120f7e-6c9a-4c61-a0d0-33cf4e96a791"), null, null, null, "بيبسي كولا مصر", new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), true, new Guid("00000000-0000-0000-0000-000000000004"), null, null, new Guid("e6ea6265-20b4-4c39-a9ed-a77e9a1ebd78") },
+                    { new Guid("fcf3bdbc-9e25-48b2-96b0-a00a755cef06"), null, null, null, "مزارع دينا", new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), true, new Guid("00000000-0000-0000-0000-000000000009"), null, null, new Guid("0d7bbea3-6470-4ed5-b473-37cd22f45b95") }
                 });
 
             migrationBuilder.InsertData(
                 table: "buyers",
-                columns: new[] { "id", "address", "business_name", "business_type", "created_at", "latitude", "longitude", "rating_avg", "region_id", "tax_id", "updated_at", "user_id" },
+                columns: new[] { "id", "business_name", "business_type", "commercial_registration_no", "created_at", "region_id", "tax_id", "updated_at", "user_id" },
                 values: new object[,]
                 {
-                    { new Guid("174f74c9-72fc-4291-b9ce-330f8753a73c"), null, "ش drip القهوة", "Cafe", new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), null, null, 4.5m, new Guid("00000001-0000-0000-0000-000000000047"), null, null, new Guid("fa77e489-6f2e-4070-8edb-decc8851585c") },
-                    { new Guid("247babb0-a7cd-4af3-a292-b5e313ce85d0"), null, "فندق سفنكس", "Hotel", new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), null, null, 4.5m, new Guid("00000001-0000-0000-0000-000000000007"), null, null, new Guid("86d86b94-fc93-4e9a-a37d-90f5d89a740c") },
-                    { new Guid("34b72b5a-a8e4-46fe-bda4-cba1dc8fc5a0"), null, "سوبر ماركت النيل", "Supermarket", new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), null, null, 4.5m, new Guid("00000001-0000-0000-0000-000000000047"), null, null, new Guid("255cb26a-f00b-4ff0-813b-56d0204c64d6") },
-                    { new Guid("40b88e70-d397-4afb-a2ca-13be42ac8f8c"), null, "هايبر ماركت مصر", "Supermarket", new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), null, null, 4.5m, new Guid("00000001-0000-0000-0000-000000000209"), null, null, new Guid("acd25e71-da22-41c7-824e-5a9fd154333a") },
-                    { new Guid("5bc19380-dbcc-4d71-b7cd-261fd03d1797"), null, "مطعم الأهرام", "Restaurant", new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), null, null, 4.5m, new Guid("00000001-0000-0000-0000-000000000029"), null, null, new Guid("3ecef09b-9609-4524-97d3-b7eddd08d0e8") },
-                    { new Guid("91b476cf-b4e6-4142-a57b-e9889ab16957"), null, "مخبز الشمس", "Bakery", new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), null, null, 4.5m, new Guid("00000001-0000-0000-0000-000000000214"), null, null, new Guid("e2d20e2b-aff0-4248-b50c-e5460a248d3a") },
-                    { new Guid("98147dda-6c82-4ffa-bb83-2dd64c03d9d2"), null, "كافeteria القاهرة", "Cafe", new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), null, null, 4.5m, new Guid("00000001-0000-0000-0000-000000000209"), null, null, new Guid("4686a8ed-0c74-4648-bd5b-49d7d166679d") },
-                    { new Guid("da16cd54-e3dc-4b3e-b167-069060b2780b"), null, "نادي الرياض", "SportsClub", new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), null, null, 4.5m, new Guid("00000001-0000-0000-0000-000000000029"), null, null, new Guid("fc11d91a-3dd4-4f67-87c1-acf40b944d65") },
-                    { new Guid("e0756572-63d6-486d-af94-cfc5eb46c508"), null, "مستشفى السلام", "Hospital", new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), null, null, 4.5m, new Guid("00000001-0000-0000-0000-000000000007"), null, null, new Guid("9bfa4e4e-e5ce-4d68-bee3-808e0cd3a791") }
+                    { new Guid("174f74c9-72fc-4291-b9ce-330f8753a73c"), "ش drip القهوة", "Cafe", null, new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), new Guid("00000001-0000-0000-0000-000000000047"), null, null, new Guid("fa77e489-6f2e-4070-8edb-decc8851585c") },
+                    { new Guid("247babb0-a7cd-4af3-a292-b5e313ce85d0"), "فندق سفنكس", "Hotel", null, new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), new Guid("00000001-0000-0000-0000-000000000007"), null, null, new Guid("86d86b94-fc93-4e9a-a37d-90f5d89a740c") },
+                    { new Guid("34b72b5a-a8e4-46fe-bda4-cba1dc8fc5a0"), "سوبر ماركت النيل", "Supermarket", null, new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), new Guid("00000001-0000-0000-0000-000000000047"), null, null, new Guid("255cb26a-f00b-4ff0-813b-56d0204c64d6") },
+                    { new Guid("40b88e70-d397-4afb-a2ca-13be42ac8f8c"), "هايبر ماركت مصر", "Supermarket", null, new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), new Guid("00000001-0000-0000-0000-000000000209"), null, null, new Guid("acd25e71-da22-41c7-824e-5a9fd154333a") },
+                    { new Guid("5bc19380-dbcc-4d71-b7cd-261fd03d1797"), "مطعم الأهرام", "Restaurant", null, new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), new Guid("00000001-0000-0000-0000-000000000029"), null, null, new Guid("3ecef09b-9609-4524-97d3-b7eddd08d0e8") },
+                    { new Guid("91b476cf-b4e6-4142-a57b-e9889ab16957"), "مخبز الشمس", "Bakery", null, new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), new Guid("00000001-0000-0000-0000-000000000214"), null, null, new Guid("e2d20e2b-aff0-4248-b50c-e5460a248d3a") },
+                    { new Guid("98147dda-6c82-4ffa-bb83-2dd64c03d9d2"), "كافeteria القاهرة", "Cafe", null, new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), new Guid("00000001-0000-0000-0000-000000000209"), null, null, new Guid("4686a8ed-0c74-4648-bd5b-49d7d166679d") },
+                    { new Guid("da16cd54-e3dc-4b3e-b167-069060b2780b"), "نادي الرياض", "SportsClub", null, new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), new Guid("00000001-0000-0000-0000-000000000029"), null, null, new Guid("fc11d91a-3dd4-4f67-87c1-acf40b944d65") },
+                    { new Guid("e0756572-63d6-486d-af94-cfc5eb46c508"), "مستشفى السلام", "Hospital", null, new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), new Guid("00000001-0000-0000-0000-000000000007"), null, null, new Guid("9bfa4e4e-e5ce-4d68-bee3-808e0cd3a791") }
                 });
 
             migrationBuilder.InsertData(
@@ -7085,29 +7108,29 @@ namespace Tawreed.Infrastructure.Migrations
 
             migrationBuilder.InsertData(
                 table: "suppliers",
-                columns: new[] { "id", "address", "approved_at", "approved_by", "company_name", "created_at", "is_approved", "rating_avg", "region_id", "tax_id", "updated_at", "user_id" },
+                columns: new[] { "id", "approved_at", "approved_by", "commercial_registration_no", "company_name", "created_at", "is_approved", "region_id", "tax_id", "updated_at", "user_id" },
                 values: new object[,]
                 {
-                    { new Guid("40c42c46-3774-4ee0-ad5f-d6b16c8c0f6f"), "المراعي مصر - المنطقة الصناعية", null, null, "المراعي مصر", new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), true, 4.3m, new Guid("00000001-0000-0000-0000-000000000214"), null, null, new Guid("e424e914-7c65-4596-b5ee-2ea234643946") },
-                    { new Guid("d6a1a124-f64a-4b4f-b7cd-03642969e000"), "جهينة للصناعات الغذائية - المنطقة الصناعية", null, null, "جهينة للصناعات الغذائية", new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), true, 4.5m, new Guid("00000001-0000-0000-0000-000000000214"), null, null, new Guid("cde4bb82-3c7f-4f20-b0b1-dcc6a20b3c26") }
+                    { new Guid("40c42c46-3774-4ee0-ad5f-d6b16c8c0f6f"), null, null, null, "المراعي مصر", new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), true, new Guid("00000001-0000-0000-0000-000000000214"), null, null, new Guid("e424e914-7c65-4596-b5ee-2ea234643946") },
+                    { new Guid("d6a1a124-f64a-4b4f-b7cd-03642969e000"), null, null, null, "جهينة للصناعات الغذائية", new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), true, new Guid("00000001-0000-0000-0000-000000000214"), null, null, new Guid("cde4bb82-3c7f-4f20-b0b1-dcc6a20b3c26") }
                 });
 
             migrationBuilder.InsertData(
                 table: "buyers",
-                columns: new[] { "id", "address", "business_name", "business_type", "created_at", "latitude", "longitude", "rating_avg", "region_id", "tax_id", "updated_at", "user_id" },
-                values: new object[] { new Guid("3e701ef7-758c-4631-b371-9de27d609984"), null, "مطعم الفلاح", "Restaurant", new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), null, null, 4.5m, new Guid("00000002-0000-0000-0000-000000000435"), null, null, new Guid("69d10245-5505-4853-a8cc-01217ba4f08f") });
+                columns: new[] { "id", "business_name", "business_type", "commercial_registration_no", "created_at", "region_id", "tax_id", "updated_at", "user_id" },
+                values: new object[] { new Guid("3e701ef7-758c-4631-b371-9de27d609984"), "مطعم الفلاح", "Restaurant", null, new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), new Guid("00000002-0000-0000-0000-000000000435"), null, null, new Guid("69d10245-5505-4853-a8cc-01217ba4f08f") });
 
             migrationBuilder.InsertData(
                 table: "group_orders",
-                columns: new[] { "id", "assigned_delivery_person_id", "closed_at", "created_at", "creator_id", "deadline_at", "delivery_approval_status", "delivery_preference", "description", "notes", "order_number", "preferred_delivery_person_id", "proposed_delivery_fee", "region_id", "status", "supplier_id", "title", "updated_at", "visibility" },
+                columns: new[] { "id", "closed_at", "created_at", "creator_id", "deadline_at", "description", "notes", "order_number", "region_id", "status", "supplier_id", "title", "updated_at", "visibility" },
                 values: new object[,]
                 {
-                    { new Guid("382e6a64-ea3a-4dcc-8c05-379aa01a3461"), null, new DateTimeOffset(new DateTime(2026, 6, 14, 12, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), new Guid("da16cd54-e3dc-4b3e-b167-069060b2780b"), new DateTimeOffset(new DateTime(2026, 6, 14, 12, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), null, "None", "تم الإلغاء لعدم التوفر", null, "ORD-20260617-A007", null, null, new Guid("00000001-0000-0000-0000-000000000209"), "Cancelled", new Guid("40c42c46-3774-4ee0-ad5f-d6b16c8c0f6f"), "طلب ألبان المراعي", null, null },
-                    { new Guid("38e769df-7e03-4d47-82e2-4fe4c7a6d3ae"), null, new DateTimeOffset(new DateTime(2026, 6, 16, 12, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), new Guid("5bc19380-dbcc-4d71-b7cd-261fd03d1797"), new DateTimeOffset(new DateTime(2026, 6, 16, 12, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), null, "None", "وجبات خفيفة للمطعم", null, "ORD-20260617-A005", null, null, new Guid("00000001-0000-0000-0000-000000000029"), "Closed", new Guid("59925002-c1a0-4489-b279-943f1269819e"), "طلب هوهوز و بسكويت", null, null },
-                    { new Guid("3d1335a9-a25c-4762-9f39-8046fc475f7a"), null, null, new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), new Guid("da16cd54-e3dc-4b3e-b167-069060b2780b"), new DateTimeOffset(new DateTime(2026, 6, 24, 12, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), null, "None", "دجاج كامل للمطعم الرياضي", null, "ORD-20260617-A003", null, null, new Guid("00000001-0000-0000-0000-000000000029"), "Open", new Guid("590d8027-2ace-4e51-b627-9a10c5fcfce1"), "طلب دجاج للنادي", null, null },
-                    { new Guid("6b1ac916-146a-44e8-a523-7d69d833f055"), null, null, new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), new Guid("247babb0-a7cd-4af3-a292-b5e313ce85d0"), new DateTimeOffset(new DateTime(2026, 6, 22, 12, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), null, "None", "مشروبات غازية للفندق", null, "ORD-20260617-A002", null, null, new Guid("00000001-0000-0000-0000-000000000007"), "Open", new Guid("5374892c-cf76-4192-ad6a-f7142bcb1842"), "طلب كوكاكولا للفندق", null, null },
-                    { new Guid("7e0d7a95-b9f5-40d9-beaf-4ac077593cf5"), null, new DateTimeOffset(new DateTime(2026, 6, 13, 12, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), new Guid("34b72b5a-a8e4-46fe-bda4-cba1dc8fc5a0"), new DateTimeOffset(new DateTime(2026, 6, 12, 12, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), null, "None", "بسكويت شاي وماري", null, "ORD-20260617-A006", null, null, new Guid("00000001-0000-0000-0000-000000000047"), "Completed", new Guid("d3d792d0-2e84-4415-8345-90cf3eef943f"), "طلب بسكويت للسوبر ماركت", null, null },
-                    { new Guid("bba56c6a-827e-4394-a10a-b81c6d9dbeaf"), null, null, new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), new Guid("5bc19380-dbcc-4d71-b7cd-261fd03d1797"), new DateTimeOffset(new DateTime(2026, 6, 20, 12, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), null, "None", "حليب كامل الدسم للتوزيع على المطعم", null, "ORD-20260617-A001", null, null, new Guid("00000001-0000-0000-0000-000000000029"), "Open", new Guid("d6a1a124-f64a-4b4f-b7cd-03642969e000"), "طلب حليب جهينة", null, null }
+                    { new Guid("382e6a64-ea3a-4dcc-8c05-379aa01a3461"), new DateTimeOffset(new DateTime(2026, 6, 14, 12, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), new Guid("da16cd54-e3dc-4b3e-b167-069060b2780b"), new DateTimeOffset(new DateTime(2026, 6, 14, 12, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), "تم الإلغاء لعدم التوفر", null, "ORD-20260617-A007", new Guid("00000001-0000-0000-0000-000000000209"), "Cancelled", new Guid("40c42c46-3774-4ee0-ad5f-d6b16c8c0f6f"), "طلب ألبان المراعي", null, null },
+                    { new Guid("38e769df-7e03-4d47-82e2-4fe4c7a6d3ae"), new DateTimeOffset(new DateTime(2026, 6, 16, 12, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), new Guid("5bc19380-dbcc-4d71-b7cd-261fd03d1797"), new DateTimeOffset(new DateTime(2026, 6, 16, 12, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), "وجبات خفيفة للمطعم", null, "ORD-20260617-A005", new Guid("00000001-0000-0000-0000-000000000029"), "Closed", new Guid("59925002-c1a0-4489-b279-943f1269819e"), "طلب هوهوز و بسكويت", null, null },
+                    { new Guid("3d1335a9-a25c-4762-9f39-8046fc475f7a"), null, new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), new Guid("da16cd54-e3dc-4b3e-b167-069060b2780b"), new DateTimeOffset(new DateTime(2026, 6, 24, 12, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), "دجاج كامل للمطعم الرياضي", null, "ORD-20260617-A003", new Guid("00000001-0000-0000-0000-000000000029"), "Open", new Guid("590d8027-2ace-4e51-b627-9a10c5fcfce1"), "طلب دجاج للنادي", null, null },
+                    { new Guid("6b1ac916-146a-44e8-a523-7d69d833f055"), null, new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), new Guid("247babb0-a7cd-4af3-a292-b5e313ce85d0"), new DateTimeOffset(new DateTime(2026, 6, 22, 12, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), "مشروبات غازية للفندق", null, "ORD-20260617-A002", new Guid("00000001-0000-0000-0000-000000000007"), "Open", new Guid("5374892c-cf76-4192-ad6a-f7142bcb1842"), "طلب كوكاكولا للفندق", null, null },
+                    { new Guid("7e0d7a95-b9f5-40d9-beaf-4ac077593cf5"), new DateTimeOffset(new DateTime(2026, 6, 13, 12, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), new Guid("34b72b5a-a8e4-46fe-bda4-cba1dc8fc5a0"), new DateTimeOffset(new DateTime(2026, 6, 20, 12, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), "بسكويت شاي وماري", null, "ORD-20260617-A006", new Guid("00000001-0000-0000-0000-000000000047"), "Completed", new Guid("d3d792d0-2e84-4415-8345-90cf3eef943f"), "طلب بسكويت للسوبر ماركت", null, null },
+                    { new Guid("bba56c6a-827e-4394-a10a-b81c6d9dbeaf"), null, new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), new Guid("5bc19380-dbcc-4d71-b7cd-261fd03d1797"), new DateTimeOffset(new DateTime(2026, 6, 20, 12, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), "حليب كامل الدسم للتوزيع على المطعم", null, "ORD-20260617-A001", new Guid("00000001-0000-0000-0000-000000000029"), "Open", new Guid("d6a1a124-f64a-4b4f-b7cd-03642969e000"), "طلب حليب جهينة", null, null }
                 });
 
             migrationBuilder.InsertData(
@@ -7296,8 +7319,8 @@ namespace Tawreed.Infrastructure.Migrations
 
             migrationBuilder.InsertData(
                 table: "group_orders",
-                columns: new[] { "id", "assigned_delivery_person_id", "closed_at", "created_at", "creator_id", "deadline_at", "delivery_approval_status", "delivery_preference", "description", "notes", "order_number", "preferred_delivery_person_id", "proposed_delivery_fee", "region_id", "status", "supplier_id", "title", "updated_at", "visibility" },
-                values: new object[] { new Guid("85085d3d-4938-4ba1-8b6a-2ef99f9995b0"), null, null, new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), new Guid("3e701ef7-758c-4631-b371-9de27d609984"), new DateTimeOffset(new DateTime(2026, 6, 27, 12, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), null, "None", "أجبان متنوعة للمطعم", null, "ORD-20260617-A004", null, null, new Guid("00000002-0000-0000-0000-000000000435"), "Draft", new Guid("d967d2d6-a707-430f-b404-9b9b5858086e"), "طلب جبن دومتي", null, null });
+                columns: new[] { "id", "closed_at", "created_at", "creator_id", "deadline_at", "description", "notes", "order_number", "region_id", "status", "supplier_id", "title", "updated_at", "visibility" },
+                values: new object[] { new Guid("85085d3d-4938-4ba1-8b6a-2ef99f9995b0"), null, new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), new Guid("3e701ef7-758c-4631-b371-9de27d609984"), new DateTimeOffset(new DateTime(2026, 6, 20, 12, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), "أجبان متنوعة للمطعم", null, "ORD-20260617-A004", new Guid("00000002-0000-0000-0000-000000000435"), "Draft", new Guid("d967d2d6-a707-430f-b404-9b9b5858086e"), "طلب جبن دومتي", null, null });
 
             migrationBuilder.InsertData(
                 table: "pricing_tiers",
@@ -7409,6 +7432,26 @@ namespace Tawreed.Infrastructure.Migrations
                 column: "supplier_id");
 
             migrationBuilder.CreateIndex(
+                name: "ix_delivery_assignment_requests_delivery_person_id",
+                table: "delivery_assignment_requests",
+                column: "delivery_person_id");
+
+            migrationBuilder.CreateIndex(
+                name: "ix_delivery_assignment_requests_order_id_delivery_person_id",
+                table: "delivery_assignment_requests",
+                columns: new[] { "order_id", "delivery_person_id" });
+
+            migrationBuilder.CreateIndex(
+                name: "ix_delivery_assignment_requests_status",
+                table: "delivery_assignment_requests",
+                column: "status");
+
+            migrationBuilder.CreateIndex(
+                name: "ix_delivery_assignment_requests_supplier_id",
+                table: "delivery_assignment_requests",
+                column: "supplier_id");
+
+            migrationBuilder.CreateIndex(
                 name: "ix_delivery_person_profiles_coverage_region_id",
                 table: "delivery_person_profiles",
                 column: "coverage_region_id");
@@ -7454,11 +7497,6 @@ namespace Tawreed.Infrastructure.Migrations
                 table: "group_order_participants",
                 columns: new[] { "group_order_id", "buyer_id" },
                 unique: true);
-
-            migrationBuilder.CreateIndex(
-                name: "ix_group_orders_assigned_delivery_person_id",
-                table: "group_orders",
-                column: "assigned_delivery_person_id");
 
             migrationBuilder.CreateIndex(
                 name: "ix_group_orders_creator_id",
@@ -7596,6 +7634,9 @@ namespace Tawreed.Infrastructure.Migrations
                 name: "deliveries");
 
             migrationBuilder.DropTable(
+                name: "delivery_assignment_requests");
+
+            migrationBuilder.DropTable(
                 name: "group_order_events");
 
             migrationBuilder.DropTable(
@@ -7623,6 +7664,9 @@ namespace Tawreed.Infrastructure.Migrations
                 name: "supplier_categories");
 
             migrationBuilder.DropTable(
+                name: "delivery_person_profiles");
+
+            migrationBuilder.DropTable(
                 name: "group_order_items");
 
             migrationBuilder.DropTable(
@@ -7639,9 +7683,6 @@ namespace Tawreed.Infrastructure.Migrations
 
             migrationBuilder.DropTable(
                 name: "buyers");
-
-            migrationBuilder.DropTable(
-                name: "delivery_person_profiles");
 
             migrationBuilder.DropTable(
                 name: "suppliers");

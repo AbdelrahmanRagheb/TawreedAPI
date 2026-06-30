@@ -16,9 +16,7 @@ public class SupplierConfiguration : IEntityTypeConfiguration<Supplier>
 
         builder.HasIndex(s => s.UserId).IsUnique();
         builder.Property(s => s.TaxId).HasMaxLength(50);
-        builder.Property(s => s.RatingAvg).HasColumnType("decimal(3,2)");
-        builder.Property(s => s.Address).HasMaxLength(500);
-
+        builder.Property(s => s.CommercialRegistrationNo).HasMaxLength(100);
         builder.HasOne(s => s.User)
             .WithOne(u => u.Supplier)
             .HasForeignKey<Supplier>(s => s.UserId)

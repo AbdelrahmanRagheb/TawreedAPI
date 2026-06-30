@@ -28,8 +28,6 @@ public class SupplierPublicProfileDto
 {
     public Guid SupplierId { get; set; }
     public string SupplierName { get; set; } = string.Empty;
-    public decimal Rating { get; set; }
-    public string? Address { get; set; }
     public List<string> Categories { get; set; } = [];
     public List<SupplierPublicProductDto> Products { get; set; } = [];
 }

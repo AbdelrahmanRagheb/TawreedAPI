@@ -17,11 +17,7 @@ public class BuyerConfiguration : IEntityTypeConfiguration<Buyer>
         builder.HasIndex(b => b.UserId).IsUnique();
         builder.Property(b => b.BusinessType).HasMaxLength(20).IsRequired();
         builder.Property(b => b.TaxId).HasMaxLength(50);
-        builder.Property(b => b.Address).HasMaxLength(500);
-        builder.Property(b => b.RatingAvg).HasColumnType("decimal(3,2)");
-        builder.Property(b => b.Latitude).HasColumnType("decimal(9,6)");
-        builder.Property(b => b.Longitude).HasColumnType("decimal(9,6)");
-
+        builder.Property(b => b.CommercialRegistrationNo).HasMaxLength(100);
         builder.HasOne(b => b.User)
             .WithOne(u => u.Buyer)
             .HasForeignKey<Buyer>(b => b.UserId)

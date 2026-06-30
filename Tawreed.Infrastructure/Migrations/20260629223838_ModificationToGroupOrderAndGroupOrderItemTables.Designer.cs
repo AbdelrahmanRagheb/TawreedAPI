@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Tawreed.Infrastructure.Data;
 
@@ -11,9 +12,11 @@ using Tawreed.Infrastructure.Data;
 namespace Tawreed.Infrastructure.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260629223838_ModificationToGroupOrderAndGroupOrderItemTables")]
+    partial class ModificationToGroupOrderAndGroupOrderItemTables
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -2351,7 +2354,7 @@ namespace Tawreed.Infrastructure.Migrations
                             Id = new Guid("ace045a1-907c-4d76-939f-fd03d0e84a11"),
                             CategoryId = new Guid("628e3d75-e014-476c-a816-807393f2e09f"),
                             CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
-                            Name = "حليب جهينة كامل الدسم 1 لتر",
+                            Name = "Juhayna Milk Full Cream 1L",
                             UnitId = new Guid("1c3b36d9-216d-4480-929b-71e611773892")
                         },
                         new
@@ -2359,7 +2362,7 @@ namespace Tawreed.Infrastructure.Migrations
                             Id = new Guid("45f06ed3-d5fa-4343-9d52-a87ecfa5bae1"),
                             CategoryId = new Guid("628e3d75-e014-476c-a816-807393f2e09f"),
                             CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
-                            Name = "حليب جهينة نصف الدسم 1 لتر",
+                            Name = "Juhayna Milk Half Fat 1L",
                             UnitId = new Guid("1c3b36d9-216d-4480-929b-71e611773892")
                         },
                         new
@@ -2367,7 +2370,7 @@ namespace Tawreed.Infrastructure.Migrations
                             Id = new Guid("e5aec121-254e-42c9-a676-80453debbf89"),
                             CategoryId = new Guid("73c7a94c-92c7-4b2b-96c9-b94fa1cc4fd0"),
                             CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
-                            Name = "زبادي جهينة بلين 500 جم",
+                            Name = "Juhayna Yogurt Plain 500g",
                             UnitId = new Guid("25275027-d132-4536-a6ba-8f18d71bcec3")
                         },
                         new
@@ -2375,7 +2378,7 @@ namespace Tawreed.Infrastructure.Migrations
                             Id = new Guid("cf09c9ba-8c7e-4d32-a9e4-f7f4c3ec2746"),
                             CategoryId = new Guid("73c7a94c-92c7-4b2b-96c9-b94fa1cc4fd0"),
                             CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
-                            Name = "زبادي جهينة فراولة 150 جم",
+                            Name = "Juhayna Yogurt Strawberry 150g",
                             UnitId = new Guid("25275027-d132-4536-a6ba-8f18d71bcec3")
                         },
                         new
@@ -2383,7 +2386,7 @@ namespace Tawreed.Infrastructure.Migrations
                             Id = new Guid("4c9fa6f8-d251-466a-814f-1032d967e967"),
                             CategoryId = new Guid("46abead3-2a7c-4124-b917-9aa1d6895147"),
                             CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
-                            Name = "عصير جهينة مشكل 1 لتر",
+                            Name = "Juhayna Juice Mixed 1L",
                             UnitId = new Guid("1c3b36d9-216d-4480-929b-71e611773892")
                         },
                         new
@@ -2391,7 +2394,7 @@ namespace Tawreed.Infrastructure.Migrations
                             Id = new Guid("f80382e9-94b5-4ca0-b356-232398badbdb"),
                             CategoryId = new Guid("628e3d75-e014-476c-a816-807393f2e09f"),
                             CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
-                            Name = "لبن رايب جهينة 1 لتر",
+                            Name = "Juhayna Laban Rayeb 1L",
                             UnitId = new Guid("1c3b36d9-216d-4480-929b-71e611773892")
                         },
                         new
@@ -2399,7 +2402,7 @@ namespace Tawreed.Infrastructure.Migrations
                             Id = new Guid("75a1ba53-6f03-4e19-a309-9a48c942a457"),
                             CategoryId = new Guid("628e3d75-e014-476c-a816-807393f2e09f"),
                             CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
-                            Name = "قشطة جهينة 200 مل",
+                            Name = "Juhayna Cream 200ml",
                             UnitId = new Guid("1bb8edb8-e7f0-49d4-ac09-95c064de2d93")
                         },
                         new
@@ -2407,7 +2410,7 @@ namespace Tawreed.Infrastructure.Migrations
                             Id = new Guid("888aae79-f1d4-4e2a-af83-e62792d8eff4"),
                             CategoryId = new Guid("628e3d75-e014-476c-a816-807393f2e09f"),
                             CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
-                            Name = "حليب المراعي كامل الدسم 1 لتر",
+                            Name = "Almarai Milk Full Cream 1L",
                             UnitId = new Guid("1c3b36d9-216d-4480-929b-71e611773892")
                         },
                         new
@@ -2415,7 +2418,7 @@ namespace Tawreed.Infrastructure.Migrations
                             Id = new Guid("65f927b8-ded7-4ed6-9448-b0f28c48fb1f"),
                             CategoryId = new Guid("73c7a94c-92c7-4b2b-96c9-b94fa1cc4fd0"),
                             CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
-                            Name = "زبادي المراعي يوناني 200 جم",
+                            Name = "Almarai Yogurt Greek 200g",
                             UnitId = new Guid("25275027-d132-4536-a6ba-8f18d71bcec3")
                         },
                         new
@@ -2423,7 +2426,7 @@ namespace Tawreed.Infrastructure.Migrations
                             Id = new Guid("085218ae-4f81-4815-8428-33de12e3bef5"),
                             CategoryId = new Guid("628e3d75-e014-476c-a816-807393f2e09f"),
                             CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
-                            Name = "زبدة المراعي 100 جم",
+                            Name = "Almarai Butter 100g",
                             UnitId = new Guid("25275027-d132-4536-a6ba-8f18d71bcec3")
                         },
                         new
@@ -2431,7 +2434,7 @@ namespace Tawreed.Infrastructure.Migrations
                             Id = new Guid("dc0b12cb-7686-4d36-88ac-e721966fb65f"),
                             CategoryId = new Guid("f4513a34-620f-4e7c-b480-30364a6478ec"),
                             CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
-                            Name = "جبن المراعي شيدر 250 جم",
+                            Name = "Almarai Cheddar Cheese 250g",
                             UnitId = new Guid("25275027-d132-4536-a6ba-8f18d71bcec3")
                         },
                         new
@@ -2439,7 +2442,7 @@ namespace Tawreed.Infrastructure.Migrations
                             Id = new Guid("945caeac-565f-4260-b379-485b70aa0d7e"),
                             CategoryId = new Guid("628e3d75-e014-476c-a816-807393f2e09f"),
                             CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
-                            Name = "لبن المراعي 1 لتر",
+                            Name = "Almarai Laban 1L",
                             UnitId = new Guid("1c3b36d9-216d-4480-929b-71e611773892")
                         },
                         new
@@ -2447,7 +2450,7 @@ namespace Tawreed.Infrastructure.Migrations
                             Id = new Guid("366a5f46-4aa5-4336-b419-456d64fca6d0"),
                             CategoryId = new Guid("5752078d-9de9-4021-8a21-e42d495be44a"),
                             CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
-                            Name = "كوكاكولا 1 لتر",
+                            Name = "Coca-Cola 1L",
                             UnitId = new Guid("1bb8edb8-e7f0-49d4-ac09-95c064de2d93")
                         },
                         new
@@ -2455,7 +2458,7 @@ namespace Tawreed.Infrastructure.Migrations
                             Id = new Guid("0da04f7e-a779-45dd-98e3-0558971e6dd7"),
                             CategoryId = new Guid("5752078d-9de9-4021-8a21-e42d495be44a"),
                             CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
-                            Name = "فانتا برتقال 1 لتر",
+                            Name = "Fanta Orange 1L",
                             UnitId = new Guid("1bb8edb8-e7f0-49d4-ac09-95c064de2d93")
                         },
                         new
@@ -2463,7 +2466,7 @@ namespace Tawreed.Infrastructure.Migrations
                             Id = new Guid("76f4fd44-f497-4e75-96c9-b21f37d47e41"),
                             CategoryId = new Guid("5752078d-9de9-4021-8a21-e42d495be44a"),
                             CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
-                            Name = "سبرايت 1 لتر",
+                            Name = "Sprite 1L",
                             UnitId = new Guid("1bb8edb8-e7f0-49d4-ac09-95c064de2d93")
                         },
                         new
@@ -2471,7 +2474,7 @@ namespace Tawreed.Infrastructure.Migrations
                             Id = new Guid("f7b1cd26-efa7-4859-8ecf-95facdfcc4d4"),
                             CategoryId = new Guid("5752078d-9de9-4021-8a21-e42d495be44a"),
                             CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
-                            Name = "شويبس صودا 1 لتر",
+                            Name = "Schweppes Soda 1L",
                             UnitId = new Guid("1bb8edb8-e7f0-49d4-ac09-95c064de2d93")
                         },
                         new
@@ -2479,7 +2482,7 @@ namespace Tawreed.Infrastructure.Migrations
                             Id = new Guid("ec7275f7-13c2-4305-849f-bd71660046d3"),
                             CategoryId = new Guid("5752078d-9de9-4021-8a21-e42d495be44a"),
                             CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
-                            Name = "كوكاكولا كان 330 مل",
+                            Name = "Coca-Cola Can 330ml",
                             UnitId = new Guid("1bb8edb8-e7f0-49d4-ac09-95c064de2d93")
                         },
                         new
@@ -2487,7 +2490,7 @@ namespace Tawreed.Infrastructure.Migrations
                             Id = new Guid("571639f8-63d7-4715-9e12-34c2c35a4098"),
                             CategoryId = new Guid("5752078d-9de9-4021-8a21-e42d495be44a"),
                             CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
-                            Name = "بيبسي 1 لتر",
+                            Name = "Pepsi 1L",
                             UnitId = new Guid("1bb8edb8-e7f0-49d4-ac09-95c064de2d93")
                         },
                         new
@@ -2495,7 +2498,7 @@ namespace Tawreed.Infrastructure.Migrations
                             Id = new Guid("b9654c58-a387-4fc1-aaf9-7dae7839638c"),
                             CategoryId = new Guid("5752078d-9de9-4021-8a21-e42d495be44a"),
                             CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
-                            Name = "7UP 1 لتر",
+                            Name = "7UP 1L",
                             UnitId = new Guid("1bb8edb8-e7f0-49d4-ac09-95c064de2d93")
                         },
                         new
@@ -2503,7 +2506,7 @@ namespace Tawreed.Infrastructure.Migrations
                             Id = new Guid("e1e52a0f-1f22-4071-8562-e8df1c4e515e"),
                             CategoryId = new Guid("5752078d-9de9-4021-8a21-e42d495be44a"),
                             CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
-                            Name = "ميريندا برتقال 1 لتر",
+                            Name = "Mirinda Orange 1L",
                             UnitId = new Guid("1bb8edb8-e7f0-49d4-ac09-95c064de2d93")
                         },
                         new
@@ -2511,7 +2514,7 @@ namespace Tawreed.Infrastructure.Migrations
                             Id = new Guid("b2bd0cdb-5ccb-4816-bb1d-795daf2d248f"),
                             CategoryId = new Guid("5752078d-9de9-4021-8a21-e42d495be44a"),
                             CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
-                            Name = "بيبسي كان 330 مل",
+                            Name = "Pepsi Can 330ml",
                             UnitId = new Guid("1bb8edb8-e7f0-49d4-ac09-95c064de2d93")
                         },
                         new
@@ -2519,7 +2522,7 @@ namespace Tawreed.Infrastructure.Migrations
                             Id = new Guid("ed9a09e8-3842-4bc8-bbd6-935f58b1b97a"),
                             CategoryId = new Guid("95f91595-d5e8-4361-a633-ec27318c7393"),
                             CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
-                            Name = "بسكو مصر شاي 200 جم",
+                            Name = "Bisco Misr Tea Biscuit 200g",
                             UnitId = new Guid("9729ee93-9e25-44d9-b137-48921d676c08")
                         },
                         new
@@ -2527,7 +2530,7 @@ namespace Tawreed.Infrastructure.Migrations
                             Id = new Guid("d2fd9e66-456b-4773-851e-86c5a7bdd77c"),
                             CategoryId = new Guid("95f91595-d5e8-4361-a633-ec27318c7393"),
                             CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
-                            Name = "بسكو مصر بيتي بور 150 جم",
+                            Name = "Bisco Misr Petit Beurre 150g",
                             UnitId = new Guid("9729ee93-9e25-44d9-b137-48921d676c08")
                         },
                         new
@@ -2535,7 +2538,7 @@ namespace Tawreed.Infrastructure.Migrations
                             Id = new Guid("b7138f5f-4e7c-47e5-8f8e-7cd3108fb1a1"),
                             CategoryId = new Guid("95f91595-d5e8-4361-a633-ec27318c7393"),
                             CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
-                            Name = "بسكو مصر ويفر شوكولاتة 100 جم",
+                            Name = "Bisco Misr Wafers Chocolate 100g",
                             UnitId = new Guid("9729ee93-9e25-44d9-b137-48921d676c08")
                         },
                         new
@@ -2543,7 +2546,7 @@ namespace Tawreed.Infrastructure.Migrations
                             Id = new Guid("5ee00cf1-c0ad-43d7-a7fb-14da2f1c1034"),
                             CategoryId = new Guid("95f91595-d5e8-4361-a633-ec27318c7393"),
                             CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
-                            Name = "بسكو مصر ماري 200 جم",
+                            Name = "Bisco Misr Marie Biscuit 200g",
                             UnitId = new Guid("9729ee93-9e25-44d9-b137-48921d676c08")
                         },
                         new
@@ -2551,7 +2554,7 @@ namespace Tawreed.Infrastructure.Migrations
                             Id = new Guid("0a869846-885f-4383-bc2b-01a987b1d719"),
                             CategoryId = new Guid("f4513a34-620f-4e7c-b480-30364a6478ec"),
                             CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
-                            Name = "دمتي جبن مثلثات 250 جم",
+                            Name = "Domty Cheese Triangles 250g",
                             UnitId = new Guid("25275027-d132-4536-a6ba-8f18d71bcec3")
                         },
                         new
@@ -2559,7 +2562,7 @@ namespace Tawreed.Infrastructure.Migrations
                             Id = new Guid("d3a8ec1a-b14a-447c-938f-195210354111"),
                             CategoryId = new Guid("f4513a34-620f-4e7c-b480-30364a6478ec"),
                             CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
-                            Name = "دمتي جبن كريمي 200 جم",
+                            Name = "Domty Cream Cheese 200g",
                             UnitId = new Guid("25275027-d132-4536-a6ba-8f18d71bcec3")
                         },
                         new
@@ -2567,7 +2570,7 @@ namespace Tawreed.Infrastructure.Migrations
                             Id = new Guid("5f815f2c-98fd-4070-a3b2-e48b8e3783b4"),
                             CategoryId = new Guid("f4513a34-620f-4e7c-b480-30364a6478ec"),
                             CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
-                            Name = "دمتي موزاريلا 250 جم",
+                            Name = "Domty Mozzarella 250g",
                             UnitId = new Guid("25275027-d132-4536-a6ba-8f18d71bcec3")
                         },
                         new
@@ -2575,7 +2578,7 @@ namespace Tawreed.Infrastructure.Migrations
                             Id = new Guid("c56d0e5c-19c1-4490-9e96-b541b16c7b67"),
                             CategoryId = new Guid("628e3d75-e014-476c-a816-807393f2e09f"),
                             CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
-                            Name = "دمتي لبن بودرة 2 كجم",
+                            Name = "Domty Milk Powder 2kg",
                             UnitId = new Guid("25275027-d132-4536-a6ba-8f18d71bcec3")
                         },
                         new
@@ -2583,7 +2586,7 @@ namespace Tawreed.Infrastructure.Migrations
                             Id = new Guid("0e907b2b-b45d-4bad-833b-f29edab44fec"),
                             CategoryId = new Guid("19abea6a-4522-43aa-96ea-456c7c7aa53b"),
                             CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
-                            Name = "شيبسي هوهوز كريمة حامضة 50 جم",
+                            Name = "HOHOs Chips Sour Cream 50g",
                             UnitId = new Guid("9729ee93-9e25-44d9-b137-48921d676c08")
                         },
                         new
@@ -2591,7 +2594,7 @@ namespace Tawreed.Infrastructure.Migrations
                             Id = new Guid("17f2af19-6ca1-402a-93f5-a08193696c07"),
                             CategoryId = new Guid("19abea6a-4522-43aa-96ea-456c7c7aa53b"),
                             CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
-                            Name = "شيبسي هوهوز كاتشب 50 جم",
+                            Name = "HOHOs Chips Ketchup 50g",
                             UnitId = new Guid("9729ee93-9e25-44d9-b137-48921d676c08")
                         },
                         new
@@ -2599,7 +2602,7 @@ namespace Tawreed.Infrastructure.Migrations
                             Id = new Guid("a06d4bca-a8ec-4f2a-a19c-9978964fd086"),
                             CategoryId = new Guid("95f91595-d5e8-4361-a633-ec27318c7393"),
                             CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
-                            Name = "مول روزيتا بسكويت 100 جم",
+                            Name = "Mole Rosetta Biscuit 100g",
                             UnitId = new Guid("9729ee93-9e25-44d9-b137-48921d676c08")
                         },
                         new
@@ -2607,7 +2610,7 @@ namespace Tawreed.Infrastructure.Migrations
                             Id = new Guid("c55cedf9-be8b-4aa6-ad96-1a2dd7c2415b"),
                             CategoryId = new Guid("95f91595-d5e8-4361-a633-ec27318c7393"),
                             CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
-                            Name = "فريسكا كيك 80 جم",
+                            Name = "Fresca Cake 80g",
                             UnitId = new Guid("9729ee93-9e25-44d9-b137-48921d676c08")
                         },
                         new
@@ -2615,7 +2618,7 @@ namespace Tawreed.Infrastructure.Migrations
                             Id = new Guid("07070f15-a49e-49c7-a981-61fa8264550b"),
                             CategoryId = new Guid("945de5f2-4f10-4db4-afec-ee077ddd16a4"),
                             CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
-                            Name = "فرخة كاملة طازجة 1 كجم",
+                            Name = "Whole Chicken Fresh 1kg",
                             UnitId = new Guid("7040ee9a-21d6-48ed-b596-1dd9603e53ff")
                         },
                         new
@@ -2623,7 +2626,7 @@ namespace Tawreed.Infrastructure.Migrations
                             Id = new Guid("bf01f346-7342-47e2-a3be-3ccadcb89f2a"),
                             CategoryId = new Guid("945de5f2-4f10-4db4-afec-ee077ddd16a4"),
                             CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
-                            Name = "صدر دجاج 1 كجم",
+                            Name = "Chicken Breast 1kg",
                             UnitId = new Guid("7040ee9a-21d6-48ed-b596-1dd9603e53ff")
                         },
                         new
@@ -2631,7 +2634,7 @@ namespace Tawreed.Infrastructure.Migrations
                             Id = new Guid("bc5cd6ef-68f9-483c-8969-5df770449d62"),
                             CategoryId = new Guid("945de5f2-4f10-4db4-afec-ee077ddd16a4"),
                             CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
-                            Name = "أوراك دجاج 1 كجم",
+                            Name = "Chicken Thighs 1kg",
                             UnitId = new Guid("7040ee9a-21d6-48ed-b596-1dd9603e53ff")
                         },
                         new
@@ -2639,7 +2642,7 @@ namespace Tawreed.Infrastructure.Migrations
                             Id = new Guid("b9a84540-03bb-41f7-a039-3065484f7630"),
                             CategoryId = new Guid("945de5f2-4f10-4db4-afec-ee077ddd16a4"),
                             CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
-                            Name = "أجنحة دجاج 1 كجم",
+                            Name = "Chicken Wings 1kg",
                             UnitId = new Guid("7040ee9a-21d6-48ed-b596-1dd9603e53ff")
                         },
                         new
@@ -2647,7 +2650,7 @@ namespace Tawreed.Infrastructure.Migrations
                             Id = new Guid("d344ee05-027f-4d00-9f53-13fa205a7286"),
                             CategoryId = new Guid("af41250e-6ec7-4ebe-931f-34d053989073"),
                             CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
-                            Name = "لحم بقري مجمد 1 كجم",
+                            Name = "Frozen Beef 1kg",
                             UnitId = new Guid("7040ee9a-21d6-48ed-b596-1dd9603e53ff")
                         },
                         new
@@ -2655,7 +2658,7 @@ namespace Tawreed.Infrastructure.Migrations
                             Id = new Guid("93999360-d133-42f3-a020-b3cbfb7d407a"),
                             CategoryId = new Guid("af41250e-6ec7-4ebe-931f-34d053989073"),
                             CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
-                            Name = "لحم ضأن مجمد 1 كجم",
+                            Name = "Frozen Lamb 1kg",
                             UnitId = new Guid("7040ee9a-21d6-48ed-b596-1dd9603e53ff")
                         },
                         new
@@ -2663,7 +2666,7 @@ namespace Tawreed.Infrastructure.Migrations
                             Id = new Guid("8b30e673-a339-49e9-8a73-d282b0339489"),
                             CategoryId = new Guid("af41250e-6ec7-4ebe-931f-34d053989073"),
                             CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
-                            Name = "برجر بقري 500 جم",
+                            Name = "Beef Burger 500g",
                             UnitId = new Guid("7040ee9a-21d6-48ed-b596-1dd9603e53ff")
                         },
                         new
@@ -2671,7 +2674,7 @@ namespace Tawreed.Infrastructure.Migrations
                             Id = new Guid("005f9f49-e511-4130-8d38-9bfe78b50cd1"),
                             CategoryId = new Guid("af41250e-6ec7-4ebe-931f-34d053989073"),
                             CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
-                            Name = "سجق بقري 500 جم",
+                            Name = "Sausage Beef 500g",
                             UnitId = new Guid("7040ee9a-21d6-48ed-b596-1dd9603e53ff")
                         },
                         new
@@ -2679,7 +2682,7 @@ namespace Tawreed.Infrastructure.Migrations
                             Id = new Guid("5ef8ef3b-6887-4a94-9241-2f61540b1383"),
                             CategoryId = new Guid("628e3d75-e014-476c-a816-807393f2e09f"),
                             CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
-                            Name = "حليب دينا فارم 1 لتر",
+                            Name = "Dina Farms Milk 1L",
                             UnitId = new Guid("1c3b36d9-216d-4480-929b-71e611773892")
                         },
                         new
@@ -2687,7 +2690,7 @@ namespace Tawreed.Infrastructure.Migrations
                             Id = new Guid("c8b5ff65-f63f-4ba0-85ff-206b55a0cd70"),
                             CategoryId = new Guid("73c7a94c-92c7-4b2b-96c9-b94fa1cc4fd0"),
                             CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
-                            Name = "زبادي دينا فارم 500 جم",
+                            Name = "Dina Farms Yogurt 500g",
                             UnitId = new Guid("25275027-d132-4536-a6ba-8f18d71bcec3")
                         },
                         new
@@ -2695,7 +2698,7 @@ namespace Tawreed.Infrastructure.Migrations
                             Id = new Guid("76e31cfe-371b-4241-af12-988ba88bad02"),
                             CategoryId = new Guid("628e3d75-e014-476c-a816-807393f2e09f"),
                             CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
-                            Name = "قشطة دينا فارم 200 مل",
+                            Name = "Dina Farms Cream 200ml",
                             UnitId = new Guid("1bb8edb8-e7f0-49d4-ac09-95c064de2d93")
                         },
                         new

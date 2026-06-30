@@ -438,6 +438,36 @@ public class AdminController : ControllerBase
         return Ok(new { message = "Group region types updated" });
     }
 
+    [HttpGet("settings/default-deadline-days")]
+    public async Task<ActionResult<object>> GetDefaultDeadlineDays(CancellationToken cancellationToken)
+    {
+        var days = await _adminService.GetDefaultDeadlineDaysAsync(cancellationToken);
+        return Ok(new { days });
+    }
+
+    [HttpPut("settings/default-deadline-days")]
+    public async Task<ActionResult> SetDefaultDeadlineDays([FromBody] DefaultDeadlineDaysRequest request, CancellationToken cancellationToken)
+    {
+        if (request.Days < 1) return BadRequest(new { error = "Days must be at least 1" });
+        await _adminService.SetDefaultDeadlineDaysAsync(request.Days, cancellationToken);
+        return Ok(new { message = "Default deadline days updated" });
+    }
+
+    [HttpGet("settings/urgent-deadline-hours")]
+    public async Task<ActionResult<object>> GetUrgentDeadlineHours(CancellationToken cancellationToken)
+    {
+        var hours = await _adminService.GetUrgentDeadlineHoursAsync(cancellationToken);
+        return Ok(new { hours });
+    }
+
+    [HttpPut("settings/urgent-deadline-hours")]
+    public async Task<ActionResult> SetUrgentDeadlineHours([FromBody] UrgentDeadlineHoursRequest request, CancellationToken cancellationToken)
+    {
+        if (request.Hours < 1) return BadRequest(new { error = "Hours must be at least 1" });
+        await _adminService.SetUrgentDeadlineHoursAsync(request.Hours, cancellationToken);
+        return Ok(new { message = "Urgent deadline hours updated" });
+    }
+
     // Profile
 
     [HttpGet("profile")]
@@ -494,3 +524,6 @@ public record UpdateRegionRequest(
     Guid? ParentId,
     string? Type = null
 );
+
+public record DefaultDeadlineDaysRequest(int Days);
+public record UrgentDeadlineHoursRequest(int Hours);

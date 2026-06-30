@@ -100,11 +100,9 @@ public class AuthService : IAuthService
             UserId = user.Id,
             BusinessName = request.BusinessName,
             BusinessType = request.BusinessType,
-            RegionId = request.RegionId,
-            Address = request.Address,
-            Latitude = null,
-            Longitude = null,
-            RatingAvg = 0
+            TaxId = request.TaxId,
+            CommercialRegistrationNo = request.CommercialRegistrationNo,
+            RegionId = request.RegionId
         };
         _buyerRepository.Add(buyer);
 
@@ -138,9 +136,9 @@ public class AuthService : IAuthService
             UserId = user.Id,
             CompanyName = request.CompanyName,
             TaxId = request.TaxId,
+            CommercialRegistrationNo = request.CommercialRegistrationNo,
             RegionId = request.RegionId,
-            IsApproved = false,
-            RatingAvg = 0
+            IsApproved = false
         };
         _supplierRepository.Add(supplier);
 

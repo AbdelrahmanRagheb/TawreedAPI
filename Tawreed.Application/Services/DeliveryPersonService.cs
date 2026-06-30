@@ -113,6 +113,35 @@ public class DeliveryPersonService : IDeliveryPersonService
         };
     }
 
+    private string GetFullRegionAddress(Region? region, Dictionary<Guid, Region> regionLookup, bool useArabic = false)
+    {
+        if (region == null)
+            return "";
+
+        var parts = new List<string>();
+        var current = region;
+
+        while (current != null)
+        {
+            parts.Insert(0, useArabic ? current.NameAr : current.NameEn);
+            if (current.ParentId.HasValue && regionLookup.TryGetValue(current.ParentId.Value, out var parent))
+            {
+                current = parent;
+            }
+            else
+            {
+                break;
+            }
+        }
+
+        return string.Join(", ", parts);
+    }
+
+    private string GetFullRegionAddress(Region? region, Dictionary<Guid, Region> regionLookup)
+    {
+        return GetFullRegionAddress(region, regionLookup, false);
+    }
+
     public async Task<DeliveryPersonDeliveryDetailDto> GetDeliveryDetailAsync(Guid deliveryId, Guid userId, CancellationToken cancellationToken = default)
     {
         var delivery = await _deliveryRepository.GetByIdWithGroupOrderAsync(deliveryId, cancellationToken)
@@ -128,18 +157,48 @@ public class DeliveryPersonService : IDeliveryPersonService
             .ToList();
 
         var groupOrderItems = delivery.GroupOrder?.Items?.ToList() ?? [];
+        
+        // Pre-load all regions to avoid concurrent DB calls
+        var allRegions = await _regionRepository.GetAllAsync(cancellationToken);
+        var regionLookup = allRegions.ToDictionary(r => r.Id, r => r);
 
-        var participantDetails = joinedInvoices.Select(i =>
+        var participantDetails = new List<DeliveryPersonDeliveryParticipantDetailDto>();
+
+        foreach (var i in joinedInvoices)
         {
             var participantItems = i.Participant?.Items?.ToList() ?? [];
-            return new DeliveryPersonDeliveryParticipantDetailDto
+            var buyer = i.Buyer;
+            var regionFullAddressEn = GetFullRegionAddress(buyer?.Region, regionLookup, false);
+            var regionFullAddressAr = GetFullRegionAddress(buyer?.Region, regionLookup, true);
+            
+            // Build full address: combine buyer's address with region hierarchy
+            var fullAddressPartsEn = new List<string>();
+            var fullAddressPartsAr = new List<string>();
+            
+            if (!string.IsNullOrEmpty(regionFullAddressEn))
+                fullAddressPartsEn.Add(regionFullAddressEn);
+            if (!string.IsNullOrEmpty(regionFullAddressAr))
+                fullAddressPartsAr.Add(regionFullAddressAr);
+            
+            var fullAddressEn = string.Join(", ", fullAddressPartsEn);
+            var fullAddressAr = string.Join(", ", fullAddressPartsAr);
+            
+            // Final fallback: use ShippingRegion if we have nothing
+            if (string.IsNullOrEmpty(fullAddressEn) && !string.IsNullOrEmpty(i.ShippingRegion))
+                fullAddressEn = i.ShippingRegion;
+            if (string.IsNullOrEmpty(fullAddressAr) && !string.IsNullOrEmpty(i.ShippingRegion))
+                fullAddressAr = i.ShippingRegion;
+            
+            participantDetails.Add(new DeliveryPersonDeliveryParticipantDetailDto
             {
                 InvoiceId = i.Id,
                 ParticipantId = i.ParticipantId ?? Guid.Empty,
                 ParticipantName = i.Buyer?.User?.FullName ?? "",
                 Email = i.Buyer?.User?.Email ?? "",
                 Phone = i.Buyer?.User?.Phone ?? "",
-                Address = i.Buyer?.Address ?? i.Buyer?.Region?.NameEn ?? i.ShippingRegion ?? "",
+                Address = fullAddressEn,
+                AddressAr = fullAddressAr,
+                AddressEn = fullAddressEn,
                 Status = i.Participant?.Status ?? "Joined",
                 VerificationCode = i.VerificationCode ?? "",
                 Items = groupOrderItems.Select(goi =>
@@ -157,8 +216,8 @@ public class DeliveryPersonService : IDeliveryPersonService
                         TotalPrice = qty * unitPrice
                     };
                 }).ToList()
-            };
-        }).ToList();
+            });
+        }
 
         // Include the order creator in the delivery list
         var creator = delivery.GroupOrder?.Creator;
@@ -188,6 +247,27 @@ public class DeliveryPersonService : IDeliveryPersonService
                 })
                 .ToList();
 
+            var creatorRegionFullAddressEn = GetFullRegionAddress(creator.Region, regionLookup, false);
+            var creatorRegionFullAddressAr = GetFullRegionAddress(creator.Region, regionLookup, true);
+            
+            // Build full address: combine creator's address with region hierarchy
+            var creatorFullAddressPartsEn = new List<string>();
+            var creatorFullAddressPartsAr = new List<string>();
+            
+            if (!string.IsNullOrEmpty(creatorRegionFullAddressEn))
+                creatorFullAddressPartsEn.Add(creatorRegionFullAddressEn);
+            if (!string.IsNullOrEmpty(creatorRegionFullAddressAr))
+                creatorFullAddressPartsAr.Add(creatorRegionFullAddressAr);
+            
+            var creatorFullAddressEn = string.Join(", ", creatorFullAddressPartsEn);
+            var creatorFullAddressAr = string.Join(", ", creatorFullAddressPartsAr);
+            
+            // Final fallback: use ShippingRegion if we have nothing
+            if (string.IsNullOrEmpty(creatorFullAddressEn) && !string.IsNullOrEmpty(delivery.ShippingRegion))
+                creatorFullAddressEn = delivery.ShippingRegion;
+            if (string.IsNullOrEmpty(creatorFullAddressAr) && !string.IsNullOrEmpty(delivery.ShippingRegion))
+                creatorFullAddressAr = delivery.ShippingRegion;
+
             participantDetails.Add(new DeliveryPersonDeliveryParticipantDetailDto
             {
                 InvoiceId = Guid.Empty,
@@ -195,7 +275,9 @@ public class DeliveryPersonService : IDeliveryPersonService
                 ParticipantName = creator.User?.FullName ?? "",
                 Email = creator.User?.Email ?? "",
                 Phone = creator.User?.Phone ?? "",
-                    Address = creator.Address ?? creator.Region?.NameEn ?? delivery.ShippingRegion ?? "",
+                Address = creatorFullAddressEn,
+                AddressAr = creatorFullAddressAr,
+                AddressEn = creatorFullAddressEn,
                 Status = "Joined",
                 VerificationCode = "",
                 Items = creatorItems.Where(i => i.Quantity > 0).ToList()
@@ -371,7 +453,9 @@ public class DeliveryPersonService : IDeliveryPersonService
         var order = await _groupOrderRepository.GetWithDetailsAsync(request.OrderId, cancellationToken)
             ?? throw new KeyNotFoundException("Order not found.");
 
-        if (order.AssignedDeliveryPersonId.HasValue)
+        // Check if delivery already assigned
+        var existingDelivery = await _deliveryRepository.FindOneAsync(d => d.GroupOrderId == request.OrderId, cancellationToken);
+        if (existingDelivery?.DeliveryPersonId != null)
             throw new InvalidOperationException("Another delivery person has already been assigned to this order.");
 
         // Update request
@@ -379,20 +463,13 @@ public class DeliveryPersonService : IDeliveryPersonService
         request.RespondedAt = DateTimeOffset.UtcNow;
         _deliveryAssignmentRequestRepository.Update(request);
 
-        // Assign to order
-        order.AssignedDeliveryPersonId = profile.Id;
-        order.ProposedDeliveryFee = request.ProposedFee ?? profile.BaseDeliveryFee;
-        order.DeliveryApprovalStatus = "Pending";
-        _groupOrderRepository.Update(order);
-
-        // Update delivery record
-        var delivery = await _deliveryRepository.FindOneAsync(d => d.GroupOrderId == request.OrderId, cancellationToken);
-        if (delivery != null)
+        // Update or create delivery record
+        if (existingDelivery != null)
         {
-            delivery.DeliveryPersonId = profile.UserId;
-            delivery.DeliveryType = "System";
-            delivery.DeliveryFee = request.ProposedFee ?? profile.BaseDeliveryFee;
-            _deliveryRepository.Update(delivery);
+            existingDelivery.DeliveryPersonId = profile.UserId;
+            existingDelivery.DeliveryType = "System";
+            existingDelivery.DeliveryFee = request.ProposedFee ?? profile.BaseDeliveryFee;
+            _deliveryRepository.Update(existingDelivery);
         }
 
         // Notify supplier
@@ -419,8 +496,8 @@ public class DeliveryPersonService : IDeliveryPersonService
                 Type = "DeliveryRequestAccepted",
                 TitleAr = "تم تعيين مندوب توصيل",
                 TitleEn = "Delivery Person Assigned",
-                BodyAr = $"تم تعيين مندوب توصيل للطلب '{order.Title}'. رسوم التوصيل: {order.ProposedDeliveryFee}",
-                BodyEn = $"A delivery person has been assigned for order '{order.Title}'. Delivery fee: {order.ProposedDeliveryFee}",
+                BodyAr = $"تم تعيين مندوب توصيل للطلب '{order.Title}'. رسوم التوصيل: {request.ProposedFee ?? profile.BaseDeliveryFee}",
+                BodyEn = $"A delivery person has been assigned for order '{order.Title}'. Delivery fee: {request.ProposedFee ?? profile.BaseDeliveryFee}",
                 Channel = "InApp",
                 RelatedOrderId = request.OrderId
             });

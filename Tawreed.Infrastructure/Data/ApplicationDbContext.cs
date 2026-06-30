@@ -252,30 +252,30 @@ public class ApplicationDbContext : DbContext
 
         // ── Buyers ────────────────────────────────────────────────────────
         modelBuilder.Entity<Buyer>().HasData(
-            new Buyer { Id = SeedConstants.Buyer1, UserId = SeedConstants.UserBuyer1, BusinessName = "مطعم الأهرام", BusinessType = "Restaurant", RegionId = SeedConstants.RegionNasrCity, RatingAvg = 4.5m, CreatedAt = seedDate },
-            new Buyer { Id = SeedConstants.Buyer2, UserId = SeedConstants.UserBuyer2, BusinessName = "سوبر ماركت النيل", BusinessType = "Supermarket", RegionId = SeedConstants.RegionSmouha, RatingAvg = 4.5m, CreatedAt = seedDate },
-            new Buyer { Id = SeedConstants.Buyer3, UserId = SeedConstants.UserBuyer3, BusinessName = "كافeteria القاهرة", BusinessType = "Cafe", RegionId = SeedConstants.RegionMohandeseen, RatingAvg = 4.5m, CreatedAt = seedDate },
-            new Buyer { Id = SeedConstants.Buyer4, UserId = SeedConstants.UserBuyer4, BusinessName = "فندق سفنكس", BusinessType = "Hotel", RegionId = SeedConstants.RegionMaadi, RatingAvg = 4.5m, CreatedAt = seedDate },
-            new Buyer { Id = SeedConstants.Buyer5, UserId = SeedConstants.UserBuyer5, BusinessName = "مخبز الشمس", BusinessType = "Bakery", RegionId = SeedConstants.RegionOctober6, RatingAvg = 4.5m, CreatedAt = seedDate },
-            new Buyer { Id = SeedConstants.Buyer6, UserId = SeedConstants.UserBuyer6, BusinessName = "نادي الرياض", BusinessType = "SportsClub", RegionId = SeedConstants.RegionNasrCity, RatingAvg = 4.5m, CreatedAt = seedDate },
-            new Buyer { Id = SeedConstants.Buyer7, UserId = SeedConstants.UserBuyer7, BusinessName = "مطعم الفلاح", BusinessType = "Restaurant", RegionId = SeedConstants.RegionAgamy, RatingAvg = 4.5m, CreatedAt = seedDate },
-            new Buyer { Id = SeedConstants.Buyer8, UserId = SeedConstants.UserBuyer8, BusinessName = "هايبر ماركت مصر", BusinessType = "Supermarket", RegionId = SeedConstants.RegionMohandeseen, RatingAvg = 4.5m, CreatedAt = seedDate },
-            new Buyer { Id = SeedConstants.Buyer9, UserId = SeedConstants.UserBuyer9, BusinessName = "ش drip القهوة", BusinessType = "Cafe", RegionId = SeedConstants.RegionSmouha, RatingAvg = 4.5m, CreatedAt = seedDate },
-            new Buyer { Id = SeedConstants.Buyer10, UserId = SeedConstants.UserBuyer10, BusinessName = "مستشفى السلام", BusinessType = "Hospital", RegionId = SeedConstants.RegionMaadi, RatingAvg = 4.5m, CreatedAt = seedDate }
+            new Buyer { Id = SeedConstants.Buyer1, UserId = SeedConstants.UserBuyer1, BusinessName = "مطعم الأهرام", BusinessType = "Restaurant", RegionId = SeedConstants.RegionNasrCity,  CreatedAt = seedDate },
+            new Buyer { Id = SeedConstants.Buyer2, UserId = SeedConstants.UserBuyer2, BusinessName = "سوبر ماركت النيل", BusinessType = "Supermarket", RegionId = SeedConstants.RegionSmouha,   CreatedAt = seedDate },
+            new Buyer { Id = SeedConstants.Buyer3, UserId = SeedConstants.UserBuyer3, BusinessName = "كافeteria القاهرة", BusinessType = "Cafe", RegionId = SeedConstants.RegionMohandeseen,   CreatedAt = seedDate },
+            new Buyer { Id = SeedConstants.Buyer4, UserId = SeedConstants.UserBuyer4, BusinessName = "فندق سفنكس", BusinessType = "Hotel", RegionId = SeedConstants.RegionMaadi,   CreatedAt = seedDate },
+            new Buyer { Id = SeedConstants.Buyer5, UserId = SeedConstants.UserBuyer5, BusinessName = "مخبز الشمس", BusinessType = "Bakery", RegionId = SeedConstants.RegionOctober6,   CreatedAt = seedDate },
+            new Buyer { Id = SeedConstants.Buyer6, UserId = SeedConstants.UserBuyer6, BusinessName = "نادي الرياض", BusinessType = "SportsClub", RegionId = SeedConstants.RegionNasrCity,   CreatedAt = seedDate },
+            new Buyer { Id = SeedConstants.Buyer7, UserId = SeedConstants.UserBuyer7, BusinessName = "مطعم الفلاح", BusinessType = "Restaurant", RegionId = SeedConstants.RegionAgamy,   CreatedAt = seedDate },
+            new Buyer { Id = SeedConstants.Buyer8, UserId = SeedConstants.UserBuyer8, BusinessName = "هايبر ماركت مصر", BusinessType = "Supermarket", RegionId = SeedConstants.RegionMohandeseen,   CreatedAt = seedDate },
+            new Buyer { Id = SeedConstants.Buyer9, UserId = SeedConstants.UserBuyer9, BusinessName = "ش drip القهوة", BusinessType = "Cafe", RegionId = SeedConstants.RegionSmouha,   CreatedAt = seedDate },
+            new Buyer { Id = SeedConstants.Buyer10, UserId = SeedConstants.UserBuyer10, BusinessName = "مستشفى السلام", BusinessType = "Hospital", RegionId = SeedConstants.RegionMaadi,   CreatedAt = seedDate }
         );
 
         // ── Suppliers ─────────────────────────────────────────────────────
         modelBuilder.Entity<Supplier>().HasData(
-            new Supplier { Id = SeedConstants.Supplier1, UserId = SeedConstants.UserSupplier1, CompanyName = "جهينة للصناعات الغذائية", RegionId = SeedConstants.RegionOctober6, IsApproved = true, RatingAvg = 4.5m, Address = "جهينة للصناعات الغذائية - المنطقة الصناعية", CreatedAt = seedDate },
-            new Supplier { Id = SeedConstants.Supplier2, UserId = SeedConstants.UserSupplier2, CompanyName = "المراعي مصر", RegionId = SeedConstants.RegionOctober6, IsApproved = true, RatingAvg = 4.3m, Address = "المراعي مصر - المنطقة الصناعية", CreatedAt = seedDate },
-            new Supplier { Id = SeedConstants.Supplier3, UserId = SeedConstants.UserSupplier3, CompanyName = "كوكاكولا مصر", RegionId = SeedConstants.RegionCairo, IsApproved = true, RatingAvg = 4.7m, Address = "كوكاكولا مصر - المنطقة الصناعية", CreatedAt = seedDate },
-            new Supplier { Id = SeedConstants.Supplier4, UserId = SeedConstants.UserSupplier4, CompanyName = "بيبسي كولا مصر", RegionId = SeedConstants.RegionCairo, IsApproved = true, RatingAvg = 4.4m, Address = "بيبسي كولا مصر - المنطقة الصناعية", CreatedAt = seedDate },
-            new Supplier { Id = SeedConstants.Supplier5, UserId = SeedConstants.UserSupplier5, CompanyName = "بسكو مصر", RegionId = SeedConstants.RegionAlexandria, IsApproved = true, RatingAvg = 4.1m, Address = "بسكو مصر - المنطقة الصناعية", CreatedAt = seedDate },
-            new Supplier { Id = SeedConstants.Supplier6, UserId = SeedConstants.UserSupplier6, CompanyName = "دومتي للصناعات الغذائية", RegionId = SeedConstants.RegionSharqia, IsApproved = true, RatingAvg = 4.6m, Address = "دومتي للصناعات الغذائية - المنطقة الصناعية", CreatedAt = seedDate },
-            new Supplier { Id = SeedConstants.Supplier7, UserId = SeedConstants.UserSupplier7, CompanyName = "ايديتا للصناعات الغذائية", RegionId = SeedConstants.RegionSharqia, IsApproved = true, RatingAvg = 4.2m, Address = "ايديتا للصناعات الغذائية - المنطقة الصناعية", CreatedAt = seedDate },
-            new Supplier { Id = SeedConstants.Supplier8, UserId = SeedConstants.UserSupplier8, CompanyName = "شركة السلسلة للدواجن", RegionId = SeedConstants.RegionGharbia, IsApproved = true, RatingAvg = 4.8m, Address = "شركة السلسلة للدواجن - المنطقة الصناعية", CreatedAt = seedDate },
-            new Supplier { Id = SeedConstants.Supplier9, UserId = SeedConstants.UserSupplier9, CompanyName = "شركة الفتح للحوم", RegionId = SeedConstants.RegionFayoum, IsApproved = true, RatingAvg = 4.0m, Address = "شركة الفتح للحوم - المنطقة الصناعية", CreatedAt = seedDate },
-            new Supplier { Id = SeedConstants.Supplier10, UserId = SeedConstants.UserSupplier10, CompanyName = "مزارع دينا", RegionId = SeedConstants.RegionDakahlia, IsApproved = true, RatingAvg = 4.9m, Address = "مزارع دينا - المنطقة الصناعية", CreatedAt = seedDate }
+            new Supplier { Id = SeedConstants.Supplier1, UserId = SeedConstants.UserSupplier1, CompanyName = "جهينة للصناعات الغذائية", RegionId = SeedConstants.RegionOctober6, IsApproved = true,     CreatedAt = seedDate },
+            new Supplier { Id = SeedConstants.Supplier2, UserId = SeedConstants.UserSupplier2, CompanyName = "المراعي مصر", RegionId = SeedConstants.RegionOctober6, IsApproved = true, CreatedAt = seedDate },
+            new Supplier { Id = SeedConstants.Supplier3, UserId = SeedConstants.UserSupplier3, CompanyName = "كوكاكولا مصر", RegionId = SeedConstants.RegionCairo, IsApproved = true, CreatedAt = seedDate },
+            new Supplier { Id = SeedConstants.Supplier4, UserId = SeedConstants.UserSupplier4, CompanyName = "بيبسي كولا مصر", RegionId = SeedConstants.RegionCairo, IsApproved = true, CreatedAt = seedDate },
+            new Supplier { Id = SeedConstants.Supplier5, UserId = SeedConstants.UserSupplier5, CompanyName = "بسكو مصر", RegionId = SeedConstants.RegionAlexandria, IsApproved = true, CreatedAt = seedDate },
+            new Supplier { Id = SeedConstants.Supplier6, UserId = SeedConstants.UserSupplier6, CompanyName = "دومتي للصناعات الغذائية", RegionId = SeedConstants.RegionSharqia, IsApproved = true, CreatedAt = seedDate },
+            new Supplier { Id = SeedConstants.Supplier7, UserId = SeedConstants.UserSupplier7, CompanyName = "ايديتا للصناعات الغذائية", RegionId = SeedConstants.RegionSharqia, IsApproved = true, CreatedAt = seedDate },
+            new Supplier { Id = SeedConstants.Supplier8, UserId = SeedConstants.UserSupplier8, CompanyName = "شركة السلسلة للدواجن", RegionId = SeedConstants.RegionGharbia, IsApproved = true, CreatedAt = seedDate },
+            new Supplier { Id = SeedConstants.Supplier9, UserId = SeedConstants.UserSupplier9, CompanyName = "شركة الفتح للحوم", RegionId = SeedConstants.RegionFayoum, IsApproved = true, CreatedAt = seedDate },
+            new Supplier { Id = SeedConstants.Supplier10, UserId = SeedConstants.UserSupplier10, CompanyName = "مزارع دينا", RegionId = SeedConstants.RegionDakahlia, IsApproved = true, CreatedAt = seedDate }
         );
 
         // ── SupplierCategories ────────────────────────────────────────────
@@ -302,61 +302,61 @@ public class ApplicationDbContext : DbContext
         );
 
         // ── Products ──────────────────────────────────────────────────────
-        modelBuilder.Entity<Product>().HasData(
-            // Juhayna
-            new Product { Id = SeedConstants.Product1, Name = "Juhayna Milk Full Cream 1L", CategoryId = SeedConstants.CatMilk, UnitId = SeedConstants.UnitL, CreatedAt = seedDate },
-            new Product { Id = SeedConstants.Product2, Name = "Juhayna Milk Half Fat 1L", CategoryId = SeedConstants.CatMilk, UnitId = SeedConstants.UnitL, CreatedAt = seedDate },
-            new Product { Id = SeedConstants.Product3, Name = "Juhayna Yogurt Plain 500g", CategoryId = SeedConstants.CatYogurt, UnitId = SeedConstants.UnitPiece, CreatedAt = seedDate },
-            new Product { Id = SeedConstants.Product4, Name = "Juhayna Yogurt Strawberry 150g", CategoryId = SeedConstants.CatYogurt, UnitId = SeedConstants.UnitPiece, CreatedAt = seedDate },
-            new Product { Id = SeedConstants.Product5, Name = "Juhayna Juice Mixed 1L", CategoryId = SeedConstants.CatJuice, UnitId = SeedConstants.UnitL, CreatedAt = seedDate },
-            new Product { Id = SeedConstants.Product6, Name = "Juhayna Laban Rayeb 1L", CategoryId = SeedConstants.CatMilk, UnitId = SeedConstants.UnitL, CreatedAt = seedDate },
-            new Product { Id = SeedConstants.Product7, Name = "Juhayna Cream 200ml", CategoryId = SeedConstants.CatMilk, UnitId = SeedConstants.UnitBottle, CreatedAt = seedDate },
-            // Almarai
-            new Product { Id = SeedConstants.Product8, Name = "Almarai Milk Full Cream 1L", CategoryId = SeedConstants.CatMilk, UnitId = SeedConstants.UnitL, CreatedAt = seedDate },
-            new Product { Id = SeedConstants.Product9, Name = "Almarai Yogurt Greek 200g", CategoryId = SeedConstants.CatYogurt, UnitId = SeedConstants.UnitPiece, CreatedAt = seedDate },
-            new Product { Id = SeedConstants.Product10, Name = "Almarai Butter 100g", CategoryId = SeedConstants.CatMilk, UnitId = SeedConstants.UnitPiece, CreatedAt = seedDate },
-            new Product { Id = SeedConstants.Product11, Name = "Almarai Cheddar Cheese 250g", CategoryId = SeedConstants.CatCheese, UnitId = SeedConstants.UnitPiece, CreatedAt = seedDate },
-            new Product { Id = SeedConstants.Product12, Name = "Almarai Laban 1L", CategoryId = SeedConstants.CatMilk, UnitId = SeedConstants.UnitL, CreatedAt = seedDate },
-            // Coca-Cola
-            new Product { Id = SeedConstants.Product13, Name = "Coca-Cola 1L", CategoryId = SeedConstants.CatWater, UnitId = SeedConstants.UnitBottle, CreatedAt = seedDate },
-            new Product { Id = SeedConstants.Product14, Name = "Fanta Orange 1L", CategoryId = SeedConstants.CatWater, UnitId = SeedConstants.UnitBottle, CreatedAt = seedDate },
-            new Product { Id = SeedConstants.Product15, Name = "Sprite 1L", CategoryId = SeedConstants.CatWater, UnitId = SeedConstants.UnitBottle, CreatedAt = seedDate },
-            new Product { Id = SeedConstants.Product16, Name = "Schweppes Soda 1L", CategoryId = SeedConstants.CatWater, UnitId = SeedConstants.UnitBottle, CreatedAt = seedDate },
-            new Product { Id = SeedConstants.Product17, Name = "Coca-Cola Can 330ml", CategoryId = SeedConstants.CatWater, UnitId = SeedConstants.UnitBottle, CreatedAt = seedDate },
-            // Pepsi
-            new Product { Id = SeedConstants.Product18, Name = "Pepsi 1L", CategoryId = SeedConstants.CatWater, UnitId = SeedConstants.UnitBottle, CreatedAt = seedDate },
-            new Product { Id = SeedConstants.Product19, Name = "7UP 1L", CategoryId = SeedConstants.CatWater, UnitId = SeedConstants.UnitBottle, CreatedAt = seedDate },
-            new Product { Id = SeedConstants.Product20, Name = "Mirinda Orange 1L", CategoryId = SeedConstants.CatWater, UnitId = SeedConstants.UnitBottle, CreatedAt = seedDate },
-            new Product { Id = SeedConstants.Product21, Name = "Pepsi Can 330ml", CategoryId = SeedConstants.CatWater, UnitId = SeedConstants.UnitBottle, CreatedAt = seedDate },
-            // Bisco Misr
-            new Product { Id = SeedConstants.Product22, Name = "Bisco Misr Tea Biscuit 200g", CategoryId = SeedConstants.CatBiscuit, UnitId = SeedConstants.UnitPacket, CreatedAt = seedDate },
-            new Product { Id = SeedConstants.Product23, Name = "Bisco Misr Petit Beurre 150g", CategoryId = SeedConstants.CatBiscuit, UnitId = SeedConstants.UnitPacket, CreatedAt = seedDate },
-            new Product { Id = SeedConstants.Product24, Name = "Bisco Misr Wafers Chocolate 100g", CategoryId = SeedConstants.CatBiscuit, UnitId = SeedConstants.UnitPacket, CreatedAt = seedDate },
-            new Product { Id = SeedConstants.Product25, Name = "Bisco Misr Marie Biscuit 200g", CategoryId = SeedConstants.CatBiscuit, UnitId = SeedConstants.UnitPacket, CreatedAt = seedDate },
-            // Domty
-            new Product { Id = SeedConstants.Product26, Name = "Domty Cheese Triangles 250g", CategoryId = SeedConstants.CatCheese, UnitId = SeedConstants.UnitPiece, CreatedAt = seedDate },
-            new Product { Id = SeedConstants.Product27, Name = "Domty Cream Cheese 200g", CategoryId = SeedConstants.CatCheese, UnitId = SeedConstants.UnitPiece, CreatedAt = seedDate },
-            new Product { Id = SeedConstants.Product28, Name = "Domty Mozzarella 250g", CategoryId = SeedConstants.CatCheese, UnitId = SeedConstants.UnitPiece, CreatedAt = seedDate },
-            new Product { Id = SeedConstants.Product29, Name = "Domty Milk Powder 2kg", CategoryId = SeedConstants.CatMilk, UnitId = SeedConstants.UnitPiece, CreatedAt = seedDate },
-            // Edita
-            new Product { Id = SeedConstants.Product30, Name = "HOHOs Chips Sour Cream 50g", CategoryId = SeedConstants.CatChips, UnitId = SeedConstants.UnitPacket, CreatedAt = seedDate },
-            new Product { Id = SeedConstants.Product31, Name = "HOHOs Chips Ketchup 50g", CategoryId = SeedConstants.CatChips, UnitId = SeedConstants.UnitPacket, CreatedAt = seedDate },
-            new Product { Id = SeedConstants.Product32, Name = "Mole Rosetta Biscuit 100g", CategoryId = SeedConstants.CatBiscuit, UnitId = SeedConstants.UnitPacket, CreatedAt = seedDate },
-            new Product { Id = SeedConstants.Product33, Name = "Fresca Cake 80g", CategoryId = SeedConstants.CatBiscuit, UnitId = SeedConstants.UnitPacket, CreatedAt = seedDate },
-            // Selsela
-            new Product { Id = SeedConstants.Product34, Name = "Whole Chicken Fresh 1kg", CategoryId = SeedConstants.CatPoultry, UnitId = SeedConstants.UnitKg, CreatedAt = seedDate },
-            new Product { Id = SeedConstants.Product35, Name = "Chicken Breast 1kg", CategoryId = SeedConstants.CatPoultry, UnitId = SeedConstants.UnitKg, CreatedAt = seedDate },
-            new Product { Id = SeedConstants.Product36, Name = "Chicken Thighs 1kg", CategoryId = SeedConstants.CatPoultry, UnitId = SeedConstants.UnitKg, CreatedAt = seedDate },
-            new Product { Id = SeedConstants.Product37, Name = "Chicken Wings 1kg", CategoryId = SeedConstants.CatPoultry, UnitId = SeedConstants.UnitKg, CreatedAt = seedDate },
-            // Fath
-            new Product { Id = SeedConstants.Product38, Name = "Frozen Beef 1kg", CategoryId = SeedConstants.CatFrozen, UnitId = SeedConstants.UnitKg, CreatedAt = seedDate },
-            new Product { Id = SeedConstants.Product39, Name = "Frozen Lamb 1kg", CategoryId = SeedConstants.CatFrozen, UnitId = SeedConstants.UnitKg, CreatedAt = seedDate },
-            new Product { Id = SeedConstants.Product40, Name = "Beef Burger 500g", CategoryId = SeedConstants.CatFrozen, UnitId = SeedConstants.UnitKg, CreatedAt = seedDate },
-            new Product { Id = SeedConstants.Product41, Name = "Sausage Beef 500g", CategoryId = SeedConstants.CatFrozen, UnitId = SeedConstants.UnitKg, CreatedAt = seedDate },
-            // Dina
-            new Product { Id = SeedConstants.Product42, Name = "Dina Farms Milk 1L", CategoryId = SeedConstants.CatMilk, UnitId = SeedConstants.UnitL, CreatedAt = seedDate },
-            new Product { Id = SeedConstants.Product43, Name = "Dina Farms Yogurt 500g", CategoryId = SeedConstants.CatYogurt, UnitId = SeedConstants.UnitPiece, CreatedAt = seedDate },
-            new Product { Id = SeedConstants.Product44, Name = "Dina Farms Cream 200ml", CategoryId = SeedConstants.CatMilk, UnitId = SeedConstants.UnitBottle, CreatedAt = seedDate },
+	        modelBuilder.Entity<Product>().HasData(
+	            // Juhayna
+	            new Product { Id = SeedConstants.Product1, Name = "حليب جهينة كامل الدسم 1 لتر", CategoryId = SeedConstants.CatMilk, UnitId = SeedConstants.UnitL, CreatedAt = seedDate },
+	            new Product { Id = SeedConstants.Product2, Name = "حليب جهينة نصف الدسم 1 لتر", CategoryId = SeedConstants.CatMilk, UnitId = SeedConstants.UnitL, CreatedAt = seedDate },
+	            new Product { Id = SeedConstants.Product3, Name = "زبادي جهينة بلين 500 جم", CategoryId = SeedConstants.CatYogurt, UnitId = SeedConstants.UnitPiece, CreatedAt = seedDate },
+	            new Product { Id = SeedConstants.Product4, Name = "زبادي جهينة فراولة 150 جم", CategoryId = SeedConstants.CatYogurt, UnitId = SeedConstants.UnitPiece, CreatedAt = seedDate },
+	            new Product { Id = SeedConstants.Product5, Name = "عصير جهينة مشكل 1 لتر", CategoryId = SeedConstants.CatJuice, UnitId = SeedConstants.UnitL, CreatedAt = seedDate },
+	            new Product { Id = SeedConstants.Product6, Name = "لبن رايب جهينة 1 لتر", CategoryId = SeedConstants.CatMilk, UnitId = SeedConstants.UnitL, CreatedAt = seedDate },
+	            new Product { Id = SeedConstants.Product7, Name = "قشطة جهينة 200 مل", CategoryId = SeedConstants.CatMilk, UnitId = SeedConstants.UnitBottle, CreatedAt = seedDate },
+	            // Almarai
+	            new Product { Id = SeedConstants.Product8, Name = "حليب المراعي كامل الدسم 1 لتر", CategoryId = SeedConstants.CatMilk, UnitId = SeedConstants.UnitL, CreatedAt = seedDate },
+	            new Product { Id = SeedConstants.Product9, Name = "زبادي المراعي يوناني 200 جم", CategoryId = SeedConstants.CatYogurt, UnitId = SeedConstants.UnitPiece, CreatedAt = seedDate },
+	            new Product { Id = SeedConstants.Product10, Name = "زبدة المراعي 100 جم", CategoryId = SeedConstants.CatMilk, UnitId = SeedConstants.UnitPiece, CreatedAt = seedDate },
+	            new Product { Id = SeedConstants.Product11, Name = "جبن المراعي شيدر 250 جم", CategoryId = SeedConstants.CatCheese, UnitId = SeedConstants.UnitPiece, CreatedAt = seedDate },
+	            new Product { Id = SeedConstants.Product12, Name = "لبن المراعي 1 لتر", CategoryId = SeedConstants.CatMilk, UnitId = SeedConstants.UnitL, CreatedAt = seedDate },
+	            // Coca-Cola
+	            new Product { Id = SeedConstants.Product13, Name = "كوكاكولا 1 لتر", CategoryId = SeedConstants.CatWater, UnitId = SeedConstants.UnitBottle, CreatedAt = seedDate },
+	            new Product { Id = SeedConstants.Product14, Name = "فانتا برتقال 1 لتر", CategoryId = SeedConstants.CatWater, UnitId = SeedConstants.UnitBottle, CreatedAt = seedDate },
+	            new Product { Id = SeedConstants.Product15, Name = "سبرايت 1 لتر", CategoryId = SeedConstants.CatWater, UnitId = SeedConstants.UnitBottle, CreatedAt = seedDate },
+	            new Product { Id = SeedConstants.Product16, Name = "شويبس صودا 1 لتر", CategoryId = SeedConstants.CatWater, UnitId = SeedConstants.UnitBottle, CreatedAt = seedDate },
+	            new Product { Id = SeedConstants.Product17, Name = "كوكاكولا كان 330 مل", CategoryId = SeedConstants.CatWater, UnitId = SeedConstants.UnitBottle, CreatedAt = seedDate },
+	            // Pepsi
+	            new Product { Id = SeedConstants.Product18, Name = "بيبسي 1 لتر", CategoryId = SeedConstants.CatWater, UnitId = SeedConstants.UnitBottle, CreatedAt = seedDate },
+	            new Product { Id = SeedConstants.Product19, Name = "7UP 1 لتر", CategoryId = SeedConstants.CatWater, UnitId = SeedConstants.UnitBottle, CreatedAt = seedDate },
+	            new Product { Id = SeedConstants.Product20, Name = "ميريندا برتقال 1 لتر", CategoryId = SeedConstants.CatWater, UnitId = SeedConstants.UnitBottle, CreatedAt = seedDate },
+	            new Product { Id = SeedConstants.Product21, Name = "بيبسي كان 330 مل", CategoryId = SeedConstants.CatWater, UnitId = SeedConstants.UnitBottle, CreatedAt = seedDate },
+	            // Bisco Misr
+	            new Product { Id = SeedConstants.Product22, Name = "بسكو مصر شاي 200 جم", CategoryId = SeedConstants.CatBiscuit, UnitId = SeedConstants.UnitPacket, CreatedAt = seedDate },
+	            new Product { Id = SeedConstants.Product23, Name = "بسكو مصر بيتي بور 150 جم", CategoryId = SeedConstants.CatBiscuit, UnitId = SeedConstants.UnitPacket, CreatedAt = seedDate },
+	            new Product { Id = SeedConstants.Product24, Name = "بسكو مصر ويفر شوكولاتة 100 جم", CategoryId = SeedConstants.CatBiscuit, UnitId = SeedConstants.UnitPacket, CreatedAt = seedDate },
+	            new Product { Id = SeedConstants.Product25, Name = "بسكو مصر ماري 200 جم", CategoryId = SeedConstants.CatBiscuit, UnitId = SeedConstants.UnitPacket, CreatedAt = seedDate },
+	            // Domty
+	            new Product { Id = SeedConstants.Product26, Name = "دمتي جبن مثلثات 250 جم", CategoryId = SeedConstants.CatCheese, UnitId = SeedConstants.UnitPiece, CreatedAt = seedDate },
+	            new Product { Id = SeedConstants.Product27, Name = "دمتي جبن كريمي 200 جم", CategoryId = SeedConstants.CatCheese, UnitId = SeedConstants.UnitPiece, CreatedAt = seedDate },
+	            new Product { Id = SeedConstants.Product28, Name = "دمتي موزاريلا 250 جم", CategoryId = SeedConstants.CatCheese, UnitId = SeedConstants.UnitPiece, CreatedAt = seedDate },
+	            new Product { Id = SeedConstants.Product29, Name = "دمتي لبن بودرة 2 كجم", CategoryId = SeedConstants.CatMilk, UnitId = SeedConstants.UnitPiece, CreatedAt = seedDate },
+	            // Edita
+	            new Product { Id = SeedConstants.Product30, Name = "شيبسي هوهوز كريمة حامضة 50 جم", CategoryId = SeedConstants.CatChips, UnitId = SeedConstants.UnitPacket, CreatedAt = seedDate },
+	            new Product { Id = SeedConstants.Product31, Name = "شيبسي هوهوز كاتشب 50 جم", CategoryId = SeedConstants.CatChips, UnitId = SeedConstants.UnitPacket, CreatedAt = seedDate },
+	            new Product { Id = SeedConstants.Product32, Name = "مول روزيتا بسكويت 100 جم", CategoryId = SeedConstants.CatBiscuit, UnitId = SeedConstants.UnitPacket, CreatedAt = seedDate },
+	            new Product { Id = SeedConstants.Product33, Name = "فريسكا كيك 80 جم", CategoryId = SeedConstants.CatBiscuit, UnitId = SeedConstants.UnitPacket, CreatedAt = seedDate },
+	            // Selsela
+	            new Product { Id = SeedConstants.Product34, Name = "فرخة كاملة طازجة 1 كجم", CategoryId = SeedConstants.CatPoultry, UnitId = SeedConstants.UnitKg, CreatedAt = seedDate },
+	            new Product { Id = SeedConstants.Product35, Name = "صدر دجاج 1 كجم", CategoryId = SeedConstants.CatPoultry, UnitId = SeedConstants.UnitKg, CreatedAt = seedDate },
+	            new Product { Id = SeedConstants.Product36, Name = "أوراك دجاج 1 كجم", CategoryId = SeedConstants.CatPoultry, UnitId = SeedConstants.UnitKg, CreatedAt = seedDate },
+	            new Product { Id = SeedConstants.Product37, Name = "أجنحة دجاج 1 كجم", CategoryId = SeedConstants.CatPoultry, UnitId = SeedConstants.UnitKg, CreatedAt = seedDate },
+	            // Fath
+	            new Product { Id = SeedConstants.Product38, Name = "لحم بقري مجمد 1 كجم", CategoryId = SeedConstants.CatFrozen, UnitId = SeedConstants.UnitKg, CreatedAt = seedDate },
+	            new Product { Id = SeedConstants.Product39, Name = "لحم ضأن مجمد 1 كجم", CategoryId = SeedConstants.CatFrozen, UnitId = SeedConstants.UnitKg, CreatedAt = seedDate },
+	            new Product { Id = SeedConstants.Product40, Name = "برجر بقري 500 جم", CategoryId = SeedConstants.CatFrozen, UnitId = SeedConstants.UnitKg, CreatedAt = seedDate },
+	            new Product { Id = SeedConstants.Product41, Name = "سجق بقري 500 جم", CategoryId = SeedConstants.CatFrozen, UnitId = SeedConstants.UnitKg, CreatedAt = seedDate },
+	            // Dina
+	            new Product { Id = SeedConstants.Product42, Name = "حليب دينا فارم 1 لتر", CategoryId = SeedConstants.CatMilk, UnitId = SeedConstants.UnitL, CreatedAt = seedDate },
+	            new Product { Id = SeedConstants.Product43, Name = "زبادي دينا فارم 500 جم", CategoryId = SeedConstants.CatYogurt, UnitId = SeedConstants.UnitPiece, CreatedAt = seedDate },
+	            new Product { Id = SeedConstants.Product44, Name = "قشطة دينا فارم 200 مل", CategoryId = SeedConstants.CatMilk, UnitId = SeedConstants.UnitBottle, CreatedAt = seedDate },
             new Product { Id = SeedConstants.Product45, Name = "Dina Farms Laban 1L", CategoryId = SeedConstants.CatMilk, UnitId = SeedConstants.UnitL, CreatedAt = seedDate }
         );
 
@@ -601,7 +601,7 @@ public class ApplicationDbContext : DbContext
             {
                 Id = SeedConstants.Order4, CreatorId = SeedConstants.Buyer7, SupplierId = SeedConstants.Supplier6,
                 RegionId = SeedConstants.RegionAgamy, Title = "طلب جبن دومتي", Description = "أجبان متنوعة للمطعم",
-                OrderNumber = "ORD-20260617-A004", DeadlineAt = seedNow.AddDays(10), Status = "Draft",
+                OrderNumber = "ORD-20260617-A004", DeadlineAt = seedNow.AddDays(3), Status = "Draft",
                 CreatedAt = seedDate
             },
             new GroupOrder
@@ -615,7 +615,7 @@ public class ApplicationDbContext : DbContext
             {
                 Id = SeedConstants.Order6, CreatorId = SeedConstants.Buyer2, SupplierId = SeedConstants.Supplier5,
                 RegionId = SeedConstants.RegionSmouha, Title = "طلب بسكويت للسوبر ماركت", Description = "بسكويت شاي وماري",
-                OrderNumber = "ORD-20260617-A006", DeadlineAt = seedNow.AddDays(-5), Status = "Completed", ClosedAt = seedNow.AddDays(-4),
+                OrderNumber = "ORD-20260617-A006", DeadlineAt = seedNow.AddDays(3), Status = "Completed", ClosedAt = seedNow.AddDays(-4),
                 CreatedAt = seedDate
             },
             new GroupOrder
@@ -675,17 +675,17 @@ public class ApplicationDbContext : DbContext
 
         // ── Notifications ─────────────────────────────────────────────────
         modelBuilder.Entity<Notification>().HasData(
-            new Notification { Id = SeedConstants.Notification1, UserId = SeedConstants.UserBuyer1, Type = "order_update", TitleAr = "انضم مشارك جديد", TitleEn = "New participant joined", BodyAr = "انضم محمد حسن إلى طلب حليب جهينة", BodyEn = "Mohamed Hassan joined Juhayna Milk order", Channel = "in_app", IsRead = false, RelatedOrderId = SeedConstants.Order1, CreatedAt = seedDate },
-            new Notification { Id = SeedConstants.Notification2, UserId = SeedConstants.UserBuyer1, Type = "deadline_reminder", TitleAr = "موعد التسليم يقترب", TitleEn = "Deadline approaching", BodyAr = "موعد تسليم طلب حليب جهينة بعد 3 أيام", BodyEn = "Juhayna Milk deadline in 3 days", Channel = "in_app", IsRead = false, RelatedOrderId = SeedConstants.Order1, CreatedAt = seedDate },
-            new Notification { Id = SeedConstants.Notification3, UserId = SeedConstants.UserBuyer4, Type = "order_update", TitleAr = "تم تأكيد الطلب", TitleEn = "Order confirmed", BodyAr = "تم فتح طلب الكوكاكولا للمشاركة", BodyEn = "Coca-Cola order is now open", Channel = "in_app", IsRead = false, RelatedOrderId = SeedConstants.Order2, CreatedAt = seedDate },
-            new Notification { Id = SeedConstants.Notification4, UserId = SeedConstants.UserBuyer6, Type = "pending_approval", TitleAr = "في انتظار موافقة المورد", TitleEn = "Awaiting supplier approval", BodyAr = "طلب الدجاج في انتظار موافقة مورد السلسلة", BodyEn = "Chicken order awaiting El Selsela approval", Channel = "in_app", IsRead = false, RelatedOrderId = SeedConstants.Order3, CreatedAt = seedDate },
-            new Notification { Id = SeedConstants.Notification5, UserId = SeedConstants.UserAdmin, Type = "system", TitleAr = "تم تسجيل مورد جديد", TitleEn = "New supplier registered", BodyAr = "تم تسجيل مورد جديد في المنصة", BodyEn = "A new supplier has joined the platform", Channel = "in_app", IsRead = false, CreatedAt = seedDate }
+            new Notification { Id = SeedConstants.Notification1, UserId = SeedConstants.UserBuyer1, Type = "order_update", TitleAr = "انضم مشارك جديد", TitleEn = "New participant joined", Channel = "in_app", IsRead = false, RelatedOrderId = SeedConstants.Order1, CreatedAt = seedDate },
+            new Notification { Id = SeedConstants.Notification2, UserId = SeedConstants.UserBuyer1, Type = "deadline_reminder", TitleAr = "موعد التسليم يقترب", TitleEn = "Deadline approaching", Channel = "in_app", IsRead = false, RelatedOrderId = SeedConstants.Order1, CreatedAt = seedDate },
+            new Notification { Id = SeedConstants.Notification3, UserId = SeedConstants.UserBuyer4, Type = "order_update", TitleAr = "تم تأكيد الطلب", TitleEn = "Order confirmed", Channel = "in_app", IsRead = false, RelatedOrderId = SeedConstants.Order2, CreatedAt = seedDate },
+            new Notification { Id = SeedConstants.Notification4, UserId = SeedConstants.UserBuyer6, Type = "pending_approval", TitleAr = "في انتظار موافقة المورد", TitleEn = "Awaiting supplier approval", Channel = "in_app", IsRead = false, RelatedOrderId = SeedConstants.Order3, CreatedAt = seedDate },
+            new Notification { Id = SeedConstants.Notification5, UserId = SeedConstants.UserAdmin, Type = "system", TitleAr = "تم تسجيل مورد جديد", TitleEn = "New supplier registered", Channel = "in_app", IsRead = false, CreatedAt = seedDate }
         );
 
         // ── DeliveryPersonProfiles ────────────────────────────────────────
         modelBuilder.Entity<DeliveryPersonProfile>().HasData(
-            new DeliveryPersonProfile { Id = SeedConstants.DeliveryPersonProfile1, UserId = SeedConstants.UserDeliveryPerson1, VehicleType = "Car", LicenseInfo = "محمود - رخصة قيادة مهنية", BaseDeliveryFee = 25m, Rating = 4.5m, TotalDeliveries = 150, IsActive = true, CoverageRegionId = SeedConstants.RegionCairo, CreatedAt = seedDate },
-            new DeliveryPersonProfile { Id = SeedConstants.DeliveryPersonProfile2, UserId = SeedConstants.UserDeliveryPerson2, VehicleType = "Motorcycle", LicenseInfo = "خالد - رخصة قيادة دراجة", BaseDeliveryFee = 15m, Rating = 4.2m, TotalDeliveries = 87, IsActive = true, CoverageRegionId = SeedConstants.RegionAlexandria, CreatedAt = seedDate }
+            new DeliveryPersonProfile { Id = SeedConstants.DeliveryPersonProfile1, UserId = SeedConstants.UserDeliveryPerson1, VehicleType = "Car", LicenseInfo = "محمود - رخصة قيادة مهنية", BaseDeliveryFee = 25m, IsActive = true, CoverageRegionId = SeedConstants.RegionCairo, CreatedAt = seedDate },
+            new DeliveryPersonProfile { Id = SeedConstants.DeliveryPersonProfile2, UserId = SeedConstants.UserDeliveryPerson2, VehicleType = "Motorcycle", LicenseInfo = "خالد - رخصة قيادة دراجة", BaseDeliveryFee = 15m, IsActive = true, CoverageRegionId = SeedConstants.RegionAlexandria, CreatedAt = seedDate }
         );
     }
 

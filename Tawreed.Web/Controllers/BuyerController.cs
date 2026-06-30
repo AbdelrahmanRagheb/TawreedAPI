@@ -256,13 +256,13 @@ public class BuyerController : ControllerBase
         }
     }
 
-    [HttpPost("orders/{orderId:guid}/assign-supplier/{supplierId:guid}")]
-    public async Task<ActionResult> AssignSupplier(Guid orderId, Guid supplierId, CancellationToken cancellationToken)
+    [HttpPost("orders/{orderId:guid}/assign-supplier")]
+    public async Task<ActionResult> AssignSupplier(Guid orderId, AssignSupplierItemsRequest request, CancellationToken cancellationToken)
     {
         try
         {
             var userId = GetUserId();
-            var result = await _orderService.AssignSupplierAsync(orderId, supplierId, userId, cancellationToken);
+            var result = await _orderService.AssignSupplierItemsAsync(orderId, request, userId, cancellationToken);
             return Ok(result);
         }
         catch (KeyNotFoundException ex)
@@ -294,64 +294,11 @@ public class BuyerController : ControllerBase
         }
     }
 
-    [HttpPut("orders/{orderId:guid}/delivery-preference")]
-    public async Task<ActionResult> SetDeliveryPreference(Guid orderId, [FromBody] SetDeliveryPreferenceRequest request, CancellationToken cancellationToken)
-    {
-        try
-        {
-            var userId = GetUserId();
-            var result = await _orderService.SetDeliveryPreferenceAsync(orderId, request.Preference, request.PreferredDeliveryPersonId, userId, cancellationToken);
-            return Ok(result);
-        }
-        catch (KeyNotFoundException ex)
-        {
-            return NotFound(new { error = ex.Message });
-        }
-        catch (UnauthorizedAccessException ex)
-        {
-            return Unauthorized(new { error = ex.Message });
-        }
-        catch (InvalidOperationException ex)
-        {
-            return BadRequest(new { error = ex.Message });
-        }
-    }
-
     [HttpGet("orders/{orderId:guid}/available-delivery-persons")]
     public async Task<ActionResult> GetAvailableDeliveryPersons(Guid orderId, CancellationToken cancellationToken)
     {
-        try
-        {
-            var result = await _orderService.GetAvailableDeliveryPersonsAsync(orderId, cancellationToken);
-            return Ok(result);
-        }
-        catch (KeyNotFoundException ex)
-        {
-            return NotFound(new { error = ex.Message });
-        }
-    }
-
-    [HttpPost("orders/{orderId:guid}/approve-delivery")]
-    public async Task<ActionResult> ApproveDeliveryFee(Guid orderId, [FromBody] ApproveDeliveryFeeRequest request, CancellationToken cancellationToken)
-    {
-        try
-        {
-            var userId = GetUserId();
-            var result = await _orderService.ApproveDeliveryFeeAsync(orderId, request.IsApproved, request.Reason, userId, cancellationToken);
-            return Ok(result);
-        }
-        catch (KeyNotFoundException ex)
-        {
-            return NotFound(new { error = ex.Message });
-        }
-        catch (UnauthorizedAccessException ex)
-        {
-            return Unauthorized(new { error = ex.Message });
-        }
-        catch (InvalidOperationException ex)
-        {
-            return BadRequest(new { error = ex.Message });
-        }
+        var result = await _orderService.GetAvailableDeliveryPersonsAsync(orderId, cancellationToken);
+        return Ok(result);
     }
 
     private Guid GetUserId()

@@ -44,10 +44,9 @@ public class OrderDetailDto
     public bool DeadlinePassed { get; set; }
     public string Status { get; set; } = string.Empty;
     public decimal TotalOrderValue { get; set; }
-    public string SupplierName { get; set; } = string.Empty;
-    public Guid? SupplierId { get; set; }
+    public int? TotalProductCount { get; set; }
+    public int? AssignedProductCount { get; set; }
     public string? DeliveryPreference { get; set; }
-    public Guid? PreferredDeliveryPersonId { get; set; }
     public string? PreferredDeliveryPersonName { get; set; }
     public decimal? ProposedDeliveryFee { get; set; }
     public string? DeliveryApprovalStatus { get; set; }
@@ -68,7 +67,11 @@ public class OrderProductDto
     public int TargetQuantity { get; set; }
     public string Unit { get; set; } = string.Empty;
     public decimal? UnitPrice { get; set; }
+    public decimal? MarketPrice { get; set; }
     public Guid? SupplierProductId { get; set; }
+    public Guid? SupplierId { get; set; }
+    public string SupplierName { get; set; } = string.Empty;
+    public string ItemStatus { get; set; } = "Unassigned";
 }
 
 public class OrderParticipantDto
@@ -124,7 +127,7 @@ public class CreateOrderRequest
 {
     public string Title { get; set; } = string.Empty;
     public string? Description { get; set; }
-    public DateTimeOffset Deadline { get; set; }
+    public bool IsUrgent { get; set; }
     public required List<CreateOrderItem> Items { get; set; }
 }
 
@@ -138,8 +141,31 @@ public class EligibleSupplierDto
 {
     public Guid SupplierId { get; set; }
     public string SupplierName { get; set; } = string.Empty;
-    public decimal Rating { get; set; }
     public decimal TotalEstimatedCost { get; set; }
+    public int CoveredProductCount { get; set; }
+    public required List<EligibleProductDto> CoveredProducts { get; set; }
+}
+
+public class EligibleProductDto
+{
+    public Guid ProductId { get; set; }
+    public Guid GroupOrderItemId { get; set; }
+    public decimal UnitPrice { get; set; }
+    public int AvailableStock { get; set; }
+    public required List<EligiblePricingTierDto> PricingTiers { get; set; }
+}
+
+public class EligiblePricingTierDto
+{
+    public int MinQty { get; set; }
+    public int? MaxQty { get; set; }
+    public decimal UnitPrice { get; set; }
+}
+
+public class AssignSupplierItemsRequest
+{
+    public Guid SupplierId { get; set; }
+    public required List<Guid> ItemIds { get; set; }
 }
 
 public class BuyerDeliveryItemDto
@@ -174,10 +200,10 @@ public interface IBuyerOrderService
     Task<object> UpdateItemsAsync(Guid orderId, Guid participantId, Guid userId, UpdateItemsRequest request, CancellationToken cancellationToken = default);
     Task<object> UpdateOrderItemsAsync(Guid orderId, Guid userId, List<CreateOrderItem> items, CancellationToken cancellationToken = default);
     Task<IReadOnlyList<EligibleSupplierDto>> GetEligibleSuppliersAsync(Guid orderId, Guid userId, CancellationToken cancellationToken = default);
-    Task<object> AssignSupplierAsync(Guid orderId, Guid supplierId, Guid userId, CancellationToken cancellationToken = default);
+    Task<object> AssignSupplierItemsAsync(Guid orderId, AssignSupplierItemsRequest request, Guid userId, CancellationToken cancellationToken = default);
     Task<IReadOnlyList<BuyerDeliveryDto>> GetMyDeliveriesAsync(Guid userId, CancellationToken cancellationToken = default);
 
-    // Delivery person methods
+    // Delivery person methods (system-assigned, kept for backward compatibility)
     Task<object> SetDeliveryPreferenceAsync(Guid orderId, string preference, Guid? preferredDeliveryPersonId, Guid userId, CancellationToken cancellationToken = default);
     Task<object> ApproveDeliveryFeeAsync(Guid orderId, bool isApproved, string? reason, Guid userId, CancellationToken cancellationToken = default);
     Task<IReadOnlyList<DeliveryPersonProfileDto>> GetAvailableDeliveryPersonsAsync(Guid orderId, CancellationToken cancellationToken = default);

@@ -8,5 +8,6 @@ public record ProductDto(
     string CategoryName,
     Guid UnitId,
     string Unit,
+    decimal? MarketPrice,
     DateTime CreatedAt,
     DateTime? UpdatedAt);

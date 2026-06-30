@@ -80,6 +80,8 @@ namespace Tawreed.Application.Interfaces
         public string Email { get; set; } = string.Empty;
         public string Phone { get; set; } = string.Empty;
         public string Address { get; set; } = string.Empty;
+        public string AddressAr { get; set; } = string.Empty;
+        public string AddressEn { get; set; } = string.Empty;
         public string Status { get; set; } = "Joined";
         public string? VerificationCode { get; set; } = string.Empty;
         public List<DeliveryPersonDeliveryItemDto> Items { get; set; } = new List<DeliveryPersonDeliveryItemDto>();

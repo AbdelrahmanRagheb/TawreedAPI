@@ -10,7 +10,8 @@ public record RegisterBuyerRequest(
     string BusinessName,
     string BusinessType,
     Guid RegionId,
-    string? Address
+    string? TaxId,
+    string? CommercialRegistrationNo
 );
 
 public record RegisterSupplierRequest(
@@ -20,6 +21,7 @@ public record RegisterSupplierRequest(
     string Password,
     string CompanyName,
     string? TaxId,
+    string? CommercialRegistrationNo,
     Guid RegionId,
     List<Guid> CategoryIds
 );
@@ -47,7 +49,8 @@ public record UpdateProfileRequest(
     string? FullName,
     string? Phone,
     string? BusinessName,
-    string? Address,
     string? Avatar,
-    string? PreferredLang
+    string? PreferredLang,
+    string? TaxId,
+    string? CommercialRegistrationNo
 );

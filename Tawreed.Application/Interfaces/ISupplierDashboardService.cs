@@ -17,7 +17,6 @@ public class SupplierKpiDto
     public int ActiveOrders { get; set; }
     public int PendingDeliveries { get; set; }
     public int TotalProducts { get; set; }
-    public decimal RatingAvg { get; set; }
 }
 
 public class SupplierPendingOrderDto

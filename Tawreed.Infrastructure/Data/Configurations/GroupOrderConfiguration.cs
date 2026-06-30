@@ -14,11 +14,7 @@ public class GroupOrderConfiguration : IEntityTypeConfiguration<GroupOrder>
 
         builder.Property(o => o.Title).HasMaxLength(200).IsRequired();
         builder.Property(o => o.OrderNumber).HasMaxLength(50).IsRequired();
-        builder.Property(o => o.Notes).HasColumnType("nvarchar(max)");
-        builder.Property(o => o.Visibility).HasMaxLength(10);
         builder.Property(o => o.Status).HasMaxLength(20).IsRequired();
-        builder.Property(o => o.DeliveryPreference).HasMaxLength(20);
-        builder.Property(o => o.DeliveryApprovalStatus).HasMaxLength(20);
 
         builder.HasOne(o => o.Creator)
             .WithMany(b => b.CreatedGroupOrders)
@@ -35,11 +31,5 @@ public class GroupOrderConfiguration : IEntityTypeConfiguration<GroupOrder>
             .WithMany(r => r.GroupOrders)
             .HasForeignKey(o => o.RegionId)
             .OnDelete(DeleteBehavior.Restrict);
-
-        builder.HasOne(o => o.AssignedDeliveryPerson)
-            .WithMany()
-            .HasForeignKey(o => o.AssignedDeliveryPersonId)
-            .OnDelete(DeleteBehavior.SetNull)
-            .IsRequired(false);
     }
 }

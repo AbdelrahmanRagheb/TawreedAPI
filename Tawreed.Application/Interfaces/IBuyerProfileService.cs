@@ -8,12 +8,15 @@ public class BuyerProfileDto
     public string BusinessName { get; set; } = string.Empty;
     public string BusinessType { get; set; } = string.Empty;
     public string? TaxId { get; set; }
+    public string? CommercialRegistrationNo { get; set; }
     public string? Avatar { get; set; }
     public DateTimeOffset JoinedDate { get; set; }
-    public string? Address { get; set; }
     public string RegionName { get; set; } = string.Empty;
     public Guid RegionId { get; set; }
     public string PreferredLang { get; set; } = string.Empty;
+    public Guid? GroupRegionId { get; set; }
+    public string GroupRegionNameAr { get; set; } = string.Empty;
+    public string GroupRegionNameEn { get; set; } = string.Empty;
 }
 
 public record BuyerUpdateProfileRequest(
@@ -22,7 +25,7 @@ public record BuyerUpdateProfileRequest(
     string? BusinessName,
     string? BusinessType,
     string? TaxId,
-    string? Address,
+    string? CommercialRegistrationNo,
     Guid? RegionId,
     string? Avatar,
     string? PreferredLang

@@ -40,12 +40,11 @@ public class SupplierProfileService : ISupplierProfileService
             Phone = supplier.User?.Phone ?? "",
             CompanyName = supplier.CompanyName,
             TaxId = supplier.TaxId,
+            CommercialRegistrationNo = supplier.CommercialRegistrationNo,
             Avatar = supplier.User?.AvatarUrl,
             JoinedDate = supplier.CreatedAt,
-            Address = supplier.Address,
             RegionName = supplier.Region?.NameEn ?? "",
             RegionId = supplier.RegionId,
-            RatingAvg = supplier.RatingAvg,
             IsApproved = supplier.IsApproved,
             PreferredLang = supplier.User?.PreferredLang ?? "en",
             CategoryIds = detailed?.SupplierCategories?.Select(sc => sc.CategoryId).ToList() ?? []
@@ -67,7 +66,8 @@ public class SupplierProfileService : ISupplierProfileService
         if (request.Avatar != null) user.AvatarUrl = request.Avatar;
         if (request.PreferredLang != null) user.PreferredLang = request.PreferredLang;
         if (request.BusinessName != null) supplier.CompanyName = request.BusinessName;
-        if (request.Address != null) supplier.Address = request.Address;
+        if (request.TaxId != null) supplier.TaxId = request.TaxId;
+        if (request.CommercialRegistrationNo != null) supplier.CommercialRegistrationNo = request.CommercialRegistrationNo;
 
         await _unitOfWork.SaveChangesAsync(cancellationToken);
     }

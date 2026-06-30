@@ -10,6 +10,7 @@ public class SupplierOrderService : ISupplierOrderService
 {
     private readonly IGroupOrderRepository _groupOrderRepository;
     private readonly IGroupOrderEventRepository _eventRepository;
+    private readonly IGroupOrderItemRepository _groupOrderItemRepository;
     private readonly IDeliveryRepository _deliveryRepository;
     private readonly ISupplierRepository _supplierRepository;
     private readonly IRegionRepository _regionRepository;
@@ -22,6 +23,7 @@ public class SupplierOrderService : ISupplierOrderService
     public SupplierOrderService(
         IGroupOrderRepository groupOrderRepository,
         IGroupOrderEventRepository eventRepository,
+        IGroupOrderItemRepository groupOrderItemRepository,
         IDeliveryRepository deliveryRepository,
         ISupplierRepository supplierRepository,
         IRegionRepository regionRepository,
@@ -33,6 +35,7 @@ public class SupplierOrderService : ISupplierOrderService
     {
         _groupOrderRepository = groupOrderRepository;
         _eventRepository = eventRepository;
+        _groupOrderItemRepository = groupOrderItemRepository;
         _deliveryRepository = deliveryRepository;
         _supplierRepository = supplierRepository;
         _regionRepository = regionRepository;
@@ -50,18 +53,24 @@ public class SupplierOrderService : ISupplierOrderService
         if (!supplier.IsApproved)
             throw new InvalidOperationException("Account pending approval.");
 
-        var assignedOrders = await _groupOrderRepository.GetBySupplierAsync(supplier.Id, cancellationToken);
-        var assignedIds = assignedOrders.Select(o => o.Id).ToHashSet();
+        // Get orders where supplier has items assigned
+        var allOrders = await _groupOrderRepository.GetAllAsync(cancellationToken);
+        var ordersWithMyItems = allOrders
+            .Where(o => o.Items != null && o.Items.Any(i => i.SupplierId == supplier.Id))
+            .ToList();
 
+        // Also include orders in the supplier's region that have unassigned items
         var regionIds = await _regionRepository.GetAncestorIdsAsync(supplier.RegionId, cancellationToken);
         regionIds.Add(supplier.RegionId);
         var regionSet = regionIds.ToHashSet();
 
-        var allOrders = await _groupOrderRepository.GetAllAsync(cancellationToken);
-        var orders = allOrders.Where(o =>
-            assignedIds.Contains(o.Id) ||
-            regionSet.Contains(o.RegionId)
-        ).ToList();
+        var regionOrders = allOrders
+            .Where(o => regionSet.Contains(o.RegionId) && o.Items != null && o.Items.Any(i => i.ItemStatus == "Unassigned"))
+            .ToList();
+
+        var orders = ordersWithMyItems
+            .UnionBy(regionOrders, o => o.Id)
+            .ToList();
 
         if (!string.IsNullOrEmpty(status))
             orders = orders.Where(o => o.Status == status).ToList();
@@ -69,28 +78,35 @@ public class SupplierOrderService : ISupplierOrderService
         var total = orders.Count;
         var paged = orders.Skip((page - 1) * limit).Take(limit).ToList();
 
-        var items = paged.Select(o => new SupplierOrderListDto
+        var items = paged.Select(o =>
         {
-            Id = o.Id,
-            Title = o.Title,
-            CreatorName = o.Creator?.User?.FullName ?? "",
-            BuyerCompany = o.Creator?.BusinessName,
-            TotalAmount = o.Items?.Sum(i => (i.UnitPrice ?? 0) * i.TargetQty) ?? 0,
-            Status = o.Status,
-            Deadline = o.DeadlineAt,
-            Region = o.Region?.NameEn ?? "",
-            ReceivedAt = o.CreatedAt,
-            DeliveryPreference = o.DeliveryPreference,
-            PreferredDeliveryPersonId = o.PreferredDeliveryPersonId,
-            PreferredDeliveryPersonName = o.PreferredDeliveryPerson?.User?.FullName,
-            Items = o.Items?.Select(i => new SupplierOrderItemDto
+            // Only show items assigned to this supplier (or unassigned items in region)
+            var myItems = o.Items?
+                .Where(i => i.SupplierId == supplier.Id || (i.ItemStatus == "Unassigned" && regionSet.Contains(o.RegionId)))
+                .Select(i => new SupplierOrderItemDto
+                {
+                    GroupOrderItemId = i.Id,
+                    ProductId = i.ProductId,
+                    ProductName = i.Product?.Name ?? "",
+                    Quantity = i.SupplierId == supplier.Id ? i.TargetQty : 0,
+                    UnitPrice = i.UnitPrice ?? 0,
+                    LineTotal = (i.UnitPrice ?? 0) * (i.SupplierId == supplier.Id ? i.TargetQty : 0),
+                    ItemStatus = i.ItemStatus
+                }).ToList() ?? [];
+
+            return new SupplierOrderListDto
             {
-                ProductId = i.ProductId,
-                ProductName = i.Product?.Name ?? "",
-                Quantity = i.TargetQty,
-                UnitPrice = i.UnitPrice ?? 0,
-                LineTotal = (i.UnitPrice ?? 0) * i.TargetQty
-            }).ToList() ?? []
+                Id = o.Id,
+                Title = o.Title,
+                CreatorName = o.Creator?.User?.FullName ?? "",
+                BuyerCompany = o.Creator?.BusinessName,
+                TotalAmount = myItems.Sum(i => i.LineTotal),
+                Status = o.Status,
+                Deadline = o.DeadlineAt,
+                Region = o.Region?.NameEn ?? "",
+                ReceivedAt = o.CreatedAt,
+                Items = myItems
+            };
         }).ToList();
 
         return new PaginatedResult<SupplierOrderListDto>
@@ -108,35 +124,62 @@ public class SupplierOrderService : ISupplierOrderService
         var order = await _groupOrderRepository.GetWithDetailsAsync(orderId, cancellationToken)
             ?? throw new KeyNotFoundException("Order not found.");
 
-        if (order.Status != OrderStatus.PendingApproval)
-            throw new InvalidOperationException("Order is not pending approval.");
-
         var supplier = await _supplierRepository.GetByUserIdAsync(userId, cancellationToken)
             ?? throw new KeyNotFoundException("Supplier profile not found.");
 
-        if (order.SupplierId != supplier.Id)
-            throw new InvalidOperationException("This order is not assigned to you.");
+        if (order.Items == null || !order.Items.Any(i => i.SupplierId == supplier.Id))
+            throw new InvalidOperationException("This order has no items assigned to you.");
 
-        order.Status = OrderStatus.Locked;
-        _groupOrderRepository.Update(order);
+        // Accept all pending items assigned to this supplier
+        var myPendingItems = order.Items.Where(i => i.SupplierId == supplier.Id && i.ItemStatus == "Pending").ToList();
+        if (myPendingItems.Count == 0)
+            throw new InvalidOperationException("No pending items to accept.");
+
+        foreach (var item in myPendingItems)
+        {
+            item.ItemStatus = "Accepted";
+            _groupOrderItemRepository.Update(item);
+        }
+
+        var acceptedProductNames = myPendingItems.Select(i => i.Product?.Name ?? "Unknown").ToList();
+
+        // Check if all items in the order are now Accepted or Declined
+        var allItemsResolved = order.Items.All(i => i.ItemStatus == "Accepted" || i.ItemStatus == "Declined");
+        if (allItemsResolved)
+        {
+            order.Status = OrderStatus.Locked;
+            _groupOrderRepository.Update(order);
+        }
 
         _eventRepository.Add(new GroupOrderEvent
         {
             Id = Guid.NewGuid(),
             GroupOrderId = order.Id,
             EventType = "SupplierApproved",
-            NotesEn = string.IsNullOrEmpty(request.Notes) ? "The supplier has accepted the order" : request.Notes,
-            NotesAr = "وافق المورد على الطلب",
+            NotesEn = string.IsNullOrEmpty(request.Notes)
+                ? $"Supplier accepted items: {string.Join(", ", acceptedProductNames)}"
+                : request.Notes,
+            NotesAr = $"وافق المورد على العناصر: {string.Join("، ", acceptedProductNames)}",
             CreatedBy = userId
         });
 
-        // Create invoices and deliveries for each participant
+        // Create invoices for participants (only for this supplier's items)
         var shippingRegion = order.Region?.NameEn ?? "Main Address";
-        var joinedParticipants = order.Participants?.Where(p => p.Status == "Joined" && p.Items != null && p.Items.Any(i => i.Quantity > 0)).ToList() ?? [];
+        var joinedParticipants = order.Participants?
+            .Where(p => p.Status == "Joined" && p.Items != null && p.Items.Any(i => i.Quantity > 0))
+            .ToList() ?? [];
 
         foreach (var participant in joinedParticipants)
         {
-            decimal subtotal = participant.Items!.Sum(pi => pi.Quantity * (pi.GroupOrderItem?.UnitPrice ?? 0));
+            // Only include items from this supplier
+            var supplierItemIds = myPendingItems.Select(i => i.Id).ToHashSet();
+            var participantSupplierItems = participant.Items?
+                .Where(pi => supplierItemIds.Contains(pi.GroupOrderItemId))
+                .ToList() ?? [];
+
+            if (participantSupplierItems.Count == 0) continue;
+
+            decimal subtotal = participantSupplierItems.Sum(pi => pi.Quantity * (pi.GroupOrderItem?.UnitPrice ?? 0));
 
             var invoice = new Invoice
             {
@@ -156,43 +199,56 @@ public class SupplierOrderService : ISupplierOrderService
             _invoiceRepository.Add(invoice);
         }
 
-        // Create a single delivery for the entire order
-        var delivery = new Delivery
+        // Create delivery for this supplier's items
+        var existingDelivery = order.Deliveries?.FirstOrDefault(d => d.SupplierId == supplier.Id);
+        if (existingDelivery == null)
         {
-            Id = Guid.NewGuid(),
-            GroupOrderId = order.Id,
-            SupplierId = supplier.Id,
-            Status = "Pending",
-            ScheduledAt = request.ScheduledDeliveryAt,
-            TrackingNotes = request.DeliveryNotes,
-            ShippingRegion = shippingRegion
-        };
-        _deliveryRepository.Add(delivery);
+            var delivery = new Delivery
+            {
+                Id = Guid.NewGuid(),
+                GroupOrderId = order.Id,
+                SupplierId = supplier.Id,
+                Status = "Pending",
+                ScheduledAt = request.ScheduledDeliveryAt,
+                TrackingNotes = request.DeliveryNotes,
+                ShippingRegion = shippingRegion
+            };
+            _deliveryRepository.Add(delivery);
+        }
 
         await _unitOfWork.SaveChangesAsync(cancellationToken);
 
-        // Notify all participants (creator + joined buyers)
+        // Notify creator + participants
         var participantUserIds = GetAllParticipantUserIds(order);
         var supplierName = supplier.CompanyName;
 
-        foreach (var participantUserId in participantUserIds)
+        var enMsg = allItemsResolved
+            ? $"Supplier '{supplierName}' accepted the final items for order '{order.Title}'."
+            : $"Supplier '{supplierName}' accepted items: {string.Join(", ", acceptedProductNames)} for order '{order.Title}'.";
+
+        foreach (var pid in participantUserIds)
         {
             _notificationRepository.Add(new Notification
             {
                 Id = Guid.NewGuid(),
-                UserId = participantUserId,
+                UserId = pid,
                 Type = "SupplierAcceptedOrder",
-                TitleAr = "تم قبول طلبك الجماعي",
-                TitleEn = "Your Group Order Was Accepted",
-                BodyAr = $"قبل المورد '{supplierName}' طلبك الجماعي '{order.Title}'.",
-                BodyEn = $"Supplier '{supplierName}' has accepted the group order '{order.Title}'.",
+                TitleAr = allItemsResolved ? "تم قبول طلبك الجماعي" : "تم قبول بعض العناصر",
+                TitleEn = allItemsResolved ? "Your Group Order Was Accepted" : "Some Items Accepted",
+                BodyAr = $"قبل المورد '{supplierName}' العناصر: {string.Join("، ", acceptedProductNames)} في طلب '{order.Title}'.",
+                BodyEn = enMsg,
                 Channel = "InApp",
                 RelatedOrderId = orderId
             });
         }
         await _unitOfWork.SaveChangesAsync(cancellationToken);
 
-        return new { message = "Order accepted", orderStatus = OrderStatus.Locked };
+        return new
+        {
+            message = allItemsResolved ? "All items accepted. Order is locked." : "Supplier items accepted.",
+            orderStatus = allItemsResolved ? OrderStatus.Locked : order.Status,
+            acceptedItems = acceptedProductNames
+        };
     }
 
     public async Task<object> DeclineOrderAsync(Guid orderId, Guid userId, string reason, CancellationToken cancellationToken = default)
@@ -200,32 +256,42 @@ public class SupplierOrderService : ISupplierOrderService
         var order = await _groupOrderRepository.GetWithDetailsAsync(orderId, cancellationToken)
             ?? throw new KeyNotFoundException("Order not found.");
 
-        if (order.Status != OrderStatus.PendingApproval)
-            throw new InvalidOperationException("Order is not pending approval.");
-
         var supplier = await _supplierRepository.GetByUserIdAsync(userId, cancellationToken)
             ?? throw new KeyNotFoundException("Supplier profile not found.");
 
-        if (order.SupplierId != supplier.Id)
-            throw new InvalidOperationException("This order is not assigned to you.");
+        if (order.Items == null || !order.Items.Any(i => i.SupplierId == supplier.Id && i.ItemStatus == "Pending"))
+            throw new InvalidOperationException("No pending items to decline.");
 
-        order.Status = OrderStatus.Open;
-        order.SupplierId = null;
-        _groupOrderRepository.Update(order);
+        // Decline all pending items assigned to this supplier (reset to Unassigned)
+        var myPendingItems = order.Items.Where(i => i.SupplierId == supplier.Id && i.ItemStatus == "Pending").ToList();
+        foreach (var item in myPendingItems)
+        {
+            item.SupplierId = null;
+            item.SupplierProductId = null;
+            item.UnitPrice = null;
+            item.ItemStatus = "Unassigned";
+            _groupOrderItemRepository.Update(item);
+        }
+
+        var declinedProductNames = myPendingItems.Select(i => i.Product?.Name ?? "Unknown").ToList();
 
         _eventRepository.Add(new GroupOrderEvent
         {
             Id = Guid.NewGuid(),
             GroupOrderId = order.Id,
             EventType = "SupplierDeclined",
-            NotesEn = reason,
-            NotesAr = $"رفض المورد الطلب. السبب: {reason}",
+            NotesEn = string.IsNullOrEmpty(reason)
+                ? $"Supplier declined items: {string.Join(", ", declinedProductNames)}"
+                : $"{reason} - Items: {string.Join(", ", declinedProductNames)}",
+            NotesAr = string.IsNullOrEmpty(reason)
+                ? $"رفض المورد العناصر: {string.Join("، ", declinedProductNames)}"
+                : $"السبب: {reason} - العناصر: {string.Join("، ", declinedProductNames)}",
             CreatedBy = userId
         });
 
         await _unitOfWork.SaveChangesAsync(cancellationToken);
 
-        // Notify the creator that the supplier declined
+        // Notify the creator about declined items
         if (order.Creator?.UserId is Guid creatorUserId)
         {
             var supplierName = supplier.CompanyName;
@@ -234,17 +300,19 @@ public class SupplierOrderService : ISupplierOrderService
                 Id = Guid.NewGuid(),
                 UserId = creatorUserId,
                 Type = "SupplierDeclinedOrder",
-                TitleAr = "رفض المورد الطلب",
-                TitleEn = "Supplier Declined Order",
-                BodyAr = $"رفض المورد '{supplierName}' طلبك الجماعي '{order.Title}'. السبب: {reason}",
-                BodyEn = $"Supplier '{supplierName}' has declined the group order '{order.Title}'. Reason: {reason}",
+                TitleAr = "رفض المورد بعض العناصر",
+                TitleEn = "Supplier Declined Items",
+                BodyAr = $"رفض المورد '{supplierName}' العناصر: {string.Join("، ", declinedProductNames)} في طلب '{order.Title}'." +
+                         (string.IsNullOrEmpty(reason) ? "" : $" السبب: {reason}"),
+                BodyEn = $"Supplier '{supplierName}' declined items: {string.Join(", ", declinedProductNames)} in order '{order.Title}'." +
+                         (string.IsNullOrEmpty(reason) ? "" : $" Reason: {reason}"),
                 Channel = "InApp",
                 RelatedOrderId = orderId
             });
         }
         await _unitOfWork.SaveChangesAsync(cancellationToken);
 
-        return new { message = "Order declined. You can assign a different supplier.", orderStatus = OrderStatus.Open };
+        return new { message = "Items declined. They are now available for other suppliers.", declinedItems = declinedProductNames };
     }
 
     public async Task<PaginatedResult<DeliveryListDto>> GetDeliveriesAsync(Guid userId, string? status = null, int page = 1, int limit = 20, CancellationToken cancellationToken = default)
@@ -365,224 +433,7 @@ public class SupplierOrderService : ISupplierOrderService
         return ids.Distinct().ToList();
     }
 
-    // Browse available delivery persons for supplier to choose from
-    public async Task<IReadOnlyList<AvailableDeliveryPersonDto>> BrowseAvailableDeliveryPersonsAsync(Guid orderId, Guid userId, CancellationToken cancellationToken = default)
-    {
-        var order = await _groupOrderRepository.GetWithDetailsAsync(orderId, cancellationToken)
-            ?? throw new KeyNotFoundException("Order not found.");
-
-        var supplier = await _supplierRepository.GetByUserIdAsync(userId, cancellationToken)
-            ?? throw new KeyNotFoundException("Supplier profile not found.");
-
-        if (order.SupplierId != supplier.Id)
-            throw new InvalidOperationException("This order is not assigned to you.");
-
-        // If buyer selected a specific delivery person, only show that one
-        if (order.DeliveryPreference == "SpecificPerson" && order.PreferredDeliveryPersonId.HasValue)
-        {
-            var profile = await _deliveryPersonProfileRepository.GetByIdAsync(order.PreferredDeliveryPersonId.Value, cancellationToken);
-            if (profile == null) return [];
-            return [MapToDto(profile)];
-        }
-
-        var regionId = order.RegionId;
-        var profiles = await _deliveryPersonProfileRepository.GetForRegionAsync(regionId, cancellationToken);
-
-        return profiles.Select(MapToDto).ToList();
-    }
-
-    // Send a delivery request (not direct assignment)
-    public async Task<object> RequestDeliveryPersonAsync(Guid orderId, Guid deliveryPersonId, Guid userId, CancellationToken cancellationToken = default)
-    {
-        var order = await _groupOrderRepository.GetWithDetailsAsync(orderId, cancellationToken)
-            ?? throw new KeyNotFoundException("Order not found.");
-
-        var supplier = await _supplierRepository.GetByUserIdAsync(userId, cancellationToken)
-            ?? throw new KeyNotFoundException("Supplier profile not found.");
-
-        if (order.SupplierId != supplier.Id)
-            throw new InvalidOperationException("This order is not assigned to you.");
-
-        if (order.Status != OrderStatus.Locked)
-            throw new InvalidOperationException("Order must be locked to assign a delivery person.");
-
-        var deliveryPerson = await _deliveryPersonProfileRepository.GetByIdAsync(deliveryPersonId, cancellationToken)
-            ?? throw new KeyNotFoundException("Delivery person not found.");
-
-        if (!deliveryPerson.IsActive)
-            throw new InvalidOperationException("Delivery person is not active.");
-
-        if (order.DeliveryPreference == "OwnDelivery")
-            throw new InvalidOperationException("Buyer chose to use their own delivery.");
-
-        if (order.DeliveryPreference == "SpecificPerson" && order.PreferredDeliveryPersonId != deliveryPersonId)
-            throw new InvalidOperationException("Buyer specified a different delivery person.");
-
-        // Create the request
-        var request = new DeliveryAssignmentRequest
-        {
-            Id = Guid.NewGuid(),
-            OrderId = orderId,
-            DeliveryPersonId = deliveryPersonId,
-            SupplierId = supplier.Id,
-            Status = "Pending",
-            ProposedFee = deliveryPerson.BaseDeliveryFee
-        };
-        _deliveryAssignmentRequestRepository.Add(request);
-
-        // Notify the delivery person
-        _notificationRepository.Add(new Notification
-        {
-            Id = Guid.NewGuid(),
-            UserId = deliveryPerson.UserId,
-            Type = "DeliveryAssignmentRequest",
-            TitleAr = "طلب توصيل جديد",
-            TitleEn = "New Delivery Request",
-            BodyAr = $"لديك طلب توصيل جديد للطلب '{order.Title}' من المورد {order.Supplier?.CompanyName ?? ""}",
-            BodyEn = $"You have a new delivery request for order '{order.Title}' from supplier {order.Supplier?.CompanyName ?? ""}",
-            Channel = "InApp",
-            RelatedOrderId = orderId
-        });
-
-        await _unitOfWork.SaveChangesAsync(cancellationToken);
-
-        return new { message = "Delivery request sent to provider.", requestId = request.Id };
-    }
-
-    // Assign a delivery person to a locked order
-    public async Task<object> AssignDeliveryPersonAsync(Guid orderId, Guid deliveryPersonId, Guid userId, CancellationToken cancellationToken = default)
-    {
-        var order = await _groupOrderRepository.GetWithDetailsAsync(orderId, cancellationToken)
-            ?? throw new KeyNotFoundException("Order not found.");
-
-        var supplier = await _supplierRepository.GetByUserIdAsync(userId, cancellationToken)
-            ?? throw new KeyNotFoundException("Supplier profile not found.");
-
-        if (order.SupplierId != supplier.Id)
-            throw new InvalidOperationException("This order is not assigned to you.");
-
-        if (order.Status != OrderStatus.Locked)
-            throw new InvalidOperationException("Order must be locked to assign a delivery person.");
-
-        var deliveryPerson = await _deliveryPersonProfileRepository.GetByIdAsync(deliveryPersonId, cancellationToken)
-            ?? throw new KeyNotFoundException("Delivery person not found.");
-
-        if (!deliveryPerson.IsActive)
-            throw new InvalidOperationException("Delivery person is not active.");
-
-        // If buyer chose own delivery, only allow own
-        if (order.DeliveryPreference == "OwnDelivery")
-            throw new InvalidOperationException("Buyer chose to use their own delivery.");
-
-        // If buyer chose specific person, only allow that person
-        if (order.DeliveryPreference == "SpecificPerson" && order.PreferredDeliveryPersonId != deliveryPersonId)
-            throw new InvalidOperationException("Buyer specified a different delivery person.");
-
-        order.AssignedDeliveryPersonId = deliveryPersonId;
-        order.ProposedDeliveryFee = deliveryPerson.BaseDeliveryFee;
-        order.DeliveryApprovalStatus = "Pending";
-        _groupOrderRepository.Update(order);
-
-        // Update delivery record
-        var delivery = await _deliveryRepository.FindOneAsync(d => d.GroupOrderId == orderId, cancellationToken);
-        if (delivery != null)
-        {
-            delivery.DeliveryPersonId = deliveryPerson.UserId;
-            delivery.DeliveryType = "System";
-            delivery.DeliveryFee = deliveryPerson.BaseDeliveryFee;
-            _deliveryRepository.Update(delivery);
-        }
-
-        await _unitOfWork.SaveChangesAsync(cancellationToken);
-
-        return new { message = "Delivery person assigned. Waiting for buyer approval.", fee = deliveryPerson.BaseDeliveryFee };
-    }
-
-    // Propose a delivery fee and send to buyer for approval
-    public async Task<object> ProposeDeliveryFeeAsync(Guid orderId, decimal fee, string? notes, Guid userId, CancellationToken cancellationToken = default)
-    {
-        var order = await _groupOrderRepository.GetWithDetailsAsync(orderId, cancellationToken)
-            ?? throw new KeyNotFoundException("Order not found.");
-
-        var supplier = await _supplierRepository.GetByUserIdAsync(userId, cancellationToken)
-            ?? throw new KeyNotFoundException("Supplier profile not found.");
-
-        if (order.SupplierId != supplier.Id)
-            throw new InvalidOperationException("This order is not assigned to you.");
-
-        if (order.Status != OrderStatus.Locked)
-            throw new InvalidOperationException("Order must be locked to propose a delivery fee.");
-
-        if (order.AssignedDeliveryPersonId == null)
-            throw new InvalidOperationException("No delivery person assigned.");
-
-        order.ProposedDeliveryFee = fee;
-        order.DeliveryApprovalStatus = "Pending";
-        _groupOrderRepository.Update(order);
-
-        // Update delivery record fee
-        var delivery = await _deliveryRepository.FindOneAsync(d => d.GroupOrderId == orderId, cancellationToken);
-        if (delivery != null)
-        {
-            delivery.DeliveryFee = fee;
-            _deliveryRepository.Update(delivery);
-        }
-
-        // Notify creator for approval
-        if (order.Creator?.UserId is Guid creatorUserId)
-        {
-            _notificationRepository.Add(new Notification
-            {
-                Id = Guid.NewGuid(),
-                UserId = creatorUserId,
-                Type = "DeliveryFeeProposal",
-                TitleAr = "عرض جديد لرسوم التوصيل",
-                TitleEn = "New Delivery Fee Proposal",
-                BodyAr = $"قدم المورد عرض لرسوم التوصيل لطلبك '{order.Title ?? ""}'. يرجى المراجعة. Fee: {fee}",
-                BodyEn = $"The supplier proposed a delivery fee for '{order.Title ?? ""}'. Please review and approve. Fee: {fee}",
-                Channel = "InApp",
-                RelatedOrderId = orderId
-            });
-        }
-
-        await _unitOfWork.SaveChangesAsync(cancellationToken);
-        return new { message = "Delivery fee proposed. Waiting for buyer approval.", proposedFee = fee };
-    }
-
-    // Mark delivery as supplier's own delivery (free for participants)
-    public async Task<object> UseOwnDeliveryAsync(Guid orderId, Guid userId, CancellationToken cancellationToken = default)
-    {
-        var order = await _groupOrderRepository.GetWithDetailsAsync(orderId, cancellationToken)
-            ?? throw new KeyNotFoundException("Order not found.");
-
-        var supplier = await _supplierRepository.GetByUserIdAsync(userId, cancellationToken)
-            ?? throw new KeyNotFoundException("Supplier profile not found.");
-
-        if (order.SupplierId != supplier.Id)
-            throw new InvalidOperationException("This order is not assigned to you.");
-
-        if (order.DeliveryPreference == "SpecificPerson" || order.DeliveryPreference == "SystemDelivery")
-            throw new InvalidOperationException("Buyer chose to use a system delivery person.");
-
-        order.AssignedDeliveryPersonId = null;
-        order.ProposedDeliveryFee = 0;
-        order.DeliveryApprovalStatus = null;
-        _groupOrderRepository.Update(order);
-
-        var delivery = await _deliveryRepository.FindOneAsync(d => d.GroupOrderId == orderId, cancellationToken);
-        if (delivery != null)
-        {
-            delivery.DeliveryPersonId = null;
-            delivery.DeliveryType = "Own";
-            delivery.DeliveryFee = 0;
-            _deliveryRepository.Update(delivery);
-        }
-
-        await _unitOfWork.SaveChangesAsync(cancellationToken);
-        return new { message = "Delivery set to own delivery (free)." };
-    }
-
-    // Cancel order from supplier side (if buyer rejects delivery fee or for any other reason)
+    // Cancel/withdraw supplier's items from order
     public async Task<object> CancelOrderFromSupplierAsync(Guid orderId, Guid userId, CancellationToken cancellationToken = default)
     {
         var order = await _groupOrderRepository.GetWithDetailsAsync(orderId, cancellationToken)
@@ -591,24 +442,34 @@ public class SupplierOrderService : ISupplierOrderService
         var supplier = await _supplierRepository.GetByUserIdAsync(userId, cancellationToken)
             ?? throw new KeyNotFoundException("Supplier profile not found.");
 
-        if (order.SupplierId != supplier.Id)
-            throw new InvalidOperationException("This order is not assigned to you.");
+        if (order.Items == null || !order.Items.Any(i => i.SupplierId == supplier.Id))
+            throw new InvalidOperationException("This order has no items from you.");
 
-        order.Status = OrderStatus.Open;
-        order.SupplierId = null;
-        order.AssignedDeliveryPersonId = null;
-        order.ProposedDeliveryFee = null;
-        order.DeliveryApprovalStatus = null;
-        order.DeliveryPreference = "None";
-        _groupOrderRepository.Update(order);
+        // Reset all this supplier's items to Unassigned
+        var supplierItems = order.Items.Where(i => i.SupplierId == supplier.Id).ToList();
+        foreach (var item in supplierItems)
+        {
+            item.SupplierId = null;
+            item.SupplierProductId = null;
+            item.UnitPrice = null;
+            item.ItemStatus = "Unassigned";
+            _groupOrderItemRepository.Update(item);
+        }
+
+        // Remove delivery for this supplier
+        var delivery = order.Deliveries?.FirstOrDefault(d => d.SupplierId == supplier.Id);
+        if (delivery != null)
+        {
+            _deliveryRepository.Delete(delivery);
+        }
 
         _eventRepository.Add(new GroupOrderEvent
         {
             Id = Guid.NewGuid(),
             GroupOrderId = order.Id,
             EventType = "SupplierCancelled",
-            NotesEn = "Supplier cancelled the order",
-            NotesAr = "ألغى المورد الطلب",
+            NotesEn = $"Supplier withdrew from items: {string.Join(", ", supplierItems.Select(i => i.Product?.Name ?? "Unknown"))}",
+            NotesAr = "ألغى المورد مشاركته في بعض العناصر",
             CreatedBy = userId
         });
 
@@ -620,31 +481,17 @@ public class SupplierOrderService : ISupplierOrderService
                 Id = Guid.NewGuid(),
                 UserId = creatorUserId,
                 Type = "SupplierCancelledOrder",
-                TitleAr = "تم إلغاء الطلب",
-                TitleEn = "Order Cancelled",
-                BodyAr = $"قام المورد بإلغاء الطلب '{order.Title ?? ""}'.",
-                BodyEn = $"The supplier cancelled the order '{order.Title ?? ""}'.",
+                TitleAr = "تم إلغاء عناصر المورد",
+                TitleEn = "Supplier Items Cancelled",
+                BodyAr = $"قام المورد '{supplier.CompanyName}' بإلغاء العناصر المخصصة له في الطلب '{order.Title ?? ""}'.",
+                BodyEn = $"Supplier '{supplier.CompanyName}' cancelled their items in order '{order.Title ?? ""}'.",
                 Channel = "InApp",
                 RelatedOrderId = orderId
             });
         }
 
         await _unitOfWork.SaveChangesAsync(cancellationToken);
-        return new { message = "Order cancelled. It is now open again.", orderStatus = OrderStatus.Open };
+        return new { message = "Supplier items cancelled. They are now unassigned.", cancelledItems = supplierItems.Count };
     }
 
-    private static AvailableDeliveryPersonDto MapToDto(DeliveryPersonProfile profile)
-    {
-return new AvailableDeliveryPersonDto
-        {
-            Id = profile.Id,
-            FullName = profile.User?.FullName ?? "",
-            Rating = (double)profile.Rating,
-            TotalDeliveries = profile.TotalDeliveries,
-            BaseDeliveryFee = profile.BaseDeliveryFee,
-            VehicleType = profile.VehicleType,
-            CoverageRegionId = profile.CoverageRegionId,
-            CoverageRegionName = profile.CoverageRegion?.NameEn
-        };
-    }
 }

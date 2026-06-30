@@ -13,6 +13,7 @@ public class GroupOrderItemConfiguration : IEntityTypeConfiguration<GroupOrderIt
         builder.HasKey(i => i.Id);
 
         builder.Property(i => i.UnitPrice).HasColumnType("decimal(12,2)");
+        builder.Property(i => i.ItemStatus).HasMaxLength(20).HasDefaultValue("Unassigned");
 
         builder.HasOne(i => i.GroupOrder)
             .WithMany(o => o.Items)
@@ -27,6 +28,12 @@ public class GroupOrderItemConfiguration : IEntityTypeConfiguration<GroupOrderIt
         builder.HasOne(i => i.SupplierProduct)
             .WithMany(sp => sp.GroupOrderItems)
             .HasForeignKey(i => i.SupplierProductId)
+            .OnDelete(DeleteBehavior.Restrict)
+            .IsRequired(false);
+
+        builder.HasOne(i => i.Supplier)
+            .WithMany(s => s.GroupOrderItems)
+            .HasForeignKey(i => i.SupplierId)
             .OnDelete(DeleteBehavior.Restrict)
             .IsRequired(false);
     }
