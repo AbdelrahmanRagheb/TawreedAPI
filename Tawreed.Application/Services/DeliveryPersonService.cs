@@ -215,7 +215,7 @@ public class DeliveryPersonService : IDeliveryPersonService
                         UnitPrice = unitPrice,
                         TotalPrice = qty * unitPrice
                     };
-                }).ToList()
+                }).Where(i => i.Quantity > 0).ToList()
             });
         }
 
@@ -245,7 +245,7 @@ public class DeliveryPersonService : IDeliveryPersonService
                         TotalPrice = Math.Max(0, creatorQty) * unitPrice
                     };
                 })
-                .ToList();
+                .Where(i => i.Quantity > 0).ToList();
 
             var creatorRegionFullAddressEn = GetFullRegionAddress(creator.Region, regionLookup, false);
             var creatorRegionFullAddressAr = GetFullRegionAddress(creator.Region, regionLookup, true);
@@ -476,7 +476,7 @@ public class DeliveryPersonService : IDeliveryPersonService
         _notificationRepository.Add(new Notification
         {
             Id = Guid.NewGuid(),
-            UserId = order.Supplier?.UserId ?? Guid.Empty,
+            UserId = request.Supplier?.UserId ?? Guid.Empty,
             Type = "DeliveryRequestAccepted",
             TitleAr = "قبول طلب التوصيل",
             TitleEn = "Delivery Request Accepted",
@@ -529,7 +529,7 @@ public class DeliveryPersonService : IDeliveryPersonService
 
         // Notify supplier
         var order = await _groupOrderRepository.GetWithDetailsAsync(request.OrderId, cancellationToken);
-        if (order?.Supplier?.UserId is Guid supplierUserId)
+        if (request.Supplier?.UserId is Guid supplierUserId)
         {
             _notificationRepository.Add(new Notification
             {

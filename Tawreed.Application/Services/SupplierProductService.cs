@@ -90,7 +90,7 @@ public class SupplierProductService : ISupplierProductService
             sp.Product?.Name ?? "",
             sp.Product?.Description,
             sp.Product?.CategoryId ?? Guid.Empty,
-            sp.Product?.Category?.NameEn ?? "",
+            sp.Product?.Category?.NameAr ?? "",
             sp.Product?.UnitId ?? Guid.Empty,
             sp.Product?.Unit?.Symbol ?? "",
             cover?.ImageUrl,

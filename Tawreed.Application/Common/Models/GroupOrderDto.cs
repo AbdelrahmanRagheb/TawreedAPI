@@ -3,7 +3,6 @@ namespace Tawreed.Application.Common.Models;
 public record GroupOrderDto(
     Guid Id,
     Guid CreatorId,
-    Guid? SupplierId,
     Guid RegionId,
     string Title,
     string? Description,

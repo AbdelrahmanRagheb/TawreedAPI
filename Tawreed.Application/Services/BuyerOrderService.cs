@@ -102,7 +102,6 @@ public class BuyerOrderService : IBuyerOrderService
             ProductCount = o.Items?.Count ?? 0,
             Region = o.Region?.NameEn ?? "",
             CreatorName = o.Creator?.User?.FullName ?? "",
-            SupplierName = o.Supplier?.CompanyName ?? "",
             CreatorId = o.CreatorId,
             IsCreator = o.CreatorId == buyer.Id,
             IsParticipant = participatedIds.Contains(o.Id)
@@ -237,7 +236,7 @@ public class BuyerOrderService : IBuyerOrderService
             GroupOrderId = order.Id,
             EventType = "Created",
             NotesEn = $"{buyer.BusinessName ?? "A buyer"} created the order",
-            NotesAr = $"???? {buyer.BusinessName ?? "???????"} ?????",
+            NotesAr = $"أنشأ {buyer.BusinessName ?? "المتجر"} طلباً",
             CreatedBy = userId
         });
 
@@ -253,9 +252,9 @@ public class BuyerOrderService : IBuyerOrderService
                 Id = Guid.NewGuid(),
                 UserId = regionBuyer.UserId,
                 Type = "NewGroupOrder",
-                TitleAr = "??? ????? ???? ?? ??????",
+                TitleAr = "طلب جماعي جديد في منطقتك",
                 TitleEn = "New Group Order in Your Area",
-                BodyAr = $"?? ????? ??? ????? ???? '{order.Title}' ?? ??????. ???? ????!",
+                BodyAr = $"تم إنشاء طلب جماعي جديد '{order.Title}' في منطقتك. انضم الآن!",
                 BodyEn = $"A new group order '{order.Title}' has been created in your area. Join now!",
                 Channel = "InApp",
                 RelatedOrderId = order.Id
@@ -306,7 +305,7 @@ public class BuyerOrderService : IBuyerOrderService
             GroupOrderId = order.Id,
             EventType = "DraftCreated",
             NotesEn = $"{buyer.BusinessName ?? "A buyer"} saved a draft",
-            NotesAr = $"??? {buyer.BusinessName ?? "???????"} ?????",
+            NotesAr = $"حفظ {buyer.BusinessName ?? "المتجر"} مسودة",
             CreatedBy = userId
         });
 
@@ -367,7 +366,7 @@ public class BuyerOrderService : IBuyerOrderService
                 GroupOrderId = order.Id,
                 EventType = "BuyerJoined",
                 NotesEn = $"{buyer.User?.FullName ?? "A buyer"} joined the order",
-                NotesAr = $"???? {buyer.User?.FullName ?? "?????"} ??? ?????",
+                NotesAr = $"انضم {buyer.User?.FullName ?? "مشتري"} إلى الطلب",
                 CreatedBy = userId
             });
         }
@@ -384,7 +383,7 @@ public class BuyerOrderService : IBuyerOrderService
                 GroupOrderId = order.Id,
                 EventType = "BuyerJoined",
                 NotesEn = $"{buyer.User?.FullName ?? "A buyer"} rejoined the order",
-                NotesAr = $"???? {buyer.User?.FullName ?? "?????"} ?????? ??? ?????",
+                NotesAr = $"انضم {buyer.User?.FullName ?? "مشتري"} مجدداً إلى الطلب",
                 CreatedBy = userId
             });
         }
@@ -500,7 +499,7 @@ public class BuyerOrderService : IBuyerOrderService
                 if (oldQty == null)
                 {
                     enChanges.Add($"{productName} increased by ?{item.Quantity}");
-                    arChanges.Add(ToArabicNumerals($"????? {productName} ?????? {item.Quantity}"));
+                    arChanges.Add(ToArabicNumerals($"أضاف {productName} بكمية {item.Quantity}"));
                 }
                 else if (oldQty.Value != item.Quantity)
                 {
@@ -508,12 +507,12 @@ public class BuyerOrderService : IBuyerOrderService
                     if (diff > 0)
                     {
                         enChanges.Add($"{productName} increased by ?{diff}");
-                        arChanges.Add(ToArabicNumerals($"????? {productName} ?????? {diff}"));
+                        arChanges.Add(ToArabicNumerals($"زاد {productName} بكمية {diff}"));
                     }
                     else
                     {
                         enChanges.Add($"{productName} decreased by ?{-diff}");
-                        arChanges.Add(ToArabicNumerals($"??? {productName} ?????? {-diff}"));
+                        arChanges.Add(ToArabicNumerals($"خفض {productName} بكمية {-diff}"));
                     }
                 }
             }
@@ -524,7 +523,7 @@ public class BuyerOrderService : IBuyerOrderService
                 if (goi == null || requestedProductIds.Contains(goi.ProductId)) continue;
                 var productName = goi.Product?.Name ?? "Unknown";
                 enChanges.Add($"removed {productName}");
-                arChanges.Add($"????? {productName}");
+                arChanges.Add($"أزال {productName}");
             }
 
             if (enChanges.Count > 0)
@@ -535,7 +534,7 @@ public class BuyerOrderService : IBuyerOrderService
                     GroupOrderId = order.Id,
                     EventType = "ItemsUpdated",
                     NotesEn = $"{buyer.User?.FullName ?? "A buyer"} updated items: {string.Join(", ", enChanges)}",
-                    NotesAr = $"{buyer.User?.FullName ?? "?????"} ??? ?????? ???????: {string.Join("? ", arChanges)}",
+                    NotesAr = $"{buyer.User?.FullName ?? "مشتري"} قام بتحديث الطلب: {string.Join("، ", arChanges)}",
                     CreatedBy = userId
                 });
             }
@@ -555,9 +554,9 @@ public class BuyerOrderService : IBuyerOrderService
                 Id = Guid.NewGuid(),
                 UserId = creatorUserId.Value,
                 Type = "BuyerJoinedOrder",
-                TitleAr = "???? ????? ?????",
+                TitleAr = "انضم مشتري لطلبك",
                 TitleEn = "A Buyer Joined Your Order",
-                BodyAr = $"???? '{buyer.User?.FullName ?? "?????"}' ??? ???? ??????? '{order.Title}'.",
+                BodyAr = $"انضم '{buyer.User?.FullName ?? "مشتري"}' إلى طلبك الجماعي '{order.Title}'.",
                 BodyEn = $"'{buyer.User?.FullName ?? "A buyer"}' has joined your group order '{order.Title}'.",
                 Channel = "InApp",
                 RelatedOrderId = orderId
@@ -582,9 +581,9 @@ public class BuyerOrderService : IBuyerOrderService
                     Id = Guid.NewGuid(),
                     UserId = participantUserId,
                     Type = "OrderQuantityUpdated",
-                    TitleAr = "?? ????? ????? ????? ???????",
+                    TitleAr = "تم تحديث كميات الطلب الجماعي",
                     TitleEn = "Group Order Quantities Updated",
-                    BodyAr = $"?? ????? ??????? ?? ????? ??????? '{order.Title}'. ???? ?? ??????? ???????!",
+                    BodyAr = $"تم تحديث الكميات في الطلب الجماعي '{order.Title}'. تحقق من الأسعار الجديدة!",
                     BodyEn = $"Quantities in group order '{order.Title}' have been updated. Check for new pricing!",
                     Channel = "InApp",
                     RelatedOrderId = orderId
@@ -677,9 +676,9 @@ public class BuyerOrderService : IBuyerOrderService
                     Id = Guid.NewGuid(),
                     UserId = creatorUserId.Value,
                     Type = "BuyerLeftOrder",
-                    TitleAr = "???? ????? ???? ???????",
+                    TitleAr = "غادر مشتري طلبك الجماعي",
                     TitleEn = "A Buyer Left Your Order",
-                    BodyAr = $"???? '{buyer.User?.FullName ?? "?????"}' ???? ??????? '{order.Title}'.",
+                    BodyAr = $"غادر '{buyer.User?.FullName ?? "مشتري"}' طلبك الجماعي '{order.Title}'.",
                     BodyEn = $"'{buyer.User?.FullName ?? "A buyer"}' has left your group order '{order.Title}'.",
                     Channel = "InApp",
                     RelatedOrderId = orderId
@@ -770,10 +769,8 @@ public class BuyerOrderService : IBuyerOrderService
 
         if (order.Items == null || order.Items.Count == 0) return [];
 
-        var unassignedItems = order.Items.Where(i => i.ItemStatus == "Unassigned").ToList();
-        if (unassignedItems.Count == 0) return [];
-
-        var productIds = unassignedItems.Select(i => i.ProductId).ToList();
+        var orderItems = order.Items.ToList();
+        var productIds = orderItems.Select(i => i.ProductId).ToList();
         var supplierProducts = await _supplierProductRepository.GetForProductsWithTiersAsync(productIds, cancellationToken);
 
         var eligible = new List<EligibleSupplierDto>();
@@ -788,7 +785,7 @@ public class BuyerOrderService : IBuyerOrderService
             decimal totalCost = 0;
             var coveredProducts = new List<EligibleProductDto>();
 
-            foreach (var req in unassignedItems)
+            foreach (var req in orderItems)
             {
                 var sp = g.FirstOrDefault(x => x.ProductId == req.ProductId);
                 if (sp == null || sp.Stock < req.TargetQty) continue;
@@ -1042,7 +1039,7 @@ public class BuyerOrderService : IBuyerOrderService
     }
 
     private static GroupOrderDto MapToDto(GroupOrder o) =>
-        new(o.Id, o.CreatorId, o.SupplierId, o.RegionId, o.Title, o.Description,
+        new(o.Id, o.CreatorId, o.RegionId, o.Title, o.Description,
             o.OrderNumber, o.DeadlineAt, o.Status,
             o.ClosedAt, o.CreatedAt, o.UpdatedAt);
 

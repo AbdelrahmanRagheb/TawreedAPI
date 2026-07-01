@@ -17,6 +17,8 @@ public class BuyerProfileDto
     public Guid? GroupRegionId { get; set; }
     public string GroupRegionNameAr { get; set; } = string.Empty;
     public string GroupRegionNameEn { get; set; } = string.Empty;
+    public int DefaultDeadlineDays { get; set; } = 3;
+    public int UrgentDeadlineHours { get; set; } = 6;
 }
 
 public record BuyerUpdateProfileRequest(

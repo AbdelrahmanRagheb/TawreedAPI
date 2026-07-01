@@ -578,49 +578,49 @@ public class ApplicationDbContext : DbContext
         modelBuilder.Entity<GroupOrder>().HasData(
             new GroupOrder
             {
-                Id = SeedConstants.Order1, CreatorId = SeedConstants.Buyer1, SupplierId = SeedConstants.Supplier1,
+                Id = SeedConstants.Order1, CreatorId = SeedConstants.Buyer1,
                 RegionId = SeedConstants.RegionNasrCity, Title = "طلب حليب جهينة", Description = "حليب كامل الدسم للتوزيع على المطعم",
                 OrderNumber = "ORD-20260617-A001", DeadlineAt = seedNow.AddDays(3), Status = "Open",
                 CreatedAt = seedDate
             },
             new GroupOrder
             {
-                Id = SeedConstants.Order2, CreatorId = SeedConstants.Buyer4, SupplierId = SeedConstants.Supplier3,
+                Id = SeedConstants.Order2, CreatorId = SeedConstants.Buyer4,
                 RegionId = SeedConstants.RegionMaadi, Title = "طلب كوكاكولا للفندق", Description = "مشروبات غازية للفندق",
                 OrderNumber = "ORD-20260617-A002", DeadlineAt = seedNow.AddDays(5), Status = "Open",
                 CreatedAt = seedDate
             },
             new GroupOrder
             {
-                Id = SeedConstants.Order3, CreatorId = SeedConstants.Buyer6, SupplierId = SeedConstants.Supplier8,
+                Id = SeedConstants.Order3, CreatorId = SeedConstants.Buyer6, 
                 RegionId = SeedConstants.RegionNasrCity, Title = "طلب دجاج للنادي", Description = "دجاج كامل للمطعم الرياضي",
                 OrderNumber = "ORD-20260617-A003", DeadlineAt = seedNow.AddDays(7), Status = "Open",
                 CreatedAt = seedDate
             },
             new GroupOrder
             {
-                Id = SeedConstants.Order4, CreatorId = SeedConstants.Buyer7, SupplierId = SeedConstants.Supplier6,
+                Id = SeedConstants.Order4, CreatorId = SeedConstants.Buyer7,
                 RegionId = SeedConstants.RegionAgamy, Title = "طلب جبن دومتي", Description = "أجبان متنوعة للمطعم",
                 OrderNumber = "ORD-20260617-A004", DeadlineAt = seedNow.AddDays(3), Status = "Draft",
                 CreatedAt = seedDate
             },
             new GroupOrder
             {
-                Id = SeedConstants.Order5, CreatorId = SeedConstants.Buyer1, SupplierId = SeedConstants.Supplier7,
+                Id = SeedConstants.Order5, CreatorId = SeedConstants.Buyer1,
                 RegionId = SeedConstants.RegionNasrCity, Title = "طلب هوهوز و بسكويت", Description = "وجبات خفيفة للمطعم",
                 OrderNumber = "ORD-20260617-A005", DeadlineAt = seedNow.AddDays(-1), Status = "Closed", ClosedAt = seedNow.AddDays(-1),
                 CreatedAt = seedDate
             },
             new GroupOrder
             {
-                Id = SeedConstants.Order6, CreatorId = SeedConstants.Buyer2, SupplierId = SeedConstants.Supplier5,
+                Id = SeedConstants.Order6, CreatorId = SeedConstants.Buyer2,
                 RegionId = SeedConstants.RegionSmouha, Title = "طلب بسكويت للسوبر ماركت", Description = "بسكويت شاي وماري",
                 OrderNumber = "ORD-20260617-A006", DeadlineAt = seedNow.AddDays(3), Status = "Completed", ClosedAt = seedNow.AddDays(-4),
                 CreatedAt = seedDate
             },
             new GroupOrder
             {
-                Id = SeedConstants.Order7, CreatorId = SeedConstants.Buyer6, SupplierId = SeedConstants.Supplier2,
+                Id = SeedConstants.Order7, CreatorId = SeedConstants.Buyer6,
                 RegionId = SeedConstants.RegionMohandeseen, Title = "طلب ألبان المراعي", Description = "تم الإلغاء لعدم التوفر",
                 OrderNumber = "ORD-20260617-A007", DeadlineAt = seedNow.AddDays(-3), Status = "Cancelled", ClosedAt = seedNow.AddDays(-3),
                 CreatedAt = seedDate

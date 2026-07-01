@@ -1,4 +1,4 @@
-using Tawreed.Application.Common.Models;
+﻿using Tawreed.Application.Common.Models;
 using Tawreed.Application.Interfaces;
 using Tawreed.Domain.Entities;
 using Tawreed.Domain.Enums;
@@ -159,7 +159,7 @@ public class SupplierOrderService : ISupplierOrderService
             NotesEn = string.IsNullOrEmpty(request.Notes)
                 ? $"Supplier accepted items: {string.Join(", ", acceptedProductNames)}"
                 : request.Notes,
-            NotesAr = $"وافق المورد على العناصر: {string.Join("، ", acceptedProductNames)}",
+            NotesAr = $"ÙˆØ§ÙÙ‚ Ø§Ù„Ù…ÙˆØ±Ø¯ Ø¹Ù„Ù‰ Ø§Ù„Ø¹Ù†Ø§ØµØ±: {string.Join("ØŒ ", acceptedProductNames)}",
             CreatedBy = userId
         });
 
@@ -199,11 +199,47 @@ public class SupplierOrderService : ISupplierOrderService
             _invoiceRepository.Add(invoice);
         }
 
+        // Create invoice for the creator for any unclaimed portion of this supplier's items
+        var creatorShareItems = myPendingItems
+            .Select(i => new
+            {
+                Item = i,
+                ClaimedQty = order.Participants?
+                    .Where(p => p.Status == "Joined")
+                    .SelectMany(p => p.Items ?? Enumerable.Empty<ParticipantItem>())
+                    .Where(pi => pi.GroupOrderItemId == i.Id)
+                    .Sum(pi => pi.Quantity) ?? 0
+            })
+            .Where(x => x.ClaimedQty < x.Item.TargetQty)
+            .ToList();
+
+        if (creatorShareItems.Count > 0 && order.Creator?.UserId is Guid creatorUserId)
+        {
+            decimal creatorSubtotal = creatorShareItems
+                .Sum(x => (x.Item.UnitPrice ?? 0) * (x.Item.TargetQty - x.ClaimedQty));
+
+            _invoiceRepository.Add(new Invoice
+            {
+                Id = Guid.NewGuid(),
+                InvoiceNumber = $"INV-{DateTimeOffset.UtcNow:yyyyMMdd}-{Guid.NewGuid():N}"[..30],
+                GroupOrderId = order.Id,
+                BuyerId = order.CreatorId,
+                ParticipantId = null,
+                Subtotal = creatorSubtotal,
+                DeliveryFee = 0,
+                Total = creatorSubtotal,
+                PaymentMethod = "Cash",
+                PaymentStatus = "Unpaid",
+                ShippingRegion = shippingRegion,
+                VerificationCode = Random.Shared.Next(100000, 999999).ToString()
+            });
+        }
+
         // Create delivery for this supplier's items
         var existingDelivery = order.Deliveries?.FirstOrDefault(d => d.SupplierId == supplier.Id);
         if (existingDelivery == null)
         {
-            var delivery = new Delivery
+            existingDelivery = new Delivery
             {
                 Id = Guid.NewGuid(),
                 GroupOrderId = order.Id,
@@ -213,7 +249,36 @@ public class SupplierOrderService : ISupplierOrderService
                 TrackingNotes = request.DeliveryNotes,
                 ShippingRegion = shippingRegion
             };
-            _deliveryRepository.Add(delivery);
+            _deliveryRepository.Add(existingDelivery);
+        }
+
+        // Auto-assign the best available delivery person for this region
+        var regionId = order.Region?.Id ?? order.RegionId;
+        var deliveryProfiles = (await _deliveryPersonProfileRepository.FindAsync(
+            p => p.IsActive && p.CoverageRegionId == regionId, cancellationToken)).ToList();
+        if (deliveryProfiles.Count > 0)
+        {
+            var chosen = deliveryProfiles
+                .OrderBy(p => p.BaseDeliveryFee)
+                .ThenByDescending(p => p.Rating)
+                .First();
+            existingDelivery.DeliveryPersonId = chosen.UserId;
+            existingDelivery.DeliveryFee = chosen.BaseDeliveryFee;
+            existingDelivery.DeliveryType = "System";
+
+            // Notify the assigned delivery person
+            _notificationRepository.Add(new Notification
+                {
+                    Id = Guid.NewGuid(),
+                    UserId = chosen.UserId,
+                    Type = "DeliveryAssigned",
+                    TitleAr = "تم تعيين توصيل لك",
+                    TitleEn = "Delivery Assigned to You",
+                    BodyAr = $"تم تعيينك لتوصيل طلب '{order.Title}'. يرجى مراجعة تفاصيل التوصيل.",
+                    BodyEn = $"You have been assigned to deliver order '{order.Title}'. Please review delivery details.",
+                    Channel = "InApp",
+                    RelatedOrderId = order.Id
+                });
         }
 
         await _unitOfWork.SaveChangesAsync(cancellationToken);
@@ -284,8 +349,8 @@ public class SupplierOrderService : ISupplierOrderService
                 ? $"Supplier declined items: {string.Join(", ", declinedProductNames)}"
                 : $"{reason} - Items: {string.Join(", ", declinedProductNames)}",
             NotesAr = string.IsNullOrEmpty(reason)
-                ? $"رفض المورد العناصر: {string.Join("، ", declinedProductNames)}"
-                : $"السبب: {reason} - العناصر: {string.Join("، ", declinedProductNames)}",
+                ? $"Ø±ÙØ¶ Ø§Ù„Ù…ÙˆØ±Ø¯ Ø§Ù„Ø¹Ù†Ø§ØµØ±: {string.Join("ØŒ ", declinedProductNames)}"
+                : $"Ø§Ù„Ø³Ø¨Ø¨: {reason} - Ø§Ù„Ø¹Ù†Ø§ØµØ±: {string.Join("ØŒ ", declinedProductNames)}",
             CreatedBy = userId
         });
 
@@ -303,7 +368,7 @@ public class SupplierOrderService : ISupplierOrderService
                 TitleAr = "رفض المورد بعض العناصر",
                 TitleEn = "Supplier Declined Items",
                 BodyAr = $"رفض المورد '{supplierName}' العناصر: {string.Join("، ", declinedProductNames)} في طلب '{order.Title}'." +
-                         (string.IsNullOrEmpty(reason) ? "" : $" السبب: {reason}"),
+                         (string.IsNullOrEmpty(reason) ? "" : $" Ø§Ù„Ø³Ø¨Ø¨: {reason}"),
                 BodyEn = $"Supplier '{supplierName}' declined items: {string.Join(", ", declinedProductNames)} in order '{order.Title}'." +
                          (string.IsNullOrEmpty(reason) ? "" : $" Reason: {reason}"),
                 Channel = "InApp",
@@ -379,17 +444,17 @@ public class SupplierOrderService : ISupplierOrderService
             var participantUserIds = GetAllParticipantUserIds(order);
             var (titleAr, titleEn, bodyAr, bodyEn) = status switch
             {
-                "Scheduled" => ("تم جدولة التسليم", "Delivery Scheduled",
-                    $"تم جدولة تسليم طلبك بتاريخ {scheduledAt?.ToString("yyyy-MM-dd") ?? "قريبًا"}.",
+                "Scheduled" => ("ØªÙ… Ø¬Ø¯ÙˆÙ„Ø© Ø§Ù„ØªØ³Ù„ÙŠÙ…", "Delivery Scheduled",
+                    $"ØªÙ… Ø¬Ø¯ÙˆÙ„Ø© ØªØ³Ù„ÙŠÙ… Ø·Ù„Ø¨Ùƒ Ø¨ØªØ§Ø±ÙŠØ® {scheduledAt?.ToString("yyyy-MM-dd") ?? "Ù‚Ø±ÙŠØ¨Ù‹Ø§"}.",
                     $"Your delivery has been scheduled for {scheduledAt?.ToString("yyyy-MM-dd") ?? "soon"}."),
-                "OutForDelivery" => ("طلبك في الطريق إليك", "Out for Delivery",
-                    "طلبك في طريقه إليك الآن!",
+                "OutForDelivery" => ("Ø·Ù„Ø¨Ùƒ ÙÙŠ Ø§Ù„Ø·Ø±ÙŠÙ‚ Ø¥Ù„ÙŠÙƒ", "Out for Delivery",
+                    "Ø·Ù„Ø¨Ùƒ ÙÙŠ Ø·Ø±ÙŠÙ‚Ù‡ Ø¥Ù„ÙŠÙƒ Ø§Ù„Ø¢Ù†!",
                     "Your order is on its way!"),
-                "Delivered" => ("تم تسليم طلبك", "Order Delivered",
-                    "تم تسليم طلبك بنجاح. نأمل أن تكون راضيًا!",
+                "Delivered" => ("ØªÙ… ØªØ³Ù„ÙŠÙ… Ø·Ù„Ø¨Ùƒ", "Order Delivered",
+                    "ØªÙ… ØªØ³Ù„ÙŠÙ… Ø·Ù„Ø¨Ùƒ Ø¨Ù†Ø¬Ø§Ø­. Ù†Ø£Ù…Ù„ Ø£Ù† ØªÙƒÙˆÙ† Ø±Ø§Ø¶ÙŠÙ‹Ø§!",
                     "Your order has been delivered successfully. We hope you're satisfied!"),
-                _ => ("تحديث حالة التوصيل", "Delivery Status Updated",
-                    $"تم تحديث حالة توصيل طلبك إلى: {status}.",
+                _ => ("ØªØ­Ø¯ÙŠØ« Ø­Ø§Ù„Ø© Ø§Ù„ØªÙˆØµÙŠÙ„", "Delivery Status Updated",
+                    $"ØªÙ… ØªØ­Ø¯ÙŠØ« Ø­Ø§Ù„Ø© ØªÙˆØµÙŠÙ„ Ø·Ù„Ø¨Ùƒ Ø¥Ù„Ù‰: {status}.",
                     $"Your delivery status has been updated to: {status}.")
             };
 

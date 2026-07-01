@@ -54,8 +54,8 @@ public class SupplierDashboardService : ISupplierDashboardService
                 PendingDeliveries = supplierDeliveries.Count(d => d.Status is "Pending" or "Preparing"),
                 TotalProducts = products.Count(p => p.IsActive)
             },
-            PendingOrders = allOrders
-                .Where(o => o.Status == OrderStatus.PendingApproval)
+            PendingOrders = ordersWithMyItems
+                .Where(o => o.Items!.Any(i => i.SupplierId == supplier.Id && i.ItemStatus == "Pending"))
                 .Select(o => new SupplierPendingOrderDto
                 {
                     Id = o.Id,

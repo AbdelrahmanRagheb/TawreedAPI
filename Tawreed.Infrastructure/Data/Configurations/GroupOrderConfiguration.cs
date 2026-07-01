@@ -21,12 +21,6 @@ public class GroupOrderConfiguration : IEntityTypeConfiguration<GroupOrder>
             .HasForeignKey(o => o.CreatorId)
             .OnDelete(DeleteBehavior.Restrict);
 
-        builder.HasOne(o => o.Supplier)
-            .WithMany(s => s.GroupOrders)
-            .HasForeignKey(o => o.SupplierId)
-            .OnDelete(DeleteBehavior.Restrict)
-            .IsRequired(false);
-
         builder.HasOne(o => o.Region)
             .WithMany(r => r.GroupOrders)
             .HasForeignKey(o => o.RegionId)

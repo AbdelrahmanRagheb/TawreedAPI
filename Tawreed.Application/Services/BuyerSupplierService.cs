@@ -41,7 +41,7 @@ public class BuyerSupplierService : IBuyerSupplierService
         // Build unique category names from the supplier's active products
         var categories = supplierProducts
             .Where(sp => sp.Product?.Category != null)
-            .Select(sp => sp.Product!.Category!.NameEn)
+            .Select(sp => sp.Product!.Category!.NameAr)
             .Distinct()
             .OrderBy(c => c)
             .ToList();
@@ -74,7 +74,7 @@ public class BuyerSupplierService : IBuyerSupplierService
                     ProductId = sp.ProductId,
                     ProductName = sp.Product?.Name ?? "",
                     CategoryId = (sp.Product?.CategoryId ?? Guid.Empty).ToString(),
-                    CategoryName = sp.Product?.Category?.NameEn ?? "",
+                    CategoryName = sp.Product?.Category?.NameAr ?? "",
                     Unit = sp.Product?.Unit?.Symbol ?? "",
                     BasePrice = sp.Price,
                     AvailableStock = sp.Stock,

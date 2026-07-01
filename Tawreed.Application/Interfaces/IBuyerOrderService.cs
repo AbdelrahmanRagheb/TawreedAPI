@@ -15,7 +15,6 @@ public class OrderListDto
     public int ProductCount { get; set; }
     public string Region { get; set; } = string.Empty;
     public string CreatorName { get; set; } = string.Empty;
-    public string SupplierName { get; set; } = string.Empty;
     public Guid CreatorId { get; set; }
     public bool IsCreator { get; set; }
     public bool IsParticipant { get; set; }

@@ -111,7 +111,7 @@ public class GroupOrderService : IGroupOrderService
     }
 
     private static GroupOrderDto MapToDto(GroupOrder o) =>
-        new(o.Id, o.CreatorId, o.SupplierId, o.RegionId, o.Title, o.Description,
+        new(o.Id, o.CreatorId, o.RegionId, o.Title, o.Description,
             o.OrderNumber, o.DeadlineAt, o.Status,
             o.ClosedAt, o.CreatedAt, o.UpdatedAt);
 }

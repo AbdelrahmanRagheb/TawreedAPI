@@ -99,7 +99,7 @@ public class BuyerDashboardService : IBuyerDashboardService
                 Name = p.Product?.Name ?? "",
                 Price = p.Price,
                 ImageUrl = p.Images?.FirstOrDefault(i => i.IsCover)?.ImageUrl ?? p.Images?.FirstOrDefault()?.ImageUrl,
-                CategoryName = p.Product?.Category?.NameEn ?? "",
+                CategoryName = p.Product?.Category?.NameAr ?? "",
                 OrderCount = p.GroupOrderItems?.Count ?? 0
             })
             .OrderByDescending(p => p.OrderCount)

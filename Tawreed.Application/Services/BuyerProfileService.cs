@@ -74,6 +74,15 @@ public class BuyerProfileService : IBuyerProfileService
             dto.GroupRegionNameEn = buyer.Region?.NameEn ?? "";
         }
 
+        // Read deadline settings from app_settings
+        var defaultDeadline = await _appSettingRepository.GetByKeyAsync("DefaultDeadlineDays", cancellationToken);
+        if (defaultDeadline != null && int.TryParse(defaultDeadline.Value, out var days))
+            dto.DefaultDeadlineDays = days;
+
+        var urgentDeadline = await _appSettingRepository.GetByKeyAsync("UrgentDeadlineHours", cancellationToken);
+        if (urgentDeadline != null && int.TryParse(urgentDeadline.Value, out var hours))
+            dto.UrgentDeadlineHours = hours;
+
         return dto;
     }
 

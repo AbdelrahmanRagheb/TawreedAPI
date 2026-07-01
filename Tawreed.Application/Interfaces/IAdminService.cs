@@ -164,7 +164,6 @@ public class AdminOrderListDto
     public string Title { get; set; } = string.Empty;
     public string BuyerName { get; set; } = string.Empty;
     public string? BuyerCompany { get; set; }
-    public string SupplierName { get; set; } = string.Empty;
     public decimal TotalAmount { get; set; }
     public string Status { get; set; } = string.Empty;
     public string RegionEn { get; set; } = string.Empty;

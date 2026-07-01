@@ -444,7 +444,7 @@ PendingSupplierApplications = allSuppliers
             Items = paged.Select(o => new AdminOrderListDto
             {
                 Id = o.Id, Title = o.Title, BuyerName = o.Creator?.User?.FullName ?? "",
-                BuyerCompany = o.Creator?.BusinessName, SupplierName = o.Supplier?.CompanyName ?? "",
+                BuyerCompany = o.Creator?.BusinessName,
                 TotalAmount = o.Items?.Sum(i => (i.UnitPrice ?? 0) * i.TargetQty) ?? 0,
                 Status = o.Status,
                 RegionEn = o.Region?.NameEn ?? "",
@@ -474,12 +474,6 @@ PendingSupplierApplications = allSuppliers
                 email = order.Creator?.User?.Email ?? "",
                 phone = order.Creator?.User?.Phone ?? ""
             },
-            supplier = order.SupplierId.HasValue ? new
-            {
-                id = order.SupplierId.ToString(),
-                name = order.Supplier?.User?.FullName ?? "",
-                companyName = order.Supplier?.CompanyName ?? ""
-            } : null,
             regionEn = order.Region?.NameEn ?? "",
             regionAr = order.Region?.NameAr ?? "",
             createdAt = order.CreatedAt,
