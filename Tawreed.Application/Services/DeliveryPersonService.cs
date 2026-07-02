@@ -156,7 +156,7 @@ public class DeliveryPersonService : IDeliveryPersonService
             .Where(i => i.Participant == null || i.Participant.Status == "Joined")
             .ToList();
 
-        var groupOrderItems = delivery.GroupOrder?.Items?.ToList() ?? [];
+        var groupOrderItems = delivery.GroupOrder?.Items?.Where(i => i.SupplierId == delivery.SupplierId).ToList() ?? [];
         
         // Pre-load all regions to avoid concurrent DB calls
         var allRegions = await _regionRepository.GetAllAsync(cancellationToken);
@@ -166,6 +166,7 @@ public class DeliveryPersonService : IDeliveryPersonService
 
         foreach (var i in joinedInvoices)
         {
+            if (i.Participant == null) continue; // handled separately below
             var participantItems = i.Participant?.Items?.ToList() ?? [];
             var buyer = i.Buyer;
             var regionFullAddressEn = GetFullRegionAddress(buyer?.Region, regionLookup, false);
@@ -220,6 +221,7 @@ public class DeliveryPersonService : IDeliveryPersonService
         }
 
         // Include the order creator in the delivery list
+        var creatorInvoice = joinedInvoices.FirstOrDefault(i => i.ParticipantId == null);
         var creator = delivery.GroupOrder?.Creator;
         if (creator != null)
         {
@@ -270,7 +272,7 @@ public class DeliveryPersonService : IDeliveryPersonService
 
             participantDetails.Add(new DeliveryPersonDeliveryParticipantDetailDto
             {
-                InvoiceId = Guid.Empty,
+                InvoiceId = creatorInvoice?.Id ?? Guid.Empty,
                 ParticipantId = Guid.Empty,
                 ParticipantName = creator.User?.FullName ?? "",
                 Email = creator.User?.Email ?? "",
@@ -279,7 +281,7 @@ public class DeliveryPersonService : IDeliveryPersonService
                 AddressAr = creatorFullAddressAr,
                 AddressEn = creatorFullAddressEn,
                 Status = "Joined",
-                VerificationCode = "",
+                VerificationCode = creatorInvoice?.VerificationCode ?? "",
                 Items = creatorItems.Where(i => i.Quantity > 0).ToList()
             });
         }

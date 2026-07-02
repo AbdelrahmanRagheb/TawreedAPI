@@ -159,7 +159,7 @@ public class SupplierOrderService : ISupplierOrderService
             NotesEn = string.IsNullOrEmpty(request.Notes)
                 ? $"Supplier accepted items: {string.Join(", ", acceptedProductNames)}"
                 : request.Notes,
-            NotesAr = $"ÙˆØ§ÙÙ‚ Ø§Ù„Ù…ÙˆØ±Ø¯ Ø¹Ù„Ù‰ Ø§Ù„Ø¹Ù†Ø§ØµØ±: {string.Join("ØŒ ", acceptedProductNames)}",
+            NotesAr = $"وافق المورد على العناصر: {string.Join("، ", acceptedProductNames)}",
             CreatedBy = userId
         });
 
@@ -349,8 +349,8 @@ public class SupplierOrderService : ISupplierOrderService
                 ? $"Supplier declined items: {string.Join(", ", declinedProductNames)}"
                 : $"{reason} - Items: {string.Join(", ", declinedProductNames)}",
             NotesAr = string.IsNullOrEmpty(reason)
-                ? $"Ø±ÙØ¶ Ø§Ù„Ù…ÙˆØ±Ø¯ Ø§Ù„Ø¹Ù†Ø§ØµØ±: {string.Join("ØŒ ", declinedProductNames)}"
-                : $"Ø§Ù„Ø³Ø¨Ø¨: {reason} - Ø§Ù„Ø¹Ù†Ø§ØµØ±: {string.Join("ØŒ ", declinedProductNames)}",
+                ? $"رفض المورد العناصر: {string.Join("، ", declinedProductNames)}"
+                : $"السبب: {reason} - العناصر: {string.Join("، ", declinedProductNames)}",
             CreatedBy = userId
         });
 
